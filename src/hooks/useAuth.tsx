@@ -47,11 +47,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const data = await response.json();
     const { token: newToken, user: userData } = data;
 
+    if (!newToken) {
+      throw new Error('Token não recebido do servidor');
+    }
+
     setToken(newToken);
     setUser(userData);
 
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
+    
+    // Forçar atualização do estado antes de redirecionar
+    await new Promise(resolve => setTimeout(resolve, 50));
   };
 
   const logout = () => {

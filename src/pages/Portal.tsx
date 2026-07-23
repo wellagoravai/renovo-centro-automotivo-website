@@ -38,7 +38,9 @@ const Portal: React.FC = () => {
 
         try {
             await login(username, password);
-            navigate('/dashboard');
+            // Pequeno delay para garantir que o token foi salvo no localStorage
+            await new Promise(resolve => setTimeout(resolve, 100));
+            // O redirecionamento é feito pelo useEffect quando isAuthenticated mudar
         } catch (err) {
             setError('Usuário ou senha inválidos. Tente novamente.');
         } finally {
@@ -52,7 +54,8 @@ const Portal: React.FC = () => {
                 <div className="portal-header">
                     <h1>Área do Cliente</h1>
                     <p>Para acessar os recursos exclusivos do portal, faça login.</p>
-                    <button type="button" className="button portal-login-button" onClick={openModal}>
+                    <button type="button" className="portal-login-button" onClick={openModal}>
+                        <span className="portal-login-icon" aria-hidden="true">🔑</span>
                         Entrar no Portal
                     </button>
                 </div>

@@ -41,7 +41,43 @@
 }
 
 .portal-login-button {
-    margin-top: 20px;
+    margin-top: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #8f0000 100%);
+    color: #fff;
+    font-family: var(--font-family);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(204, 0, 0, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.portal-login-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.portal-login-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(204, 0, 0, 0.45);
+    background: linear-gradient(135deg, #e60000 0%, var(--accent-color) 100%);
+}
+
+.portal-login-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(204, 0, 0, 0.35);
+}
+
+.portal-login-button:focus-visible {
+    outline: 3px solid rgba(204, 0, 0, 0.4);
+    outline-offset: 3px;
 }
 
 .modal-overlay {

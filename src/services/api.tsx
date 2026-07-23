@@ -1,8 +1,9 @@
-const API_URL = 'http://localhost:5235/api';
+const API_URL = 'http://localhost:5001/api';
 
 export const api = {
   async get(url: string) {
     const token = localStorage.getItem('token');
+    console.log('GET request to:', `${API_URL}${url}`, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -11,6 +12,7 @@ export const api = {
     }
 
     const response = await fetch(`${API_URL}${url}`, { headers });
+    console.log('GET response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -21,6 +23,7 @@ export const api = {
 
   async post(url: string, data: any) {
     const token = localStorage.getItem('token');
+    console.log('POST request to:', `${API_URL}${url}`, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -34,6 +37,7 @@ export const api = {
       body: JSON.stringify(data),
     });
     
+    console.log('POST response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -45,6 +49,7 @@ export const api = {
 
   async put(url: string, data: any) {
     const token = localStorage.getItem('token');
+    console.log('PUT request to:', `${API_URL}${url}`, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -58,6 +63,7 @@ export const api = {
       body: JSON.stringify(data),
     });
     
+    console.log('PUT response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -69,6 +75,7 @@ export const api = {
 
   async patch(url: string, data: any) {
     const token = localStorage.getItem('token');
+    console.log('PATCH request to:', `${API_URL}${url}`, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -82,6 +89,7 @@ export const api = {
       body: JSON.stringify(data),
     });
     
+    console.log('PATCH response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -93,6 +101,7 @@ export const api = {
 
   async delete(url: string) {
     const token = localStorage.getItem('token');
+    console.log('DELETE request to:', `${API_URL}${url}`, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -105,6 +114,7 @@ export const api = {
       headers,
     });
     
+    console.log('DELETE response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
