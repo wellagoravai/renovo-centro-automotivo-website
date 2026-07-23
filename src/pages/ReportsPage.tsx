@@ -46,7 +46,37 @@ interface TopService {
   totalRevenue: number;
 }
 
-type ReportTab = 'overview' | 'completed' | 'top-services' | 'revenue';
+interface EmployeeStat {
+  employee: string;
+  completedOrders: number;
+  totalValue: number;
+}
+
+interface InventoryCategoryStat {
+  category: string;
+  itemCount: number;
+  totalQuantity: number;
+  totalValue: number;
+}
+
+interface LowStockItem {
+  id: string;
+  code: string;
+  description: string;
+  category: string;
+  quantity: number;
+  minimumQuantity: number;
+}
+
+interface PartsConsumptionItem {
+  code: string;
+  description: string;
+  category: string;
+  quantityUsed: number;
+  totalValue: number;
+}
+
+type ReportTab = 'overview' | 'completed' | 'top-services' | 'revenue' | 'employees' | 'inventory' | 'annual' | 'parts-consumption';
 
 const ReportsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ReportTab>('overview');
@@ -90,6 +120,36 @@ const ReportsPage: React.FC = () => {
   const [reportType, setReportType] = useState<'day' | 'week' | 'month'>('day');
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Funcionários
+  const [employeesData, setEmployeesData] = useState<{ period: string; employees: EmployeeStat[] } | null>(null);
+  const [employeesPeriod, setEmployeesPeriod] = useState<'week' | 'month'>('month');
+
+  // Estoque
+  const [inventoryReportData, setInventoryReportData] = useState<{
+    totalItems: number;
+    totalValue: number;
+    byCategory: InventoryCategoryStat[];
+    lowStock: LowStockItem[];
+  } | null>(null);
+
+  // Anual
+  const [annualYear, setAnnualYear] = useState(new Date().getFullYear());
+  const [annualData, setAnnualData] = useState<{
+    year: number;
+    totalOrders: number;
+    monthly: { month: number; orderCount: number; totalValue: number }[];
+    topServices: TopService[];
+  } | null>(null);
+
+  // Consumo de Peças
+  const [partsStartDate, setPartsStartDate] = useState(
+    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  );
+  const [partsEndDate, setPartsEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [partsConsumptionData, setPartsConsumptionData] = useState<{ consumption: PartsConsumptionItem[] } | null>(null);
+
+  const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
   useEffect(() => {
     loadOverview();
@@ -162,6 +222,66 @@ const ReportsPage: React.FC = () => {
     }
   };
 
+  const loadEmployees = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/reports/top-employees?period=${employeesPeriod}`);
+      if (response.ok) {
+        setEmployeesData(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao carregar relatório de funcionários:', error);
+      alert('❌ Erro ao carregar relatório');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInventoryReport = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/reports/inventory');
+      if (response.ok) {
+        setInventoryReportData(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao carregar relatório de estoque:', error);
+      alert('❌ Erro ao carregar relatório');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadAnnualReport = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/reports/annual-services?year=${annualYear}`);
+      if (response.ok) {
+        setAnnualData(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao carregar relatório anual:', error);
+      alert('❌ Erro ao carregar relatório');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPartsConsumption = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/reports/parts-consumption?startDate=${partsStartDate}&endDate=${partsEndDate}`);
+      if (response.ok) {
+        setPartsConsumptionData(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao carregar consumo de peças:', error);
+      alert('❌ Erro ao carregar relatório');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const generateReport = async () => {
     setLoading(true);
     try {
@@ -179,7 +299,7 @@ const ReportsPage: React.FC = () => {
         endDate.setDate(0);
       }
 
-      const url = `/Reports/service-orders?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+      const url = `/reports/service-orders?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
       const response = await api.get(url);
 
       if (response.ok) {
@@ -274,6 +394,42 @@ const ReportsPage: React.FC = () => {
             }}
           >
             💰 Faturamento
+          </button>
+          <button
+            className={`tab ${activeTab === 'employees' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('employees');
+              loadEmployees();
+            }}
+          >
+            👷 Funcionários
+          </button>
+          <button
+            className={`tab ${activeTab === 'inventory' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('inventory');
+              loadInventoryReport();
+            }}
+          >
+            📦 Estoque
+          </button>
+          <button
+            className={`tab ${activeTab === 'annual' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('annual');
+              loadAnnualReport();
+            }}
+          >
+            📅 Anual
+          </button>
+          <button
+            className={`tab ${activeTab === 'parts-consumption' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('parts-consumption');
+              loadPartsConsumption();
+            }}
+          >
+            🛢️ Consumo de Peças
           </button>
         </div>
       </div>
@@ -643,6 +799,264 @@ const ReportsPage: React.FC = () => {
                 >
                   🖨️ Imprimir Relatório
                 </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Funcionários */}
+      {activeTab === 'employees' && !loading && (
+        <div className="report-section">
+          <h2>Funcionário que Mais Realizou Serviços</h2>
+
+          <div className="report-filters">
+            <div className="filter-group">
+              <label>Período:</label>
+              <div className="button-group">
+                <button
+                  className={`btn ${employeesPeriod === 'week' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { setEmployeesPeriod('week'); loadEmployees(); }}
+                >
+                  📆 Semana
+                </button>
+                <button
+                  className={`btn ${employeesPeriod === 'month' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { setEmployeesPeriod('month'); loadEmployees(); }}
+                >
+                  📊 Mês
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {employeesData && (
+            <>
+              <div className="report-table-container">
+                <table className="data-table">
+                  <thead>
+                    <tr><th>#</th><th>Funcionário</th><th>OS Concluídas</th><th>Valor Total</th></tr>
+                  </thead>
+                  <tbody>
+                    {employeesData.employees.map((emp, index) => (
+                      <tr key={emp.employee}>
+                        <td><strong>#{index + 1}</strong></td>
+                        <td>{emp.employee}</td>
+                        <td><span className="badge badge-primary">{emp.completedOrders}</span></td>
+                        <td><strong>{formatCurrency(emp.totalValue)}</strong></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {employeesData.employees.length === 0 && (
+                  <div className="empty-state"><p>Nenhuma OS concluída no período</p></div>
+                )}
+              </div>
+              <div className="report-actions">
+                <button className="btn btn-primary" onClick={() => window.print()}>🖨️ Imprimir Relatório</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Estoque */}
+      {activeTab === 'inventory' && !loading && (
+        <div className="report-section">
+          <h2>Relatório de Estoque</h2>
+
+          {inventoryReportData && (
+            <>
+              <div className="report-summary">
+                <div className="summary-card">
+                  <h3>Itens Cadastrados</h3>
+                  <p className="summary-value">{inventoryReportData.totalItems}</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Valor Total em Estoque</h3>
+                  <p className="summary-value">{formatCurrency(inventoryReportData.totalValue)}</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Itens Abaixo do Mínimo</h3>
+                  <p className="summary-value">{inventoryReportData.lowStock.length}</p>
+                </div>
+              </div>
+
+              <div className="report-grid">
+                <div className="report-card">
+                  <h3>Por Categoria</h3>
+                  <div className="report-table-container">
+                    <table className="data-table">
+                      <thead>
+                        <tr><th>Categoria</th><th>Itens</th><th>Qtd</th><th>Valor</th></tr>
+                      </thead>
+                      <tbody>
+                        {inventoryReportData.byCategory.map(cat => (
+                          <tr key={cat.category}>
+                            <td>{cat.category}</td>
+                            <td>{cat.itemCount}</td>
+                            <td>{cat.totalQuantity}</td>
+                            <td>{formatCurrency(cat.totalValue)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="report-card">
+                  <h3>Abaixo do Estoque Mínimo</h3>
+                  <div className="report-table-container">
+                    <table className="data-table">
+                      <thead>
+                        <tr><th>Código</th><th>Descrição</th><th>Qtd</th><th>Mínimo</th></tr>
+                      </thead>
+                      <tbody>
+                        {inventoryReportData.lowStock.map(item => (
+                          <tr key={item.id} className="low-stock">
+                            <td>{item.code}</td>
+                            <td>{item.description}</td>
+                            <td>{item.quantity}</td>
+                            <td>{item.minimumQuantity}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {inventoryReportData.lowStock.length === 0 && (
+                      <div className="empty-state"><p>Nenhum item abaixo do mínimo</p></div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="report-actions">
+                <button className="btn btn-primary" onClick={() => window.print()}>🖨️ Imprimir Relatório</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Anual */}
+      {activeTab === 'annual' && !loading && (
+        <div className="report-section">
+          <h2>Serviços Mais Realizados no Ano</h2>
+
+          <div className="report-filters">
+            <div className="filter-group">
+              <label>Ano:</label>
+              <input
+                type="number"
+                className="form-control"
+                value={annualYear}
+                onChange={(e) => setAnnualYear(parseInt(e.target.value) || new Date().getFullYear())}
+              />
+            </div>
+            <button className="btn btn-primary" onClick={loadAnnualReport}>🔍 Filtrar</button>
+          </div>
+
+          {annualData && (
+            <>
+              <div className="report-summary">
+                <div className="summary-card">
+                  <h3>Ano</h3>
+                  <p className="summary-value">{annualData.year}</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Total de Ordens</h3>
+                  <p className="summary-value">{annualData.totalOrders}</p>
+                </div>
+              </div>
+
+              <div className="report-card">
+                <h3>Ordens por Mês</h3>
+                <div className="revenue-chart">
+                  {annualData.monthly.map(m => (
+                    <div key={m.month} className="revenue-day">
+                      <div className="revenue-bar-container">
+                        <div
+                          className="revenue-bar"
+                          style={{ height: `${(m.orderCount / Math.max(...annualData.monthly.map(x => x.orderCount), 1)) * 100}%` }}
+                        ></div>
+                      </div>
+                      <div className="revenue-info">
+                        <span className="revenue-date">{monthNames[m.month - 1]}</span>
+                        <span className="revenue-amount">{formatCurrency(m.totalValue)}</span>
+                        <span className="revenue-count">{m.orderCount} OS</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="report-table-container">
+                <h3>Top 10 Serviços do Ano</h3>
+                <table className="data-table">
+                  <thead>
+                    <tr><th>#</th><th>Serviço</th><th>Quantidade</th></tr>
+                  </thead>
+                  <tbody>
+                    {annualData.topServices.map((service, index) => (
+                      <tr key={index}>
+                        <td><strong>#{index + 1}</strong></td>
+                        <td>{service.serviceName}</td>
+                        <td><span className="badge badge-primary">{service.count}x</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="report-actions">
+                <button className="btn btn-primary" onClick={() => window.print()}>🖨️ Imprimir Relatório</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Consumo de Peças */}
+      {activeTab === 'parts-consumption' && !loading && (
+        <div className="report-section">
+          <h2>Consumo de Peças e Insumos</h2>
+
+          <div className="report-filters">
+            <div className="filter-group">
+              <label>Data Inicial:</label>
+              <input type="date" className="form-control" value={partsStartDate} onChange={(e) => setPartsStartDate(e.target.value)} />
+            </div>
+            <div className="filter-group">
+              <label>Data Final:</label>
+              <input type="date" className="form-control" value={partsEndDate} onChange={(e) => setPartsEndDate(e.target.value)} />
+            </div>
+            <button className="btn btn-primary" onClick={loadPartsConsumption}>🔍 Filtrar</button>
+          </div>
+
+          {partsConsumptionData && (
+            <>
+              <div className="report-table-container">
+                <table className="data-table">
+                  <thead>
+                    <tr><th>Código</th><th>Descrição</th><th>Categoria</th><th>Qtd Usada</th><th>Valor Total</th></tr>
+                  </thead>
+                  <tbody>
+                    {partsConsumptionData.consumption.map(item => (
+                      <tr key={item.code}>
+                        <td>{item.code}</td>
+                        <td>{item.description}</td>
+                        <td>{item.category}</td>
+                        <td><span className="badge badge-primary">{item.quantityUsed}</span></td>
+                        <td><strong>{formatCurrency(item.totalValue)}</strong></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {partsConsumptionData.consumption.length === 0 && (
+                  <div className="empty-state"><p>Nenhuma peça lançada em ordens de serviço no período</p></div>
+                )}
+              </div>
+              <div className="report-actions">
+                <button className="btn btn-primary" onClick={() => window.print()}>🖨️ Imprimir Relatório</button>
               </div>
             </>
           )}

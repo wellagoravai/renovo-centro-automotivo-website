@@ -11,7 +11,7 @@ export const AuthDebug: React.FC = () => {
   }, [token]);
 
   // Only show in development mode
-  const isDevelopment = true; // Change to false to hide debug panel
+  const isDevelopment = false; // Change to true to show debug panel
   
   if (!isDevelopment) {
     return null;

@@ -157,6 +157,29 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
+.kanban-card-tv.dragging {
+  opacity: 0.4;
+}
+
+.kanban-column-tv.drag-over {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.kanban-column-cancelled {
+  flex: 0 0 260px;
+  opacity: 0.85;
+}
+
+.kanban-column-cancelled.collapsed {
+  padding-bottom: 20px;
+}
+
+.column-header-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
 .card-header-tv {
   display: flex;
   justify-content: space-between;
@@ -453,6 +476,28 @@ textarea.form-control-tv {
 
   .vehicle-info-tv {
     font-size: 26px;
+  }
+}
+
+/* Monitores menores (notebook 1366x768, 1440x900...): em vez de forçar
+   scroll horizontal gigante nas 6-7 colunas, deixa quebrar em várias
+   linhas pra dar pra ver o fluxo inteiro sem rolar a tela inteira. */
+@media (max-width: 1600px) {
+  .kanban-board-tv {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    min-height: auto;
+  }
+
+  .kanban-column-tv {
+    flex: 1 1 240px;
+    max-width: 280px;
+    max-height: 440px;
+  }
+
+  .kanban-column-cancelled {
+    flex: 1 1 200px;
+    max-width: 240px;
   }
 }
 

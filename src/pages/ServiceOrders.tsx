@@ -38,23 +38,18 @@ const ServiceOrders: React.FC = () => {
       
       if (statusFilter) params.append('status', statusFilter);
       if (search) params.append('search', search);
-      
+
       if (params.toString()) {
         url += `?${params.toString()}`;
       }
-      
-      console.log('Carregando ordens de:', url);
+
       const response = await api.get(url);
-      console.log('Response status:', response.status);
-      
+
       if (response.ok) {
         const data = await response.json();
-        console.log('Dados recebidos:', data);
         setOrders(data);
       } else {
         console.error('Erro na resposta:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Detalhes do erro:', errorText);
       }
     } catch (error) {
       console.error('Erro ao carregar ordens:', error);
@@ -88,21 +83,8 @@ const ServiceOrders: React.FC = () => {
     return <div className="loading">Carregando...</div>;
   }
 
-  console.log('Estado atual - orders:', orders.length, 'filtros:', { statusFilter, search });
-
   return (
     <div className="service-orders-page">
-      {/* Debug Panel */}
-      {orders.length === 0 && (
-        <div style={{ background: '#fff3cd', padding: '20px', margin: '20px 0', borderRadius: '8px', border: '2px solid #ffc107' }}>
-          <h3>⚠️ Debug Info</h3>
-          <p><strong>Total de ordens carregadas:</strong> {orders.length}</p>
-          <p><strong>Filtro de status:</strong> {statusFilter || 'Nenhum'}</p>
-          <p><strong>Busca:</strong> {search || 'Nenhuma'}</p>
-          <p><strong>API URL:</strong> http://localhost:5235/api/service-orders</p>
-          <p style={{ color: '#721c24' }}>Verifique o console do navegador (F12) para mais detalhes.</p>
-        </div>
-      )}
       <div className="page-header">
         <h1>Ordens de Serviço</h1>
         {hasPermission('orders.write') && (
@@ -147,7 +129,16 @@ const ServiceOrders: React.FC = () => {
 
       <div className="orders-grid">
         {orders.map(order => (
-          <div key={order.id} className="order-card">
+          <div
+            key={order.id}
+            className="order-card"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(`/service-orders/${order.id}`)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') navigate(`/service-orders/${order.id}`);
+            }}
+          >
             <div className="order-header">
               <div className="order-number">#{order.number}</div>
               <div

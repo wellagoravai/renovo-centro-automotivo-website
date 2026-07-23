@@ -24,23 +24,31 @@ const DashboardEnhanced: React.FC = () => {
   const [updating, setUpdating] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const statusList = [
-    'Recebido',
-    'Checklist realizado',
-    'Em diagnóstico',
-    'Orçamento elaborado',
-    'Aguardando aprovação',
-    'Aprovado',
-    'Aguardando peças',
-    'Peças recebidas',
-    'Em manutenção',
-    'Montagem',
-    'Testes',
-    'Lavagem',
-    'Pronto para retirada',
-    'Entregue',
-    'Cancelado',
-  ];
+  // O backend ainda guarda ~15 status granulares (histórico da OS mostra o detalhe),
+  // mas o board só faz sentido visualmente com poucas colunas: agrupamos em estágios.
+  const stages = [
+    { key: 'recebido', label: 'Recebido', dropStatus: 'Recebido', match: ['Recebido', 'Checklist realizado'] },
+    { key: 'diagnostico', label: 'Em Diagnóstico', dropStatus: 'Em diagnóstico', match: ['Em diagnóstico', 'Orçamento elaborado'] },
+    { key: 'aguardando', label: 'Aguardando', dropStatus: 'Aguardando aprovação', match: ['Aguardando aprovação', 'Aprovado', 'Aguardando peças', 'Peças recebidas'] },
+    { key: 'manutencao', label: 'Em Manutenção', dropStatus: 'Em manutenção', match: ['Em manutenção', 'Montagem', 'Testes', 'Lavagem'] },
+    { key: 'pronto', label: 'Pronto p/ Retirada', dropStatus: 'Pronto para retirada', match: ['Pronto para retirada'] },
+    { key: 'entregue', label: 'Entregue', dropStatus: 'Entregue', match: ['Entregue'] },
+  ] as const;
+  const cancelledStage = { key: 'cancelado', label: 'Cancelado', dropStatus: 'Cancelado', match: ['Cancelado'] } as const;
+  const allStages = [...stages, cancelledStage];
+
+  const [cancelledOpen, setCancelledOpen] = useState(false);
+  const [draggedOrderId, setDraggedOrderId] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+
+  const getStageForStatus = (status: string) => {
+    const stage = allStages.find(s => (s.match as readonly string[]).includes(status));
+    return stage ?? stages[0];
+  };
+
+  const getOrdersForStage = (stage: { match: readonly string[] }) => {
+    return serviceOrders.filter(order => (stage.match as readonly string[]).includes(order.status));
+  };
 
   useEffect(() => {
     loadDashboard();
@@ -62,28 +70,34 @@ const DashboardEnhanced: React.FC = () => {
     }
   };
 
+  const updateOrderStatus = async (orderId: string, status: string, orderNotes?: string) => {
+    const response = await api.patch(`/service-orders/${orderId}/status`, {
+      status,
+      notes: orderNotes || '',
+      changedBy: 'Usuário Atual',
+    });
+
+    if (response.ok) {
+      loadDashboard();
+      return true;
+    }
+    const error = await response.json().catch(() => null);
+    alert(`❌ Erro: ${error?.message || 'Erro ao atualizar status'}`);
+    return false;
+  };
+
   const handleUpdateStatus = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder || !newStatus) return;
 
     setUpdating(true);
     try {
-      const response = await api.patch(`/service-orders/${selectedOrder.id}/status`, {
-        status: newStatus,
-        notes: notes,
-        changedBy: 'Usuário Atual',
-      });
-
-      if (response.ok) {
-        alert('✅ Status atualizado com sucesso!');
+      const ok = await updateOrderStatus(selectedOrder.id, newStatus, notes);
+      if (ok) {
         setShowStatusModal(false);
         setSelectedOrder(null);
         setNewStatus('');
         setNotes('');
-        loadDashboard();
-      } else {
-        const error = await response.json();
-        alert(`❌ Erro: ${error.message || 'Erro ao atualizar status'}`);
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -98,6 +112,25 @@ const DashboardEnhanced: React.FC = () => {
     setNewStatus(order.status);
     setNotes('');
     setShowStatusModal(true);
+  };
+
+  const handleDragStart = (orderId: string) => {
+    setDraggedOrderId(orderId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedOrderId(null);
+    setDragOverStage(null);
+  };
+
+  const handleDropOnStage = async (stageDropStatus: string) => {
+    setDragOverStage(null);
+    if (!draggedOrderId) return;
+    const order = serviceOrders.find(o => o.id === draggedOrderId);
+    setDraggedOrderId(null);
+    if (!order || order.status === stageDropStatus) return;
+    if (getStageForStatus(order.status).dropStatus === stageDropStatus) return;
+    await updateOrderStatus(order.id, stageDropStatus);
   };
 
   const getStatusColor = (status: string) => {
@@ -121,17 +154,21 @@ const DashboardEnhanced: React.FC = () => {
     return colors[status] || '#7f8c8d';
   };
 
-  const getOrdersByStatus = (status: string) => {
-    return serviceOrders.filter(order => order.status === status);
-  };
+  // Lista granular usada só no seletor manual do modal (o board agrupa em estágios).
+  const detailedStatusList = [
+    'Recebido', 'Checklist realizado', 'Em diagnóstico', 'Orçamento elaborado',
+    'Aguardando aprovação', 'Aprovado', 'Aguardando peças', 'Peças recebidas',
+    'Em manutenção', 'Montagem', 'Testes', 'Lavagem', 'Pronto para retirada',
+    'Entregue', 'Cancelado',
+  ];
 
   const getMetrics = () => {
     const total = serviceOrders.length;
-    const received = getOrdersByStatus('Recebido').length;
-    const inProgress = getOrdersByStatus('Em manutenção').length + getOrdersByStatus('Montagem').length + getOrdersByStatus('Testes').length;
-    const waiting = getOrdersByStatus('Aguardando aprovação').length + getOrdersByStatus('Aguardando peças').length;
-    const ready = getOrdersByStatus('Pronto para retirada').length;
-    const delivered = getOrdersByStatus('Entregue').length;
+    const received = getOrdersForStage(stages[0]).length;
+    const inProgress = getOrdersForStage(stages[3]).length;
+    const waiting = getOrdersForStage(stages[2]).length;
+    const ready = getOrdersForStage(stages[4]).length;
+    const delivered = getOrdersForStage(stages[5]).length;
     return { total, received, inProgress, waiting, ready, delivered };
   };
 
@@ -186,21 +223,30 @@ const DashboardEnhanced: React.FC = () => {
         </div>
       </div>
 
-      {/* Kanban Board TV */}
+      {/* Kanban Board — arraste o card para outro estágio para atualizar o status */}
       <div className="kanban-board-tv">
-        {statusList.map(status => {
-          const orders = getOrdersByStatus(status);
+        {stages.map(stage => {
+          const orders = getOrdersForStage(stage);
           return (
-            <div key={status} className="kanban-column-tv">
+            <div
+              key={stage.key}
+              className={`kanban-column-tv ${dragOverStage === stage.key ? 'drag-over' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOverStage(stage.key); }}
+              onDragLeave={() => setDragOverStage(prev => (prev === stage.key ? null : prev))}
+              onDrop={(e) => { e.preventDefault(); handleDropOnStage(stage.dropStatus); }}
+            >
               <div className="column-header-tv">
-                <h3>{status}</h3>
+                <h3>{stage.label}</h3>
                 <span className="column-count-tv">{orders.length}</span>
               </div>
               <div className="column-content-tv">
                 {orders.map(order => (
                   <div
                     key={order.id}
-                    className="kanban-card-tv"
+                    className={`kanban-card-tv ${draggedOrderId === order.id ? 'dragging' : ''}`}
+                    draggable
+                    onDragStart={() => handleDragStart(order.id)}
+                    onDragEnd={handleDragEnd}
                     onClick={() => navigate(`/service-orders/${order.id}`)}
                   >
                     <div className="card-header-tv">
@@ -242,6 +288,42 @@ const DashboardEnhanced: React.FC = () => {
             </div>
           );
         })}
+
+        {/* Cancelado fica à parte, colapsado por padrão, pra não competir com o fluxo ativo */}
+        <div className={`kanban-column-tv kanban-column-cancelled ${cancelledOpen ? '' : 'collapsed'} ${dragOverStage === cancelledStage.key ? 'drag-over' : ''}`}>
+          <div
+            className="column-header-tv column-header-clickable"
+            onClick={() => setCancelledOpen(o => !o)}
+            onDragOver={(e) => { e.preventDefault(); setDragOverStage(cancelledStage.key); }}
+            onDragLeave={() => setDragOverStage(prev => (prev === cancelledStage.key ? null : prev))}
+            onDrop={(e) => { e.preventDefault(); handleDropOnStage(cancelledStage.dropStatus); }}
+          >
+            <h3>{cancelledStage.label}</h3>
+            <span className="column-count-tv">{getOrdersForStage(cancelledStage).length}</span>
+          </div>
+          {cancelledOpen && (
+            <div className="column-content-tv">
+              {getOrdersForStage(cancelledStage).map(order => (
+                <div
+                  key={order.id}
+                  className="kanban-card-tv"
+                  onClick={() => navigate(`/service-orders/${order.id}`)}
+                >
+                  <div className="card-header-tv">
+                    <span className="os-number-tv">OS {order.number}</span>
+                  </div>
+                  <div className="card-body-tv">
+                    <p className="vehicle-info-tv">🚗 {order.vehicleInfo}</p>
+                    <p className="customer-name-tv">👤 {order.customerName}</p>
+                  </div>
+                </div>
+              ))}
+              {getOrdersForStage(cancelledStage).length === 0 && (
+                <div className="empty-column-tv"><p>Nenhuma OS</p></div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Status Update Modal TV */}
@@ -288,7 +370,7 @@ const DashboardEnhanced: React.FC = () => {
                   className="form-control-tv"
                   required
                 >
-                  {statusList.map(status => (
+                  {detailedStatusList.map(status => (
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>

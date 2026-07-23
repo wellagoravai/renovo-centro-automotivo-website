@@ -372,6 +372,10 @@
   color: white;
 }
 
+tr.low-stock {
+  background: #fdecea;
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;

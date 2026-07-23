@@ -30,6 +30,12 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.order-card:focus-visible {
+  outline: 3px solid var(--accent-color, #CC0000);
+  outline-offset: 2px;
 }
 
 .order-card:hover {

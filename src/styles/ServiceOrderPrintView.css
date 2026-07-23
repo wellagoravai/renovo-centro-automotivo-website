@@ -1,0 +1,169 @@
+.print-only {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-only,
+  .print-only * {
+    visibility: visible;
+  }
+
+  .print-only {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}
+
+.os-print {
+  font-family: Arial, sans-serif;
+  color: #1a1a1a;
+  padding: 20px;
+}
+
+.os-print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #1a1a1a;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.os-print-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.os-print-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.os-print-status {
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-weight: bold;
+  font-size: 13px;
+  height: fit-content;
+}
+
+.os-print-photo {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.os-print-photo img {
+  max-width: 320px;
+  max-height: 220px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.os-print-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.os-print-grid h3 {
+  margin: 0 0 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.os-print-grid p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.os-print section {
+  margin-bottom: 18px;
+  page-break-inside: avoid;
+}
+
+.os-print section h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.os-print section p {
+  margin: 0;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.os-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.os-print-table th,
+.os-print-table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.os-print-checklist-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.os-print-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px 12px;
+}
+
+.os-print-check {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.os-print-checkbox {
+  font-size: 16px;
+}
+
+.os-print-value {
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+.os-print-signatures {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.os-print-signature {
+  border-top: 1px solid #1a1a1a;
+  padding-top: 6px;
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+}

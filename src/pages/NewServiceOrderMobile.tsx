@@ -118,6 +118,7 @@ const NewServiceOrderMobile: React.FC = () => {
         estimatedDate: serviceOrder.estimatedDelivery || null,
         status: 'Recebido',
         responsibleUser: 'Usuário Atual',
+        photos: vehicle.photos.join(','),
         customer: {
           name: customer.name,
           document: customer.document,
@@ -157,7 +158,7 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const renderStep1 = () => (
     <div className="wizard-step">
-      <h2>👤 Etapa 1 - Dados do Cliente</h2>
+      <h2>Dados do Cliente</h2>
       <div className="form-group">
         <label>Nome Completo *</label>
         <input
@@ -226,7 +227,7 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const renderStep2 = () => (
     <div className="wizard-step">
-      <h2>🚗 Etapa 2 - Dados do Veículo</h2>
+      <h2>Dados do Veículo</h2>
       <div className="form-group">
         <label>Placa *</label>
         <input
@@ -305,7 +306,7 @@ const NewServiceOrderMobile: React.FC = () => {
 
       {/* Photo Upload Section */}
       <div className="form-group">
-        <label>📸 Fotos do Veículo</label>
+        <label>Fotos do Veículo</label>
         <div className="photo-upload-container">
           <input
             ref={fileInputRef}
@@ -360,7 +361,7 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const renderStep3 = () => (
     <div className="wizard-step">
-      <h2>📝 Etapa 3 - Recepção</h2>
+      <h2>Recepção</h2>
       <div className="form-group">
         <label>Problema Informado pelo Cliente *</label>
         <textarea
@@ -397,18 +398,21 @@ const NewServiceOrderMobile: React.FC = () => {
   return (
     <div className="new-service-order-mobile">
       <div className="wizard-header">
-        <h1>📋 Nova Ordem de Serviço</h1>
-        <div className="wizard-progress">
-          <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1</div>
-          <div className="step-line"></div>
-          <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2</div>
-          <div className="step-line"></div>
-          <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3</div>
-        </div>
-        <div className="step-labels">
-          <span>Cliente</span>
-          <span>Veículo</span>
-          <span>Recepção</span>
+        <h1>Nova Ordem de Serviço</h1>
+        <div className="wizard-progress-bar">
+          <div className="wizard-progress-track">
+            <div
+              className="wizard-progress-fill"
+              style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
+            />
+          </div>
+          <div className="step-labels">
+            {['Cliente', 'Veículo', 'Recepção'].map((label, i) => (
+              <span key={label} className={currentStep >= i + 1 ? 'active' : ''}>
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
