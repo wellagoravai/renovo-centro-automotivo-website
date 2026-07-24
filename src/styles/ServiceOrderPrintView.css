@@ -123,18 +123,41 @@
   text-align: left;
 }
 
-.os-print-checklist-meta {
+.os-print-checklist-section {
+  page-break-inside: avoid;
+}
+
+.os-print-checklist-lines {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 24px;
+  margin-bottom: 12px;
+}
+
+.os-print-line-field {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 20px;
+  align-items: flex-end;
+  gap: 6px;
   font-size: 13px;
-  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+.os-print-line-field-wide {
+  margin-top: 8px;
+}
+
+.os-print-fill-line {
+  flex: 1;
+  border-bottom: 1px solid #999;
+  min-width: 60px;
+  height: 14px;
 }
 
 .os-print-checklist-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px 12px;
+  gap: 8px 12px;
+  margin: 10px 0;
 }
 
 .os-print-check {

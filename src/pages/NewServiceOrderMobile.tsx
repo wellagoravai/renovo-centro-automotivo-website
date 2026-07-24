@@ -395,6 +395,29 @@ const NewServiceOrderMobile: React.FC = () => {
     </div>
   );
 
+  const renderActions = (variant: 'top' | 'bottom') => (
+    <div className={`wizard-actions wizard-actions-${variant}`}>
+      {currentStep > 1 && (
+        <button className="btn-secondary" onClick={handleBack}>
+          ← Voltar
+        </button>
+      )}
+      {currentStep < 3 ? (
+        <button className="btn-primary" onClick={handleNext}>
+          Próximo →
+        </button>
+      ) : (
+        <button className="btn-success" onClick={handleSubmit} disabled={loading}>
+          {loading ? '⏳ Criando...' : '✅ Criar Ordem de Serviço'}
+        </button>
+      )}
+    </div>
+  );
+
+  const scrollDown = () => {
+    window.scrollBy({ top: Math.round(window.innerHeight * 0.6), behavior: 'smooth' });
+  };
+
   return (
     <div className="new-service-order-mobile">
       <div className="wizard-header">
@@ -416,28 +439,24 @@ const NewServiceOrderMobile: React.FC = () => {
         </div>
       </div>
 
+      {renderActions('top')}
+
       <div className="wizard-content">
         {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
       </div>
 
-      <div className="wizard-actions">
-        {currentStep > 1 && (
-          <button className="btn-secondary" onClick={handleBack}>
-            ← Voltar
-          </button>
-        )}
-        {currentStep < 3 ? (
-          <button className="btn-primary" onClick={handleNext}>
-            Próximo →
-          </button>
-        ) : (
-          <button className="btn-success" onClick={handleSubmit} disabled={loading}>
-            {loading ? '⏳ Criando...' : '✅ Criar Ordem de Serviço'}
-          </button>
-        )}
-      </div>
+      {renderActions('bottom')}
+
+      <button
+        type="button"
+        className="scroll-down-fab"
+        aria-label="Rolar para baixo"
+        onClick={scrollDown}
+      >
+        ↓
+      </button>
     </div>
   );
 };

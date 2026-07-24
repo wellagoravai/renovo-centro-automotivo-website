@@ -727,10 +727,7 @@ const ServiceOrderDetails: React.FC = () => {
         </div>
       </div>
 
-      <ServiceOrderPrintView
-        order={serviceOrder}
-        checklist={serviceOrder.hasChecklist ? checklist : null}
-      />
+      <ServiceOrderPrintView order={serviceOrder} />
     </div>
   );
 };

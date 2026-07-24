@@ -10,33 +10,6 @@ interface ServiceOrderItem {
   totalValue: number;
 }
 
-interface ChecklistData {
-  mileage: number;
-  fuelLevel: string;
-  tireCondition: string;
-  coolingLevel: string;
-  oilLevel: string;
-  tirePressure: string;
-  spareTire: boolean;
-  rims: boolean;
-  headlights: boolean;
-  taillights: boolean;
-  mirrors: boolean;
-  windows: boolean;
-  windshield: boolean;
-  wipers: boolean;
-  seats: boolean;
-  dashboard: boolean;
-  multimedia: boolean;
-  airConditioning: boolean;
-  jack: boolean;
-  triangle: boolean;
-  spareKey: boolean;
-  documents: boolean;
-  generalState: string;
-  observations: string;
-}
-
 interface ServiceOrderForPrint {
   number: string;
   status: string;
@@ -56,29 +29,20 @@ interface ServiceOrderForPrint {
 
 interface Props {
   order: ServiceOrderForPrint;
-  checklist: ChecklistData | null;
 }
 
-const checklistLabels: { key: keyof ChecklistData; label: string }[] = [
-  { key: 'spareTire', label: 'Estepe' },
-  { key: 'rims', label: 'Rodas' },
-  { key: 'headlights', label: 'Faróis' },
-  { key: 'taillights', label: 'Lanternas' },
-  { key: 'mirrors', label: 'Retrovisores' },
-  { key: 'windows', label: 'Vidros' },
-  { key: 'windshield', label: 'Para-brisa' },
-  { key: 'wipers', label: 'Palhetas' },
-  { key: 'seats', label: 'Bancos' },
-  { key: 'dashboard', label: 'Painel' },
-  { key: 'multimedia', label: 'Multimídia' },
-  { key: 'airConditioning', label: 'Ar-condicionado' },
-  { key: 'jack', label: 'Macaco' },
-  { key: 'triangle', label: 'Triângulo' },
-  { key: 'spareKey', label: 'Chave reserva' },
-  { key: 'documents', label: 'Documentos' },
+const checklistBoxLabels = [
+  'Estepe', 'Rodas', 'Faróis', 'Lanternas', 'Retrovisores', 'Vidros',
+  'Para-brisa', 'Palhetas', 'Bancos', 'Painel', 'Multimídia', 'Ar-condicionado',
+  'Macaco', 'Triângulo', 'Chave reserva', 'Documentos',
 ];
 
-const ServiceOrderPrintView: React.FC<Props> = ({ order, checklist }) => {
+const checklistLineLabels = [
+  'Quilometragem', 'Nível de combustível', 'Nível de óleo',
+  'Condição dos pneus', 'Calibragem dos pneus', 'Nível de arrefecimento',
+];
+
+const ServiceOrderPrintView: React.FC<Props> = ({ order }) => {
   const firstPhoto = order.photos ? order.photos.split(',').filter(Boolean)[0] : null;
 
   return (
@@ -153,33 +117,37 @@ const ServiceOrderPrintView: React.FC<Props> = ({ order, checklist }) => {
         </section>
       )}
 
-      {checklist && (
-        <section>
-          <h3>Checklist do Veículo</h3>
-          <div className="os-print-checklist-meta">
-            <span>KM: {checklist.mileage.toLocaleString('pt-BR')}</span>
-            <span>Combustível: {checklist.fuelLevel || '—'}</span>
-            <span>Nível de óleo: {checklist.oilLevel || '—'}</span>
-            <span>Pneus: {checklist.tireCondition || '—'}</span>
-            <span>Arrefecimento: {checklist.coolingLevel || '—'}</span>
-            <span>Calibragem: {checklist.tirePressure || '—'}</span>
-          </div>
-          <div className="os-print-checklist-grid">
-            {checklistLabels.map(({ key, label }) => (
-              <label key={key} className="os-print-check">
-                <span className="os-print-checkbox">{checklist[key] ? '☑' : '☐'}</span>
-                {label}
-              </label>
-            ))}
-          </div>
-          {checklist.generalState && (
-            <p><strong>Estado geral:</strong> {checklist.generalState}</p>
-          )}
-          {checklist.observations && (
-            <p><strong>Observações do checklist:</strong> {checklist.observations}</p>
-          )}
-        </section>
-      )}
+      <section className="os-print-checklist-section">
+        <h3>Checklist do Veículo (preencher à mão)</h3>
+        <div className="os-print-checklist-lines">
+          {checklistLineLabels.map(label => (
+            <div key={label} className="os-print-line-field">
+              <span>{label}:</span>
+              <span className="os-print-fill-line" />
+            </div>
+          ))}
+        </div>
+        <div className="os-print-checklist-grid">
+          {checklistBoxLabels.map(label => (
+            <span key={label} className="os-print-check">
+              <span className="os-print-checkbox">☐</span>
+              {label}
+            </span>
+          ))}
+        </div>
+        <div className="os-print-line-field os-print-line-field-wide">
+          <span>Estado geral:</span>
+          <span className="os-print-fill-line" />
+        </div>
+        <div className="os-print-line-field os-print-line-field-wide">
+          <span>Avarias visuais:</span>
+          <span className="os-print-fill-line" />
+        </div>
+        <div className="os-print-line-field os-print-line-field-wide">
+          <span>Observações:</span>
+          <span className="os-print-fill-line" />
+        </div>
+      </section>
 
       {typeof order.value === 'number' && order.value > 0 && (
         <section>

@@ -455,7 +455,7 @@ const ReportsPage: React.FC = () => {
                 <div className="summary-card">
                   <h3>Período</h3>
                   <p className="summary-value">
-                    {formatDate(overviewData.Period.start.toString())} - {formatDate(overviewData.Period.end.toString())}
+                    {formatDate(overviewData.period.start.toString())} - {formatDate(overviewData.period.end.toString())}
                   </p>
                 </div>
               </div>
@@ -464,7 +464,7 @@ const ReportsPage: React.FC = () => {
                 <div className="report-card">
                   <h3>Serviços Realizados</h3>
                   <div className="services-list">
-                    {overviewData.Services.slice(0, 10).map((service: ServiceStat, index: number) => (
+                    {overviewData.services.slice(0, 10).map((service: ServiceStat, index: number) => (
                       <div key={index} className="service-item">
                         <div className="service-info">
                           <span className="service-name">{service.serviceName}</span>
@@ -479,15 +479,15 @@ const ReportsPage: React.FC = () => {
                 <div className="report-card">
                   <h3>Status das Ordens</h3>
                   <div className="status-breakdown">
-                    {overviewData.StatusBreakdown.map((item: any, index: number) => (
+                    {overviewData.statusBreakdown.map((item: any, index: number) => (
                       <div key={index} className="status-item">
-                        <span 
-                          className="status-badge" 
-                          style={{ backgroundColor: getStatusColor(item.Status) }}
+                        <span
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(item.status) }}
                         >
-                          {item.Status}
+                          {item.status}
                         </span>
-                        <span className="status-count">{item.Count}</span>
+                        <span className="status-count">{item.count}</span>
                       </div>
                     ))}
                   </div>
@@ -535,19 +535,19 @@ const ReportsPage: React.FC = () => {
               <div className="report-summary">
                 <div className="summary-card">
                   <h3>Total Concluídas</h3>
-                  <p className="summary-value">{completedData.summary.TotalCompleted}</p>
+                  <p className="summary-value">{completedData.summary.totalCompleted}</p>
                 </div>
                 <div className="summary-card">
                   <h3>Valor Total</h3>
-                  <p className="summary-value">{formatCurrency(completedData.summary.TotalValue)}</p>
+                  <p className="summary-value">{formatCurrency(completedData.summary.totalValue)}</p>
                 </div>
                 <div className="summary-card">
                   <h3>Valor Médio</h3>
-                  <p className="summary-value">{formatCurrency(completedData.summary.AverageValue)}</p>
+                  <p className="summary-value">{formatCurrency(completedData.summary.averageValue)}</p>
                 </div>
                 <div className="summary-card">
                   <h3>Duração Média</h3>
-                  <p className="summary-value">{completedData.summary.AverageDuration.toFixed(1)}h</p>
+                  <p className="summary-value">{completedData.summary.averageDuration.toFixed(1)}h</p>
                 </div>
               </div>
 
@@ -775,17 +775,17 @@ const ReportsPage: React.FC = () => {
                   {revenueData.dailyRevenue.map((day: any, index: number) => (
                     <div key={index} className="revenue-day">
                       <div className="revenue-bar-container">
-                        <div 
-                          className="revenue-bar" 
-                          style={{ 
-                            height: `${(day.Revenue / Math.max(...revenueData.dailyRevenue.map((d: any) => d.Revenue))) * 100}%` 
+                        <div
+                          className="revenue-bar"
+                          style={{
+                            height: `${(day.revenue / Math.max(...revenueData.dailyRevenue.map((d: any) => d.revenue))) * 100}%`
                           }}
                         ></div>
                       </div>
                       <div className="revenue-info">
-                        <span className="revenue-date">{formatDate(day.Date.toString())}</span>
-                        <span className="revenue-amount">{formatCurrency(day.Revenue)}</span>
-                        <span className="revenue-count">{day.Count} OS</span>
+                        <span className="revenue-date">{formatDate(day.date.toString())}</span>
+                        <span className="revenue-amount">{formatCurrency(day.revenue)}</span>
+                        <span className="revenue-count">{day.count} OS</span>
                       </div>
                     </div>
                   ))}
