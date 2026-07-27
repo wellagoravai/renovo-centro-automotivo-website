@@ -1,6 +1,28 @@
 import React from 'react';
 import './Products.css';
 
+const openVirtualAssistant = () => {
+    const chatWindow = document.querySelector('.chat-window');
+    const chatButton = document.querySelector<HTMLButtonElement>('.chat-button');
+
+    // Prefer opening the in-page IA/chat if available
+    if (chatWindow) {
+        (chatWindow as HTMLElement).style.display = '';
+        return;
+    }
+
+    if (chatButton) {
+        chatButton.click();
+        return;
+    }
+
+    // Fallback: open WhatsApp (loja number provided)
+    const whatsappNumber = '5518998139810';
+    const text = encodeURIComponent('Olá, gostaria de consultar o preço de um produto.');
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
+    window.open(whatsappUrl, '_blank');
+};
+
 const Products: React.FC = () => {
     const products = [
         {
@@ -8,24 +30,28 @@ const Products: React.FC = () => {
             name: 'Óleo Sintético Premium',
             category: 'Fluidos',
             description: 'Óleo de motor sintético de alta performance para proteção máxima do motor.',
+            image: '/assets/products/oleo-sintetico.jpg',
         },
         {
             id: '2',
             name: 'Filtro de Ar',
             category: 'Filtros',
             description: 'Filtro de ar de reposição para melhor fluxo de ar no motor.',
+            image: '/assets/products/filtro-ar.jpg',
         },
         {
             id: '3',
             name: 'Pastilhas de Freio',
             category: 'Freios',
             description: 'Pastilhas de freio de cerâmica para segurança e durabilidade.',
+            image: '/assets/products/pastilhas-freio.jpg',
         },
         {
             id: '4',
             name: 'Velas de Ignição',
             category: 'Ignição',
             description: 'Velas de ignição de qualidade para melhor desempenho do motor.',
+            image: '/assets/products/velas-ignicao.jpg',
         },
     ];
 
@@ -42,13 +68,15 @@ const Products: React.FC = () => {
                         {products.map((product) => (
                             <div key={product.id} className="product-item">
                                 <div className="product-image">
-                                    <img src="/assets/product-placeholder.png" alt={product.name} />
+                                    <img src={product.image} alt={product.name} />
                                 </div>
                                 <div className="product-info">
                                     <h3>{product.name}</h3>
                                     <p className="category">{product.category}</p>
                                     <p className="description">{product.description}</p>
-                                    <button className="button">Consultar Preço</button>
+                                    <button type="button" className="button" onClick={openVirtualAssistant}>
+                                        🤖 Consultar Preço
+                                    </button>
                                 </div>
                             </div>
                         ))}

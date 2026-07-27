@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Contact.css';
-import { CONTACT_EMAIL, CONTACT_PHONE, ADDRESS } from '../utils/constants';
+import { CONTACT_EMAIL, CONTACT_PHONE, WHATSAPP_PHONE_1, WHATSAPP_PHONE_2, ADDRESS } from '../utils/constants';
+
+const toWhatsappLink = (phone: string) => `https://wa.me/55${phone.replace(/\D/g, '')}`;
 
 const Contact: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -44,6 +46,20 @@ const Contact: React.FC = () => {
                             <div className="info-item">
                                 <h3>📞 Telefone</h3>
                                 <p><a href={`tel:${CONTACT_PHONE}`}>{CONTACT_PHONE}</a></p>
+                            </div>
+
+                            <div className="info-item">
+                                <h3>💬 WhatsApp</h3>
+                                <p>
+                                    <a href={toWhatsappLink(WHATSAPP_PHONE_1)} target="_blank" rel="noopener noreferrer">
+                                        {WHATSAPP_PHONE_1}
+                                    </a>
+                                </p>
+                                <p>
+                                    <a href={toWhatsappLink(WHATSAPP_PHONE_2)} target="_blank" rel="noopener noreferrer">
+                                        {WHATSAPP_PHONE_2}
+                                    </a>
+                                </p>
                             </div>
 
                             <div className="info-item">

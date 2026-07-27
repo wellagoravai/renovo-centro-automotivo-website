@@ -1,6 +1,43 @@
 import React from 'react';
 import './Services.css';
 
+const COMPANY_PHONE = '+551837222388';
+const COMPANY_PHONE_DISPLAY = '+55 (18) 3722-2388';
+
+const openVirtualAssistant = () => {
+    const chatWindow = document.querySelector('.chat-window');
+    const chatButton = document.querySelector<HTMLButtonElement>('.chat-button');
+
+    // Prefer opening the in-page IA/chat if available
+    if (chatWindow) {
+        (chatWindow as HTMLElement).style.display = '';
+        return;
+    }
+
+    if (chatButton) {
+        chatButton.click();
+        return;
+    }
+
+    // Fallback: open WhatsApp (loja number provided)
+    const whatsappNumber = '5518998139810';
+    const text = encodeURIComponent('Olá, quero solicitar um serviço.');
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
+    window.open(whatsappUrl, '_blank');
+};
+
+const handleCallNow = () => {
+    const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+    );
+
+    if (isMobileDevice) {
+        window.location.href = `tel:${COMPANY_PHONE}`;
+    } else {
+        alert(`Ligue para nós: ${COMPANY_PHONE_DISPLAY}`);
+    }
+};
+
 const Services: React.FC = () => {
     const services = [
         {
@@ -63,7 +100,9 @@ const Services: React.FC = () => {
                                 <h3>{service.name}</h3>
                                 <p className="description">{service.description}</p>
                                 <p className="details">{service.details}</p>
-                                <button className="button">Solicitar Serviço</button>
+                                <button type="button" className="button" onClick={openVirtualAssistant}>
+                                    🤖 Solicitar Serviço
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -74,8 +113,12 @@ const Services: React.FC = () => {
                 <h2>Agende seu Serviço Agora</h2>
                 <p>Ligue para nós ou use nosso chat para agendar um horário que seja conveniente para você.</p>
                 <div className="cta-buttons">
-                    <button className="button">📞 Ligar Agora</button>
-                    <button className="button secondary-button">💬 Usar Chat</button>
+                    <button type="button" className="button" onClick={handleCallNow}>
+                        📞 Ligar Agora
+                    </button>
+                    <button type="button" className="button secondary-button" onClick={openVirtualAssistant}>
+                        💬 Usar Chat
+                    </button>
                 </div>
             </section>
         </div>
