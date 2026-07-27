@@ -1,4 +1,5 @@
-.new-service-order {
+.new-service-order,
+.new-service-order-mobile {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
@@ -152,39 +153,67 @@
 .wizard-actions button {
   flex: 1;
   padding: 15px 30px;
+  font-family: var(--font-family);
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .btn-primary {
-  background: #27ae60;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, var(--accent-color, #CC0000) 0%, #8f0000 100%);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(204, 0, 0, 0.35);
 }
 
 .btn-primary:hover {
-  background: #229954;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #e60000 0%, var(--accent-color, #CC0000) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(204, 0, 0, 0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(204, 0, 0, 0.35);
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid rgba(204, 0, 0, 0.4);
+  outline-offset: 3px;
 }
 
 .btn-primary:disabled {
-  background: #95a5a6;
+  background: #b0b0b0;
+  box-shadow: none;
   cursor: not-allowed;
   transform: none;
 }
 
 .btn-secondary {
-  background: #95a5a6;
-  color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  color: var(--primary-color, #1a1a1a);
+  border: 2px solid #d8d8d8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .btn-secondary:hover {
-  background: #7f8c8d;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-color: #bfbfbf;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.btn-secondary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid rgba(26, 26, 26, 0.25);
+  outline-offset: 3px;
 }
 
 .photo-upload-container {
@@ -253,7 +282,8 @@
 }
 
 @media (max-width: 768px) {
-  .new-service-order {
+  .new-service-order,
+  .new-service-order-mobile {
     padding: 10px;
   }
 
