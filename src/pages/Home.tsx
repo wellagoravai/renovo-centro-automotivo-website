@@ -35,6 +35,24 @@ const Home: React.FC = () => {
                         <button className="button" type="button" onClick={openVirtualAssistant}>🚗 Solicitar Serviço</button>
                     </div>
 
+                    <div className="banner-scene" aria-hidden="true">
+                        <div className="dirt-road dirt-road-back"></div>
+                        <div className="dirt-road dirt-road-front"></div>
+                        <div className="truck-rig">
+                            <div className="truck-bob">
+                                <div className="dust-trail">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div className="truck-visual">
+                                    <img src="/assets/truck-offroad.png" alt="" className="hero-truck" />
+                                    <img src="/assets/truck-wheel.png" alt="" className="wheel wheel-front" />
+                                    <img src="/assets/truck-wheel.png" alt="" className="wheel wheel-rear" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 {/* Store Photos Section */}

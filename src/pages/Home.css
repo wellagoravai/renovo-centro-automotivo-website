@@ -45,141 +45,132 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 220px;
+  height: 200px;
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
 }
 
-.wave-track {
+.dirt-road {
   position: absolute;
-  left: -8%;
-  right: -8%;
-  bottom: 80px;
-  height: 95px;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.11) 45%, rgba(255,255,255,0.04) 100%);
-  box-shadow: inset 0 -8px 18px rgba(0, 0, 0, 0.24);
-  transform: perspective(400px) rotateX(14deg);
-  animation: wave-slide 8s linear infinite;
-}
-
-.wave-track::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
-  opacity: 0.55;
-  animation: wave-ripple 4.5s linear infinite;
-}
-
-.dirt-trail {
-  position: absolute;
-  left: -10%;
-  right: -10%;
-  bottom: 28px;
-  height: 70px;
-  background: radial-gradient(circle at 0% 50%, rgba(139, 84, 35, 0.52) 0 8px, transparent 9px) repeat-x;
-  background-size: 24px 24px;
-  transform: translateX(0);
-  animation: dirt-flow 1.2s linear infinite;
-  opacity: 0.75;
-}
-
-.truck-3d {
-  position: absolute;
-  left: -6%;
-  bottom: 22px;
-  width: 270px;
-  height: 110px;
-  animation: truck-drive 9s linear infinite;
-  transform: translate3d(0, 0, 0);
-}
-
-.truck-body,
-.truck-cab,
-.truck-bed,
-.truck-wheel,
-.truck-grille,
-.truck-light {
-  position: absolute;
-}
-
-.truck-body {
-  left: 30px;
-  bottom: 24px;
-  width: 170px;
-  height: 56px;
-  background: linear-gradient(135deg, #b1362b 0%, #7d201f 100%);
-  border-radius: 20px 30px 14px 14px;
-  box-shadow: inset -10px -10px 0 rgba(0, 0, 0, 0.2), 0 10px 18px rgba(0, 0, 0, 0.3);
-  transform: perspective(500px) rotateX(6deg);
-}
-
-.truck-cab {
   left: 0;
-  bottom: 28px;
-  width: 95px;
-  height: 52px;
-  background: linear-gradient(135deg, #d94c3d 0%, #a42622 100%);
-  border-radius: 16px 24px 14px 14px;
-  box-shadow: inset -8px -8px 0 rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.28);
-  transform: perspective(500px) rotateX(6deg);
+  right: 0;
+  background-repeat: repeat-x;
 }
 
-.truck-bed {
-  left: 132px;
-  bottom: 24px;
-  width: 78px;
-  height: 44px;
-  background: linear-gradient(135deg, #f2c86e 0%, #c98a23 100%);
-  border-radius: 12px 18px 10px 10px;
-  box-shadow: inset -6px -6px 0 rgba(0, 0, 0, 0.16), 0 8px 14px rgba(0, 0, 0, 0.24);
+.dirt-road-back {
+  bottom: 40px;
+  height: 60px;
+  opacity: 0.35;
+  background-size: 400px 60px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60"><path d="M0,30 C60,4 140,56 200,30 C260,4 340,56 400,30 L400,60 L0,60 Z" fill="rgb(107,74,43)"/><ellipse cx="40" cy="44" rx="10" ry="4" fill="rgb(84,58,32)"/><ellipse cx="160" cy="48" rx="12" ry="5" fill="rgb(84,58,32)"/><ellipse cx="300" cy="42" rx="9" ry="4" fill="rgb(84,58,32)"/></svg>');
+  animation: dirt-scroll-back 6s linear infinite;
 }
 
-.truck-grille {
-  left: 4px;
-  bottom: 38px;
-  width: 24px;
-  height: 18px;
-  background: linear-gradient(90deg, #202020 0%, #4d4d4d 100%);
-  border-radius: 8px;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
-}
-
-.truck-wheel {
+.dirt-road-front {
   bottom: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #f7f2eb 0 6px, #1b1b1b 7px 12px, #444 13px 100%);
-  box-shadow: 0 0 0 4px #161616;
-  animation: wheel-spin 0.7s linear infinite;
+  height: 80px;
+  opacity: 0.65;
+  background-size: 260px 80px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 80"><path d="M0,40 C40,8 90,68 130,40 C170,8 220,68 260,40 L260,80 L0,80 Z" fill="rgb(135,91,52)"/><ellipse cx="30" cy="58" rx="14" ry="6" fill="rgb(107,69,38)"/><ellipse cx="110" cy="64" rx="16" ry="7" fill="rgb(107,69,38)"/><ellipse cx="200" cy="55" rx="12" ry="5" fill="rgb(107,69,38)"/></svg>');
+  animation: dirt-scroll-front 3.2s linear infinite;
 }
 
-.wheel-front {
-  left: 82px;
+@keyframes dirt-scroll-back {
+  0% { background-position-x: 0; }
+  100% { background-position-x: 400px; }
+}
+
+@keyframes dirt-scroll-front {
+  0% { background-position-x: 0; }
+  100% { background-position-x: 260px; }
+}
+
+.truck-rig {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  width: 220px;
+  transform: translateX(-50%);
+}
+
+.truck-bob {
+  position: relative;
+  animation: truck-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes truck-bob {
+  0%   { transform: translateY(0) rotate(-1deg); }
+  20%  { transform: translateY(-5px) rotate(1deg); }
+  40%  { transform: translateY(0) rotate(-1.5deg); }
+  55%  { transform: translateY(-8px) rotate(2deg); }
+  75%  { transform: translateY(-2px) rotate(-1deg); }
+  100% { transform: translateY(0) rotate(-1deg); }
+}
+
+.truck-visual {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-truck {
+  position: relative;
+  display: block;
+  width: 220px;
+  height: auto;
+}
+
+.wheel {
+  position: absolute;
+  left: 10.9375%;
+  top: 56.71875%;
+  width: 15%;
+  height: 30%;
+  border-radius: 50%;
+  animation: wheel-spin 0.7s linear infinite;
+  transform-origin: 50% 50%;
 }
 
 .wheel-rear {
-  left: 188px;
+  left: 68.906%;
 }
 
-.truck-light {
-  bottom: 36px;
-  width: 10px;
-  height: 10px;
+@keyframes wheel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.dust-trail {
+  position: absolute;
+  right: -6px;
+  bottom: 6px;
+  width: 30px;
+  height: 30px;
+  z-index: -1;
+}
+
+.dust-trail span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #ffef95;
-  box-shadow: 0 0 16px rgba(255, 240, 150, 0.9);
+  background: radial-gradient(circle, rgba(198, 163, 110, 0.6) 0%, rgba(198, 163, 110, 0) 70%);
+  animation: dust-puff 1.1s ease-out infinite;
 }
 
-.light-left {
-  left: 66px;
+.dust-trail span:nth-child(2) {
+  animation-delay: 0.35s;
 }
 
-.light-right {
-  left: 100px;
+.dust-trail span:nth-child(3) {
+  animation-delay: 0.7s;
+}
+
+@keyframes dust-puff {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0.6; }
+  100% { transform: translate(56px, -18px) scale(1.8); opacity: 0; }
 }
 
 .banner h1 {
@@ -470,7 +461,7 @@
 
 @media (max-width: 480px) {
   .banner {
-    padding: 60px 15px;
+    padding: 60px 15px 170px;
   }
 
   .banner h1 {
@@ -481,6 +472,15 @@
   .banner p {
     font-size: 0.95rem;
     margin-bottom: 25px;
+  }
+
+  .banner-scene {
+    height: 130px;
+  }
+
+  .truck-rig,
+  .hero-truck {
+    width: 120px;
   }
 
   .services-grid {
