@@ -19,8 +19,15 @@ const Home: React.FC = () => {
         }
 
         // Fallback: open WhatsApp (loja number provided)
-        const whatsappNumber = '5518998139810';
+        const whatsappNumber = '551837222388';
         const text = encodeURIComponent('Olá, quero solicitar um serviço.');
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
+    const talkToAttendant = () => {
+        const whatsappNumber = '551837222388';
+        const text = encodeURIComponent('Olá, gostaria de falar com um atendente.');
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
         window.open(whatsappUrl, '_blank');
     };
@@ -31,7 +38,7 @@ const Home: React.FC = () => {
                 <section className="banner">
                     <div className="banner-content">
                         <h1><span className="title-3d">B</span>em-vindo à Renovo Centro Automotivo</h1>
-                        <p>Falou em solucionar seu problema ou fazer sua manutenção preventiva, vem com a Renovo Centro Automotivo. Segurança, confiança e qualidade!!! 🔧</p>
+                        <p>Falou em solucionar seu problema ou fazer sua manutenção preventiva, vem com a Renovo Centro Automotivo! Atendemos veículos a gasolina, álcool e diesel: troca de óleo de motor e câmbio, elétrica automotiva, ar condicionado veicular, sistema de arrefecimento e muito mais — e se seu carro quebrou na estrada, contamos com serviço de resgate para te ajudar. Segurança, confiança e qualidade!!! 🔧</p>
                         <button className="button" type="button" onClick={openVirtualAssistant}>🚗 Solicitar Serviço</button>
                     </div>
 
@@ -85,8 +92,32 @@ const Home: React.FC = () => {
                             <p>Mantenha seu veículo sempre em perfeito estado com nossa manutenção preventiva especializada.</p>
                         </div>
                         <div className="service-card">
+                            <h3>⛽ Gasolina, Álcool e Diesel</h3>
+                            <p>Atendemos todos os tipos de veículo, com técnicos preparados para cada tipo de motorização.</p>
+                        </div>
+                        <div className="service-card">
                             <h3>🔧 Reparos Gerais</h3>
                             <p>Reparamos qualquer tipo de problema no seu veículo com técnicos experientes e equipamentos modernos.</p>
+                        </div>
+                        <div className="service-card">
+                            <h3>🛢️ Troca de Óleo (Motor e Câmbio)</h3>
+                            <p>Troca de óleo de motor e de câmbio manual com produtos de qualidade e prazo certo.</p>
+                        </div>
+                        <div className="service-card">
+                            <h3>⚡ Elétrica Automotiva</h3>
+                            <p>Diagnóstico e reparo de sistemas elétricos, sensores, bateria e injeção eletrônica.</p>
+                        </div>
+                        <div className="service-card">
+                            <h3>❄️ Ar Condicionado Veicular</h3>
+                            <p>Higienização, recarga de gás e reparo do ar condicionado do seu veículo.</p>
+                        </div>
+                        <div className="service-card">
+                            <h3>🌡️ Sistema de Arrefecimento</h3>
+                            <p>Revisão de radiador, mangueiras e bomba d'água para evitar o superaquecimento do motor.</p>
+                        </div>
+                        <div className="service-card">
+                            <h3>🚨 Resgate de Veículos</h3>
+                            <p>Seu carro quebrou na estrada? Contamos com serviço de resgate para te socorrer.</p>
                         </div>
                         <div className="service-card">
                             <h3>🔍 Diagnóstico Completo</h3>
@@ -95,14 +126,6 @@ const Home: React.FC = () => {
                         <div className="service-card">
                             <h3>💡 Alinhamento e Balanceamento</h3>
                             <p>Garantimos alinhamento e balanceamento com máquinas de precisão para melhor performance.</p>
-                        </div>
-                        <div className="service-card">
-                            <h3>📱 Agendamento Online</h3>
-                            <p>Agende seu serviço facilmente pelo nosso chat ou entre em contato por telefone.</p>
-                        </div>
-                        <div className="service-card">
-                            <h3>⏰ Funcionamento Integral</h3>
-                            <p>Segunda a sexta de 8h às 18h, sábado de 8h às 13h. Chat disponível 24h.</p>
                         </div>
                     </div>
                 </section>
@@ -118,7 +141,7 @@ const Home: React.FC = () => {
                 <section className="cta-section">
                     <h2>Precisa de um Serviço?</h2>
                     <p>Nossa equipe especializada está pronta para resolver seu problema! Entre em contato conosco através do chat ou visite nossa oficina.</p>
-                    <button className="button">📞 Falar com Atendente</button>
+                    <button className="button" type="button" onClick={talkToAttendant}>📞 Falar com Atendente</button>
                 </section>
 
                 {/* Location Section */}

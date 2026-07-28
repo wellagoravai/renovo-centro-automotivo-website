@@ -20,7 +20,7 @@ const openVirtualAssistant = () => {
     }
 
     // Fallback: open WhatsApp (loja number provided)
-    const whatsappNumber = '5518998139810';
+    const whatsappNumber = '551837222388';
     const text = encodeURIComponent('Olá, quero solicitar um serviço.');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
     window.open(whatsappUrl, '_blank');
@@ -45,7 +45,7 @@ const Services: React.FC = () => {
             name: 'Manutenção Preventiva',
             icon: '🛠️',
             description: 'Mantenha seu veículo sempre em perfeito estado com nossa manutenção preventiva especializada.',
-            details: 'Inclui: Troca de óleo, verificação de filtros, inspeção de pastilhas e revisão geral.',
+            details: 'Troca de óleo, verificação de filtros, inspeção de pastilhas e revisão geral.',
         },
         {
             id: '2',
@@ -82,6 +82,48 @@ const Services: React.FC = () => {
             description: 'Garantimos conforto e estabilidade do seu veículo.',
             details: 'Inspeção e reparação de amortecedores e molas.',
         },
+        {
+            id: '7',
+            name: 'Gasolina, Álcool e Diesel',
+            icon: '⛽',
+            description: 'Atendemos todos os tipos de veículo, seja qual for a motorização.',
+            details: 'Técnicos preparados para veículos flex, a álcool e a diesel.',
+        },
+        {
+            id: '8',
+            name: 'Troca de Óleo (Motor e Câmbio)',
+            icon: '🛢️',
+            description: 'Troca de óleo de motor e de câmbio manual com produtos de qualidade.',
+            details: 'Utilizamos óleos recomendados pelo fabricante para cada modelo.',
+        },
+        {
+            id: '9',
+            name: 'Elétrica Automotiva',
+            icon: '⚡',
+            description: 'Diagnóstico e reparo de sistemas elétricos do seu veículo.',
+            details: 'Bateria, alternador, sensores, injeção eletrônica e fiação.',
+        },
+        {
+            id: '10',
+            name: 'Ar Condicionado Veicular',
+            icon: '❄️',
+            description: 'Ar condicionado gelado e higienizado o ano todo.',
+            details: 'Higienização, recarga de gás e reparo de componentes.',
+        },
+        {
+            id: '11',
+            name: 'Sistema de Arrefecimento',
+            icon: '🌡️',
+            description: 'Evite o superaquecimento do motor com revisões periódicas.',
+            details: 'Radiador, mangueiras, bomba d’água e fluido de arrefecimento.',
+        },
+        {
+            id: '12',
+            name: 'Resgate de Veículos',
+            icon: '🚨',
+            description: 'Seu carro quebrou na estrada? A gente te socorre.',
+            details: 'Serviço de resgate para veículos com pane ou quebrados.',
+        },
     ];
 
     return (
@@ -96,10 +138,15 @@ const Services: React.FC = () => {
                     <div className="services-grid">
                         {services.map((service) => (
                             <div key={service.id} className="service-box">
-                                <div className="service-icon">{service.icon}</div>
-                                <h3>{service.name}</h3>
+                                <div className="service-box-header">
+                                    <div className="service-icon">{service.icon}</div>
+                                    <h3>{service.name}</h3>
+                                </div>
                                 <p className="description">{service.description}</p>
-                                <p className="details">{service.details}</p>
+                                <div className="details-box">
+                                    <span className="details-label">O que inclui</span>
+                                    <p className="details">{service.details}</p>
+                                </div>
                                 <button type="button" className="button" onClick={openVirtualAssistant}>
                                     🤖 Solicitar Serviço
                                 </button>

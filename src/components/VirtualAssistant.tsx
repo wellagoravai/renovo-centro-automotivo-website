@@ -34,7 +34,7 @@ const VirtualAssistant: React.FC = () => {
     manutencao: '🛠️ Manutenção Preventiva:\n• Troca de óleo e filtros\n• Revisão de pastilhas\n• Inspeção completa\n• Alinhamento e balanceamento\n\nAgende sua manutenção agora!',
     pagamento: '💳 Aceitamos:\n• Dinheiro\n• Cartão de crédito\n• Cartão de débito\n• PIX\n\nConsulte-nos sobre condições especiais!',
     orcamento: '💰 Para um orçamento:\n• Descreva o problema do seu veículo\n• Indique o modelo e ano\n• Deixe seus dados de contato\n\nNosso time analisará e enviará um orçamento!',
-    contato: '📞 Entre em contato:\n• Telefone: (18) 3722-7031\n• Email: contato@renovocentroautomotivo.com\n• WhatsApp: (18) 98765-4321',
+    contato: '📞 Entre em contato:\n• Telefone: (18) 3722-2388\n• Email: contato@renovocentroautomotivo.com\n• WhatsApp: (18) 3722-2388',
   };
 
   const frequentQuestions: QuestionOption[] = [

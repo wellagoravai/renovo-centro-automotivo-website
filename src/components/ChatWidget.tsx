@@ -101,7 +101,7 @@ const ChatWidget: React.FC = () => {
   };
 
   const openWhatsApp = () => {
-    const whatsappNumber = '5518998139810';
+    const whatsappNumber = '551837222388';
     const text = encodeURIComponent('Olá, gostaria de mais informações sobre os serviços da Renovo Centro Automotivo.');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
     window.open(whatsappUrl, '_blank');

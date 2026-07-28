@@ -17,7 +17,7 @@ const openVirtualAssistant = () => {
     }
 
     // Fallback: open WhatsApp (loja number provided)
-    const whatsappNumber = '5518998139810';
+    const whatsappNumber = '551837222388';
     const text = encodeURIComponent('Olá, gostaria de consultar o preço de um produto.');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
     window.open(whatsappUrl, '_blank');
