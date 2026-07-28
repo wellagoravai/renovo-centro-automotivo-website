@@ -25,8 +25,10 @@ interface VehicleData {
 
 interface ServiceOrderData {
   problemReported: string;
+  services: string;
   observations: string;
   estimatedDelivery: string;
+  responsibleUser: string;
 }
 
 const NewServiceOrderMobile: React.FC = () => {
@@ -56,8 +58,10 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const [serviceOrder, setServiceOrder] = useState<ServiceOrderData>({
     problemReported: '',
+    services: '',
     observations: '',
     estimatedDelivery: '',
+    responsibleUser: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -115,10 +119,11 @@ const NewServiceOrderMobile: React.FC = () => {
     try {
       const requestData = {
         problemReported: serviceOrder.problemReported,
+        services: serviceOrder.services,
         notes: serviceOrder.observations,
         estimatedDate: serviceOrder.estimatedDelivery || null,
         status: 'Recebido',
-        responsibleUser: 'Usuário Atual',
+        responsibleUser: serviceOrder.responsibleUser,
         photos: vehicle.photos.join(','),
         customer: {
           name: customer.name,
@@ -375,6 +380,16 @@ const NewServiceOrderMobile: React.FC = () => {
         />
       </div>
       <div className="form-group">
+        <label>Serviço no Veículo</label>
+        <textarea
+          name="services"
+          value={serviceOrder.services}
+          onChange={handleServiceOrderChange}
+          placeholder="Ex: Trocar óleo e filtros"
+          rows={3}
+        />
+      </div>
+      <div className="form-group">
         <label>Observações</label>
         <textarea
           name="observations"
@@ -391,6 +406,16 @@ const NewServiceOrderMobile: React.FC = () => {
           name="estimatedDelivery"
           value={serviceOrder.estimatedDelivery}
           onChange={handleServiceOrderChange}
+        />
+      </div>
+      <div className="form-group">
+        <label>Mecânico Responsável</label>
+        <input
+          type="text"
+          name="responsibleUser"
+          value={serviceOrder.responsibleUser}
+          onChange={handleServiceOrderChange}
+          placeholder="Nome do mecânico responsável"
         />
       </div>
     </div>

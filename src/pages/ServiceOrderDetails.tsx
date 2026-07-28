@@ -30,6 +30,9 @@ interface ServiceOrder {
   vehiclePlate: string;
   vehicleBrand: string;
   vehicleModel: string;
+  vehicleColor?: string;
+  vehicleYear?: number;
+  vehicleMileage?: number;
   problemReported: string;
   diagnosis?: string;
   services?: string;
@@ -41,6 +44,7 @@ interface ServiceOrder {
   estimatedDate?: string;
   finalDate?: string;
   photos?: string;
+  responsibleUser?: string;
   hasChecklist: boolean;
   checklistId?: string;
   vehicleId: string;
@@ -54,6 +58,7 @@ interface ChecklistForm {
   tireCondition: string;
   coolingLevel: string;
   oilLevel: string;
+  steeringFluidLevel: string;
   tirePressure: string;
   spareTire: boolean;
   rims: boolean;
@@ -83,6 +88,7 @@ const emptyChecklist: ChecklistForm = {
   tireCondition: '',
   coolingLevel: '',
   oilLevel: '',
+  steeringFluidLevel: '',
   tirePressure: '',
   spareTire: false,
   rims: false,
@@ -401,6 +407,12 @@ const ServiceOrderDetails: React.FC = () => {
         <div className="info-card">
           <h3>Veículo</h3>
           <p>{serviceOrder.vehiclePlate} — {serviceOrder.vehicleBrand} {serviceOrder.vehicleModel}</p>
+          <p>
+            {[
+              serviceOrder.vehicleColor,
+              serviceOrder.vehicleYear ? String(serviceOrder.vehicleYear) : null,
+            ].filter(Boolean).join(' · ') || '—'}
+          </p>
         </div>
         <div className="info-card">
           <h3>Entrada</h3>
@@ -445,6 +457,10 @@ const ServiceOrderDetails: React.FC = () => {
                 <div className="data-item">
                   <label>Problema Relatado:</label>
                   <span>{serviceOrder.problemReported}</span>
+                </div>
+                <div className="data-item">
+                  <label>Mecânico Responsável:</label>
+                  <span>{serviceOrder.responsibleUser || '—'}</span>
                 </div>
               </div>
             </div>
@@ -529,12 +545,21 @@ const ServiceOrderDetails: React.FC = () => {
                       </select>
                     </div>
                     <div className="form-group">
-                      <label>Nível de Óleo</label>
+                      <label>Nível de Óleo do Motor</label>
                       <select value={checklist.oilLevel} onChange={(e) => handleChecklistChange('oilLevel', e.target.value)}>
                         <option value="">Selecione</option>
                         <option value="Baixo">Baixo</option>
                         <option value="Normal">Normal</option>
                         <option value="Alto">Alto</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Nível de Óleo de Direção</label>
+                      <select value={checklist.steeringFluidLevel} onChange={(e) => handleChecklistChange('steeringFluidLevel', e.target.value)}>
+                        <option value="">Selecione</option>
+                        <option value="Baixo">Baixo</option>
+                        <option value="OK">OK</option>
+                        <option value="Vencido por tempo de uso">Vencido por tempo de uso</option>
                       </select>
                     </div>
                     <div className="form-group">
@@ -602,6 +627,15 @@ const ServiceOrderDetails: React.FC = () => {
                       rows={3}
                       value={checklist.observations}
                       onChange={(e) => handleChecklistChange('observations', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Mecânico Responsável</label>
+                    <input
+                      type="text"
+                      value={checklist.responsibleUser}
+                      onChange={(e) => handleChecklistChange('responsibleUser', e.target.value)}
+                      placeholder="Nome do mecânico responsável"
                     />
                   </div>
 
@@ -727,7 +761,11 @@ const ServiceOrderDetails: React.FC = () => {
         </div>
       </div>
 
-      <ServiceOrderPrintView order={serviceOrder} />
+      <ServiceOrderPrintView
+        order={serviceOrder}
+        checklist={serviceOrder.hasChecklist ? checklist : null}
+        checklistBooleanFields={checklistBooleanFields}
+      />
     </div>
   );
 };
