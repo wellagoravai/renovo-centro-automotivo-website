@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/DashboardTV.css';
 
 interface ServiceOrder {
@@ -15,6 +16,7 @@ interface ServiceOrder {
 
 const DashboardEnhanced: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [serviceOrders, setServiceOrders] = useState<ServiceOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -74,7 +76,7 @@ const DashboardEnhanced: React.FC = () => {
     const response = await api.patch(`/service-orders/${orderId}/status`, {
       status,
       notes: orderNotes || '',
-      changedBy: 'Usuário Atual',
+      changedBy: user?.fullName || 'Usuário Atual',
     });
 
     if (response.ok) {

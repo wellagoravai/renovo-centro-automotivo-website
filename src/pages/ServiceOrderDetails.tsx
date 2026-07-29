@@ -45,6 +45,8 @@ interface ServiceOrder {
   finalDate?: string;
   photos?: string;
   responsibleUser?: string;
+  assignedUserId?: string;
+  assignedUserName?: string;
   hasChecklist: boolean;
   checklistId?: string;
   vehicleId: string;
@@ -139,6 +141,12 @@ interface InventoryResult {
   quantity: number;
 }
 
+interface AssignableUser {
+  id: string;
+  fullName: string;
+  role: string;
+}
+
 const ServiceOrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -164,9 +172,25 @@ const ServiceOrderDetails: React.FC = () => {
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
   const [searchingItems, setSearchingItems] = useState(false);
 
+  const [mechanics, setMechanics] = useState<AssignableUser[]>([]);
+  const [assignedUserId, setAssignedUserId] = useState('');
+  const [savingAssignment, setSavingAssignment] = useState(false);
+
   useEffect(() => {
     loadServiceOrder();
+    loadMechanics();
   }, [id]);
+
+  const loadMechanics = async () => {
+    try {
+      const response = await api.get('/Users/assignable?role=Mecânico');
+      if (response.ok) {
+        setMechanics(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao carregar mecânicos:', error);
+    }
+  };
 
   const loadServiceOrder = async () => {
     try {
@@ -182,6 +206,7 @@ const ServiceOrderDetails: React.FC = () => {
           notes: data.notes || '',
         });
         setPhotos(data.photos ? data.photos.split(',').filter(Boolean) : []);
+        setAssignedUserId(data.assignedUserId || '');
         if (data.hasChecklist && data.checklistId) {
           loadChecklist(data.checklistId);
         }
@@ -242,6 +267,30 @@ const ServiceOrderDetails: React.FC = () => {
       alert('❌ Erro ao salvar diagnóstico');
     } finally {
       setSavingDiagnosis(false);
+    }
+  };
+
+  const handleSaveAssignment = async () => {
+    if (!serviceOrder) return;
+    setSavingAssignment(true);
+    try {
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
+        ...diagnosisForm,
+        photos: serviceOrder.photos || '',
+        assignedUserId: assignedUserId || null,
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setServiceOrder(updated);
+        alert('✅ Mecânico atribuído com sucesso!');
+      } else {
+        alert('❌ Erro ao atribuir mecânico');
+      }
+    } catch (error) {
+      console.error('Erro ao atribuir mecânico:', error);
+      alert('❌ Erro ao atribuir mecânico');
+    } finally {
+      setSavingAssignment(false);
     }
   };
 
@@ -462,6 +511,24 @@ const ServiceOrderDetails: React.FC = () => {
                   <label>Mecânico Responsável:</label>
                   <span>{serviceOrder.responsibleUser || '—'}</span>
                 </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: 20 }}>
+                <label>Atribuir a (app mobile da equipe)</label>
+                <select value={assignedUserId} onChange={(e) => setAssignedUserId(e.target.value)}>
+                  <option value="">Não atribuído</option>
+                  {mechanics.map(m => (
+                    <option key={m.id} value={m.id}>{m.fullName}</option>
+                  ))}
+                </select>
+                <button
+                  className="btn-primary"
+                  style={{ marginTop: 10 }}
+                  onClick={handleSaveAssignment}
+                  disabled={savingAssignment}
+                >
+                  {savingAssignment ? 'Salvando...' : 'Salvar Atribuição'}
+                </button>
               </div>
             </div>
           )}
