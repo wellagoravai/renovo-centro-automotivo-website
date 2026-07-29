@@ -320,7 +320,7 @@ const UsersManagement: React.FC = () => {
                   required={!editingUser}
                 />
               </div>
-              {!editingUser && (
+              {(!editingUser || formData.password) && (
                 <div className="form-group">
                   <label>Confirmar Senha *</label>
                   <input
