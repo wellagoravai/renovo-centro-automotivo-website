@@ -290,6 +290,10 @@ const ServiceOrderDetails: React.FC = () => {
         setTowStatus(data.status);
         if (data.hasChecklist && data.checklistId) {
           loadChecklist(data.checklistId);
+        } else {
+          // KM do veículo já foi informado no Check-in; usa o mesmo valor como
+          // padrão do checklist para não pedir de novo ao mecânico.
+          setChecklist(prev => ({ ...prev, mileage: data.vehicleMileage || 0 }));
         }
       }
       if (photosResponse.ok) {
@@ -1129,6 +1133,7 @@ const ServiceOrderDetails: React.FC = () => {
         order={serviceOrder}
         checklist={serviceOrder.hasChecklist ? checklist : null}
         checklistBooleanFields={checklistBooleanFields}
+        photos={photos}
       />
     </div>
   );

@@ -14,8 +14,9 @@ interface DamagePoint {
 }
 
 // Esquema simples do carro "de pé" (visto de cima), para-choque dianteiro no topo.
-// viewBox 0 0 300 500.
-const DAMAGE_POINTS: DamagePoint[] = [
+// viewBox 0 0 300 500. Exportado para ser reaproveitado pela versão somente-leitura
+// usada no Laudo de Avarias impresso (ver ServiceOrderPrintView).
+export const DAMAGE_POINTS: DamagePoint[] = [
   { key: 'front_bumper', label: 'Para-choque dianteiro', cx: 150, cy: 35 },
   { key: 'hood', label: 'Capô', cx: 150, cy: 90 },
   { key: 'windshield_front', label: 'Para-brisa', cx: 150, cy: 140 },

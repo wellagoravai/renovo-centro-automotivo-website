@@ -192,3 +192,56 @@
   font-size: 12px;
   color: #444;
 }
+
+.os-print-photos-section {
+  page-break-inside: avoid;
+}
+
+.os-print-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.os-print-photo-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.os-print-page-break {
+  page-break-before: always;
+  padding-top: 20px;
+}
+
+.os-print-damage-diagram {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.os-print-damage-svg {
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.os-print-damage-point {
+  fill: transparent;
+  stroke: #95a5a6;
+  stroke-width: 2;
+}
+
+.os-print-damage-point.marked {
+  fill: #e74c3c;
+  stroke: #c0392b;
+}
+
+.os-print-damage-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #1a1a1a;
+}

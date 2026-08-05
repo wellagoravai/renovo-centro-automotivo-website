@@ -8,6 +8,7 @@ interface ServiceOrder {
   id: string;
   number: string;
   status: string;
+  serviceType: string;
   entryDate: string;
   estimatedDate?: string;
   finalDate?: string;
@@ -25,19 +26,23 @@ const ServiceOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
-  const { hasPermission } = useAuth();
+  const [showMine, setShowMine] = useState(false);
+  const { user, hasPermission } = useAuth();
+
+  const isMechanic = user?.role === 'Mecânico';
 
   useEffect(() => {
     loadOrders();
-  }, [statusFilter, search]);
+  }, [statusFilter, search, showMine]);
 
   const loadOrders = async () => {
     try {
       let url = '/service-orders';
       const params = new URLSearchParams();
-      
+
       if (statusFilter) params.append('status', statusFilter);
       if (search) params.append('search', search);
+      if (showMine && isMechanic && user) params.append('assignedUserId', user.id);
 
       if (params.toString()) {
         url += `?${params.toString()}`;
@@ -87,11 +92,21 @@ const ServiceOrders: React.FC = () => {
     <div className="service-orders-page">
       <div className="page-header">
         <h1>Ordens de Serviço</h1>
-        {hasPermission('orders.write') && (
-          <button className="btn btn-primary" onClick={() => navigate('/new-service-order')}>
-            + Nova Ordem
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {isMechanic && (
+            <button
+              className={showMine ? 'btn btn-primary' : 'btn btn-secondary'}
+              onClick={() => setShowMine((v) => !v)}
+            >
+              {showMine ? 'Ver Todas as Ordens' : 'Minhas Ordens'}
+            </button>
+          )}
+          {hasPermission('orders.write') && (
+            <button className="btn btn-primary" onClick={() => navigate('/new-service-order')}>
+              + Nova Ordem
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="filters-bar">
@@ -140,7 +155,16 @@ const ServiceOrders: React.FC = () => {
             }}
           >
             <div className="order-header">
-              <div className="order-number">#{order.number}</div>
+              <div className="order-number">
+                <span
+                  className="order-type-emoji"
+                  title={order.serviceType === 'Guincho' ? 'Guincho' : 'Oficina'}
+                  aria-label={order.serviceType === 'Guincho' ? 'Guincho' : 'Oficina'}
+                >
+                  {order.serviceType === 'Guincho' ? '🚛' : '🔧'}
+                </span>
+                #{order.number}
+              </div>
               <div
                 className="order-status"
                 style={{ backgroundColor: getStatusColor(order.status) }}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import ReportPrintView, { ReportPrintData } from '../components/ReportPrintView';
 import '../styles/Reports.css';
 
 interface ServiceOrder {
@@ -350,6 +351,175 @@ const ReportsPage: React.FC = () => {
         return 'Relatório Semanal';
       case 'month':
         return 'Relatório Mensal';
+    }
+  };
+
+  const getPrintData = (): ReportPrintData | null => {
+    switch (activeTab) {
+      case 'completed': {
+        if (!completedData) return null;
+        return {
+          title: 'Manutenções Concluídas',
+          meta: [`Período: ${formatDate(completedStartDate)} a ${formatDate(completedEndDate)}`],
+          summary: [
+            { label: 'Total Concluídas', value: String(completedData.summary.totalCompleted) },
+            { label: 'Valor Total', value: formatCurrency(completedData.summary.totalValue) },
+            { label: 'Valor Médio', value: formatCurrency(completedData.summary.averageValue) },
+            { label: 'Duração Média', value: `${completedData.summary.averageDuration.toFixed(1)}h` },
+          ],
+          sections: [{
+            columns: ['OS', 'Entrada', 'Conclusão', 'Cliente', 'Veículo', 'Serviços', 'Responsável', 'Duração', 'Valor'],
+            rows: completedData.data.map(o => [
+              o.orderNumber, formatDate(o.entryDate), formatDate(o.finalDate), o.customerName,
+              `${o.vehiclePlate} - ${o.vehicleBrand} ${o.vehicleModel}`, o.services || '—',
+              o.responsibleUser || '—', `${o.durationHours.toFixed(1)}h`, formatCurrency(o.value),
+            ]),
+          }],
+        };
+      }
+
+      case 'top-services': {
+        if (!topServicesData) return null;
+        const periodLabel = topServicesPeriod === 'day' ? 'Hoje' : topServicesPeriod === 'week' ? 'Últimos 7 dias' : 'Últimos 30 dias';
+        return {
+          title: 'Serviços Mais Realizados',
+          meta: [`Período: ${periodLabel}`],
+          summary: [
+            { label: 'Total de Ordens', value: String(topServicesData.totalOrders) },
+            { label: 'Serviços Diferentes', value: String(topServicesData.services.length) },
+          ],
+          sections: [{
+            columns: ['#', 'Serviço', 'Quantidade', 'Faturamento', '% do Total'],
+            rows: topServicesData.services.map((s, i) => [
+              `#${i + 1}`, s.serviceName, `${s.count}x`, formatCurrency(s.totalRevenue),
+              topServicesData.totalOrders > 0 ? `${((s.count / topServicesData.totalOrders) * 100).toFixed(1)}%` : '0%',
+            ]),
+          }],
+        };
+      }
+
+      case 'revenue': {
+        if (!revenueData) return null;
+        return {
+          title: 'Relatório de Faturamento',
+          meta: [`Período: ${formatDate(revenueStartDate)} a ${formatDate(revenueEndDate)}`],
+          summary: [
+            { label: 'Faturamento Total', value: formatCurrency(revenueData.totalRevenue) },
+            { label: 'Ticket Médio', value: formatCurrency(revenueData.averageOrderValue) },
+            { label: 'Total de Ordens', value: String(revenueData.totalOrders) },
+          ],
+          chart: {
+            heading: 'Faturamento por Dia',
+            items: revenueData.dailyRevenue.map((d: any) => ({
+              label: formatDate(d.date.toString()),
+              value: d.revenue,
+              valueLabel: `${formatCurrency(d.revenue)} (${d.count} OS)`,
+            })),
+          },
+        };
+      }
+
+      case 'employees': {
+        if (!employeesData) return null;
+        const periodLabel = employeesPeriod === 'week' ? 'Última semana' : 'Último mês';
+        return {
+          title: 'Funcionário que Mais Realizou Serviços',
+          meta: [`Período: ${periodLabel}`],
+          sections: [{
+            columns: ['#', 'Funcionário', 'OS Concluídas', 'Valor Total'],
+            rows: employeesData.employees.map((emp, i) => [
+              `#${i + 1}`, emp.employee, String(emp.completedOrders), formatCurrency(emp.totalValue),
+            ]),
+          }],
+        };
+      }
+
+      case 'inventory': {
+        if (!inventoryReportData) return null;
+        return {
+          title: 'Relatório de Estoque',
+          summary: [
+            { label: 'Itens Cadastrados', value: String(inventoryReportData.totalItems) },
+            { label: 'Valor Total em Estoque', value: formatCurrency(inventoryReportData.totalValue) },
+            { label: 'Itens Abaixo do Mínimo', value: String(inventoryReportData.lowStock.length) },
+          ],
+          sections: [
+            {
+              heading: 'Por Categoria',
+              columns: ['Categoria', 'Itens', 'Qtd', 'Valor'],
+              rows: inventoryReportData.byCategory.map(cat => [
+                cat.category, String(cat.itemCount), String(cat.totalQuantity), formatCurrency(cat.totalValue),
+              ]),
+            },
+            {
+              heading: 'Abaixo do Estoque Mínimo',
+              columns: ['Código', 'Descrição', 'Qtd', 'Mínimo'],
+              rows: inventoryReportData.lowStock.map(item => [
+                item.code, item.description, String(item.quantity), String(item.minimumQuantity),
+              ]),
+            },
+          ],
+        };
+      }
+
+      case 'annual': {
+        if (!annualData) return null;
+        return {
+          title: `Serviços Mais Realizados em ${annualData.year}`,
+          summary: [
+            { label: 'Ano', value: String(annualData.year) },
+            { label: 'Total de Ordens', value: String(annualData.totalOrders) },
+          ],
+          chart: {
+            heading: 'Ordens por Mês',
+            items: annualData.monthly.map(m => ({
+              label: monthNames[m.month - 1],
+              value: m.orderCount,
+              valueLabel: `${m.orderCount} OS — ${formatCurrency(m.totalValue)}`,
+            })),
+          },
+          sections: [{
+            heading: 'Top 10 Serviços do Ano',
+            columns: ['#', 'Serviço', 'Quantidade'],
+            rows: annualData.topServices.map((s, i) => [`#${i + 1}`, s.serviceName, `${s.count}x`]),
+          }],
+        };
+      }
+
+      case 'parts-consumption': {
+        if (!partsConsumptionData) return null;
+        return {
+          title: 'Consumo de Peças e Insumos',
+          meta: [`Período: ${formatDate(partsStartDate)} a ${formatDate(partsEndDate)}`],
+          sections: [{
+            columns: ['Código', 'Descrição', 'Categoria', 'Qtd Usada', 'Valor Total'],
+            rows: partsConsumptionData.consumption.map(item => [
+              item.code, item.description, item.category, String(item.quantityUsed), formatCurrency(item.totalValue),
+            ]),
+          }],
+        };
+      }
+
+      case 'overview': {
+        if (!reportData) return null;
+        return {
+          title: `Ordens de Serviço — ${getReportTitle()}`,
+          meta: [`Data de referência: ${formatDate(selectedDate)}`],
+          summary: [
+            { label: 'Total de Ordens', value: String(reportData.totalOrders) },
+            { label: 'Valor Total', value: formatCurrency(reportData.totalValue) },
+          ],
+          sections: [{
+            columns: ['Número', 'Data Entrada', 'Cliente', 'Veículo', 'Status', 'Valor'],
+            rows: reportData.orders.map(o => [
+              `OS ${o.number}`, formatDate(o.entryDate), o.customerName, o.vehiclePlate, o.status, formatCurrency(o.value),
+            ]),
+          }],
+        };
+      }
+
+      default:
+        return null;
     }
   };
 
@@ -1205,6 +1375,8 @@ const ReportsPage: React.FC = () => {
           )}
         </div>
       )}
+
+      <ReportPrintView data={getPrintData()} />
     </div>
   );
 };

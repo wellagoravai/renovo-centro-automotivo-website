@@ -53,9 +53,17 @@
 }
 
 .order-number {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 18px;
   font-weight: bold;
   color: #2c3e50;
+}
+
+.order-type-emoji {
+  font-size: 26px;
+  line-height: 1;
 }
 
 .order-status {
