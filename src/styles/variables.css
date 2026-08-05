@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+/* Fontes carregadas via <link> em public/index.html (preconnect + stylesheet),
+   não por @import aqui — evita um round-trip extra de rede antes do parser
+   descobrir a fonte, que é o que o @import antigo (Poppins) fazia. */
 
 :root {
     /* Paleta da marca: Preto + Vermelho (alta legibilidade) */
@@ -10,10 +12,12 @@
     --text-color: #1f2937; /* cinza-escuro para melhor contraste */
     --header-height: 60px;
     --footer-height: 50px;
-    --font-family: 'Poppins', sans-serif;
+    --font-family: 'Inter', sans-serif;
+    --font-family-heading: 'Instrument Sans', 'Inter', sans-serif;
     --font-size-base: 16px;
     --font-size-large: 20px;
     --font-size-small: 14px;
     --border-radius: 4px;
     --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --container-width: 1280px;
 }

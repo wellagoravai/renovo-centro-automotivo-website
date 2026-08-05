@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 import ServiceOrderPrintView from '../components/ServiceOrderPrintView';
+import VehicleDamageDiagram from '../components/VehicleDamageDiagram';
 import '../styles/ServiceOrderDetails.css';
 
 interface HistoryEntry {
@@ -22,10 +24,46 @@ interface OrderItem {
   totalValue: number;
 }
 
+interface TowServiceDetails {
+  insuranceCompany: string;
+  assistanceCompany: string;
+  claimNumber: string;
+  pickupLocation: string;
+  deliveryDestination: string;
+  towUnit: string;
+  deliveredByName: string;
+  deliveredByDocument: string;
+  receivedByName: string;
+  receivedByDocument: string;
+}
+
+const emptyTowDetails: TowServiceDetails = {
+  insuranceCompany: '',
+  assistanceCompany: '',
+  claimNumber: '',
+  pickupLocation: '',
+  deliveryDestination: '',
+  towUnit: '',
+  deliveredByName: '',
+  deliveredByDocument: '',
+  receivedByName: '',
+  receivedByDocument: '',
+};
+
+const TOW_STATUS_LIST = [
+  'Chamado recebido',
+  'A caminho do local',
+  'Veículo carregado',
+  'Em transporte',
+  'Entregue',
+  'Cancelado',
+];
+
 interface ServiceOrder {
   id: string;
   number: string;
   status: string;
+  serviceType: string;
   customerName: string;
   vehiclePlate: string;
   vehicleBrand: string;
@@ -38,6 +76,7 @@ interface ServiceOrder {
   services?: string;
   parts?: string;
   estimatedTime?: number;
+  laborValue?: number;
   value?: number;
   notes?: string;
   entryDate: string;
@@ -50,6 +89,7 @@ interface ServiceOrder {
   hasChecklist: boolean;
   checklistId?: string;
   vehicleId: string;
+  towDetails?: TowServiceDetails | null;
   history: HistoryEntry[];
   items: OrderItem[];
 }
@@ -78,6 +118,14 @@ interface ChecklistForm {
   triangle: boolean;
   spareKey: boolean;
   documents: boolean;
+  fogLights: boolean;
+  hubcaps: boolean;
+  antenna: boolean;
+  wheelWrench: boolean;
+  floorMat: boolean;
+  radio: boolean;
+  ignitionKeys: boolean;
+  damagePoints: string;
   generalState: string;
   observations: string;
   visualDamage: string;
@@ -108,6 +156,14 @@ const emptyChecklist: ChecklistForm = {
   triangle: false,
   spareKey: false,
   documents: false,
+  fogLights: false,
+  hubcaps: false,
+  antenna: false,
+  wheelWrench: false,
+  floorMat: false,
+  radio: false,
+  ignitionKeys: false,
+  damagePoints: '',
   generalState: '',
   observations: '',
   visualDamage: '',
@@ -131,6 +187,13 @@ const checklistBooleanFields: { key: keyof ChecklistForm; label: string }[] = [
   { key: 'triangle', label: 'Triângulo' },
   { key: 'spareKey', label: 'Chave reserva' },
   { key: 'documents', label: 'Documentos' },
+  { key: 'fogLights', label: 'Farol de milha' },
+  { key: 'hubcaps', label: 'Calotas' },
+  { key: 'antenna', label: 'Antena' },
+  { key: 'wheelWrench', label: 'Chave de roda' },
+  { key: 'floorMat', label: 'Tapete' },
+  { key: 'radio', label: 'Rádio' },
+  { key: 'ignitionKeys', label: 'Chaves de ignição' },
 ];
 
 interface InventoryResult {
@@ -147,15 +210,23 @@ interface AssignableUser {
   role: string;
 }
 
+interface ServiceOrderPhoto {
+  id: string;
+  url: string;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
 const ServiceOrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dados');
   const [serviceOrder, setServiceOrder] = useState<ServiceOrder | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
-    diagnosis: '', services: '', estimatedTime: 0, value: 0, notes: '',
+    diagnosis: '', services: '', estimatedTime: 0, laborValue: 0, notes: '',
   });
   const [savingDiagnosis, setSavingDiagnosis] = useState(false);
 
@@ -163,8 +234,8 @@ const ServiceOrderDetails: React.FC = () => {
   const [checklistLoading, setChecklistLoading] = useState(false);
   const [savingChecklist, setSavingChecklist] = useState(false);
 
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [savingPhotos, setSavingPhotos] = useState(false);
+  const [photos, setPhotos] = useState<ServiceOrderPhoto[]>([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [itemSearch, setItemSearch] = useState('');
@@ -175,6 +246,12 @@ const ServiceOrderDetails: React.FC = () => {
   const [mechanics, setMechanics] = useState<AssignableUser[]>([]);
   const [assignedUserId, setAssignedUserId] = useState('');
   const [savingAssignment, setSavingAssignment] = useState(false);
+
+  const [towDetailsForm, setTowDetailsForm] = useState<TowServiceDetails>(emptyTowDetails);
+  const [savingTowDetails, setSavingTowDetails] = useState(false);
+  const [converting, setConverting] = useState(false);
+  const [towStatus, setTowStatus] = useState('');
+  const [updatingTowStatus, setUpdatingTowStatus] = useState(false);
 
   useEffect(() => {
     loadServiceOrder();
@@ -194,22 +271,29 @@ const ServiceOrderDetails: React.FC = () => {
 
   const loadServiceOrder = async () => {
     try {
-      const response = await api.get(`/service-orders/${id}`);
-      if (response.ok) {
-        const data: ServiceOrder = await response.json();
+      const [orderResponse, photosResponse] = await Promise.all([
+        api.get(`/service-orders/${id}`),
+        api.get(`/service-orders/${id}/photos`),
+      ]);
+      if (orderResponse.ok) {
+        const data: ServiceOrder = await orderResponse.json();
         setServiceOrder(data);
         setDiagnosisForm({
           diagnosis: data.diagnosis || '',
           services: data.services || '',
           estimatedTime: data.estimatedTime || 0,
-          value: data.value || 0,
+          laborValue: data.laborValue || 0,
           notes: data.notes || '',
         });
-        setPhotos(data.photos ? data.photos.split(',').filter(Boolean) : []);
         setAssignedUserId(data.assignedUserId || '');
+        setTowDetailsForm({ ...emptyTowDetails, ...(data.towDetails || {}) });
+        setTowStatus(data.status);
         if (data.hasChecklist && data.checklistId) {
           loadChecklist(data.checklistId);
         }
+      }
+      if (photosResponse.ok) {
+        setPhotos(await photosResponse.json());
       }
     } catch (error) {
       console.error('Erro ao carregar OS:', error);
@@ -246,6 +330,11 @@ const ServiceOrderDetails: React.FC = () => {
       'Pronto para retirada': '#27ae60',
       'Entregue': '#95a5a6',
       'Cancelado': '#e74c3c',
+      // Status de Guincho
+      'Chamado recebido': '#3498db',
+      'A caminho do local': '#f39c12',
+      'Veículo carregado': '#9b59b6',
+      'Em transporte': '#e67e22',
     };
     return colors[status] || '#7f8c8d';
   };
@@ -294,6 +383,84 @@ const ServiceOrderDetails: React.FC = () => {
     }
   };
 
+  const handleTowDetailsChange = (key: keyof TowServiceDetails, value: string) => {
+    setTowDetailsForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveTowDetails = async () => {
+    if (!serviceOrder) return;
+    setSavingTowDetails(true);
+    try {
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
+        ...diagnosisForm,
+        photos: serviceOrder.photos || '',
+        towDetails: towDetailsForm,
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setServiceOrder(updated);
+        alert('✅ Dados do guincho salvos com sucesso!');
+      } else {
+        alert('❌ Erro ao salvar dados do guincho');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar dados do guincho:', error);
+      alert('❌ Erro ao salvar dados do guincho');
+    } finally {
+      setSavingTowDetails(false);
+    }
+  };
+
+  const handleConvertToOficina = async () => {
+    if (!serviceOrder) return;
+    if (!window.confirm('Converter esta OS de Guincho para Reparo na Oficina? O status voltará para "Recebido".')) {
+      return;
+    }
+    setConverting(true);
+    try {
+      const response = await api.patch(`/service-orders/${serviceOrder.id}/convert-to-oficina`, {
+        changedBy: user?.fullName || 'Usuário Atual',
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setServiceOrder(updated);
+        alert('✅ OS convertida para Reparo na Oficina!');
+      } else {
+        const error = await response.json().catch(() => null);
+        alert(`❌ ${error?.message || 'Erro ao converter OS'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao converter OS:', error);
+      alert('❌ Erro ao converter OS');
+    } finally {
+      setConverting(false);
+    }
+  };
+
+  const handleUpdateTowStatus = async () => {
+    if (!serviceOrder || !towStatus) return;
+    setUpdatingTowStatus(true);
+    try {
+      const response = await api.patch(`/service-orders/${serviceOrder.id}/status`, {
+        status: towStatus,
+        notes: '',
+        changedBy: user?.fullName || 'Usuário Atual',
+      });
+      if (response.ok) {
+        loadServiceOrder();
+        alert('✅ Status atualizado com sucesso!');
+      } else {
+        const error = await response.json().catch(() => null);
+        alert(`❌ ${error?.message || 'Erro ao atualizar status'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      alert('❌ Erro ao atualizar status');
+    } finally {
+      setUpdatingTowStatus(false);
+    }
+  };
+
   const handleChecklistChange = <K extends keyof ChecklistForm>(key: K, value: ChecklistForm[K]) => {
     setChecklist(prev => ({ ...prev, [key]: value }));
   };
@@ -325,40 +492,30 @@ const ServiceOrderDetails: React.FC = () => {
     }
   };
 
-  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => setPhotos(prev => [...prev, reader.result as string]);
-      reader.readAsDataURL(file);
-    });
-  };
+    if (!files || !serviceOrder) return;
 
-  const removePhoto = (index: number) => {
-    setPhotos(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSavePhotos = async () => {
-    if (!serviceOrder) return;
-    setSavingPhotos(true);
+    setUploadingPhoto(true);
     try {
-      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
-        ...diagnosisForm,
-        photos: photos.join(','),
-      });
-      if (response.ok) {
-        const updated = await response.json();
-        setServiceOrder(updated);
-        alert('✅ Fotos salvas com sucesso!');
-      } else {
-        alert('❌ Erro ao salvar fotos');
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await api.post(`/service-orders/${serviceOrder.id}/photos`, formData);
+        if (response.ok) {
+          const photo: ServiceOrderPhoto = await response.json();
+          setPhotos(prev => [photo, ...prev]);
+        } else {
+          const error = await response.json().catch(() => null);
+          alert(`❌ ${error?.message || 'Erro ao enviar foto'}`);
+        }
       }
     } catch (error) {
-      console.error('Erro ao salvar fotos:', error);
-      alert('❌ Erro ao salvar fotos');
+      console.error('Erro ao enviar foto:', error);
+      alert('❌ Erro ao enviar foto');
     } finally {
-      setSavingPhotos(false);
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -431,6 +588,11 @@ const ServiceOrderDetails: React.FC = () => {
       <div className="os-header">
         <div className="os-title">
           <h1>OS {serviceOrder.number}</h1>
+          <span
+            className={`service-type-badge ${serviceOrder.serviceType === 'Guincho' ? 'tow' : 'workshop'}`}
+          >
+            {serviceOrder.serviceType === 'Guincho' ? '🚛 Guincho' : '🔧 Oficina'}
+          </span>
           <span
             className="status-badge"
             style={{ backgroundColor: getStatusColor(serviceOrder.status) }}
@@ -530,6 +692,132 @@ const ServiceOrderDetails: React.FC = () => {
                   {savingAssignment ? 'Salvando...' : 'Salvar Atribuição'}
                 </button>
               </div>
+
+              {serviceOrder.serviceType === 'Guincho' && (
+                <div className="tow-section">
+                  <h4>Atualizar Status do Guincho</h4>
+                  <div className="form-group" style={{ maxWidth: 320 }}>
+                    <label>Status Atual</label>
+                    <select value={towStatus} onChange={(e) => setTowStatus(e.target.value)}>
+                      {TOW_STATUS_LIST.map(status => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                    <button
+                      className="btn-primary"
+                      style={{ marginTop: 10 }}
+                      onClick={handleUpdateTowStatus}
+                      disabled={updatingTowStatus}
+                    >
+                      {updatingTowStatus ? 'Atualizando...' : 'Atualizar Status'}
+                    </button>
+                  </div>
+
+                  <h4>Dados do Guincho</h4>
+                  <div className="tow-details-grid">
+                    <div className="form-group">
+                      <label>Seguradora</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.insuranceCompany}
+                        onChange={(e) => handleTowDetailsChange('insuranceCompany', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Assistência</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.assistanceCompany}
+                        onChange={(e) => handleTowDetailsChange('assistanceCompany', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Sinistro</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.claimNumber}
+                        onChange={(e) => handleTowDetailsChange('claimNumber', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Local do Atendimento</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.pickupLocation}
+                        onChange={(e) => handleTowDetailsChange('pickupLocation', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Destino da Entrega</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.deliveryDestination}
+                        onChange={(e) => handleTowDetailsChange('deliveryDestination', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Viatura</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.towUnit}
+                        onChange={(e) => handleTowDetailsChange('towUnit', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Entregue por (Nome)</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.deliveredByName}
+                        onChange={(e) => handleTowDetailsChange('deliveredByName', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Entregue por (Documento)</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.deliveredByDocument}
+                        onChange={(e) => handleTowDetailsChange('deliveredByDocument', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Recebido por (Nome)</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.receivedByName}
+                        onChange={(e) => handleTowDetailsChange('receivedByName', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Recebido por (Documento)</label>
+                      <input
+                        type="text"
+                        value={towDetailsForm.receivedByDocument}
+                        onChange={(e) => handleTowDetailsChange('receivedByDocument', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    className="btn-primary"
+                    onClick={handleSaveTowDetails}
+                    disabled={savingTowDetails}
+                  >
+                    {savingTowDetails ? 'Salvando...' : 'Salvar Dados do Guincho'}
+                  </button>
+
+                  <div className="tow-convert-box">
+                    <p className="tab-hint">
+                      Quando o veículo for encaminhado para reparo, converta esta OS para o fluxo de Oficina.
+                    </p>
+                    <button
+                      className="btn-secondary"
+                      onClick={handleConvertToOficina}
+                      disabled={converting}
+                    >
+                      {converting ? 'Convertendo...' : '🔧 Converter para Reparo na Oficina'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -563,11 +851,11 @@ const ServiceOrderDetails: React.FC = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Valor Total (R$)</label>
+                <label>Mão de obra (R$)</label>
                 <input
                   type="number" step="0.01" min="0"
-                  value={diagnosisForm.value}
-                  onChange={(e) => setDiagnosisForm(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
+                  value={diagnosisForm.laborValue}
+                  onChange={(e) => setDiagnosisForm(prev => ({ ...prev, laborValue: parseFloat(e.target.value) || 0 }))}
                 />
               </div>
               <div className="form-group">
@@ -578,6 +866,9 @@ const ServiceOrderDetails: React.FC = () => {
                   onChange={(e) => setDiagnosisForm(prev => ({ ...prev, notes: e.target.value }))}
                 />
               </div>
+              <p className="tab-hint">
+                Total do orçamento (mão de obra + peças lançadas na aba "Peças Usadas"): <strong>R$ {(serviceOrder.value || 0).toFixed(2)}</strong>
+              </p>
               <button className="btn-primary" onClick={handleSaveDiagnosis} disabled={savingDiagnosis}>
                 {savingDiagnosis ? 'Salvando...' : 'Salvar Diagnóstico'}
               </button>
@@ -672,6 +963,15 @@ const ServiceOrderDetails: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="checklist-section">
+                    <h4>Avarias no Veículo</h4>
+                    <p className="tab-hint">Clique nos pontos do diagrama (ou marque na lista) para indicar avarias.</p>
+                    <VehicleDamageDiagram
+                      markedPoints={checklist.damagePoints.split(',').filter(Boolean)}
+                      onChange={(points) => handleChecklistChange('damagePoints', points.join(','))}
+                    />
+                  </div>
+
                   <div className="form-group">
                     <label>Estado Geral</label>
                     <input
@@ -717,32 +1017,29 @@ const ServiceOrderDetails: React.FC = () => {
           {activeTab === 'fotos' && (
             <div className="tab-pane">
               <h3>Fotos do Veículo</h3>
+              <p className="tab-hint">Fotos de peças defeituosas aqui são enviadas junto com o orçamento quando a OS for para "Aguardando aprovação".</p>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={handlePhotoCapture}
+                onChange={handlePhotoUpload}
                 style={{ display: 'none' }}
               />
-              <button className="btn-add-photo" onClick={() => fileInputRef.current?.click()}>
-                + Adicionar Foto
+              <button className="btn-add-photo" onClick={() => fileInputRef.current?.click()} disabled={uploadingPhoto}>
+                {uploadingPhoto ? 'Enviando...' : '+ Adicionar Foto'}
               </button>
 
               {photos.length > 0 && (
                 <div className="os-photo-grid">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="os-photo-item">
-                      <img src={photo} alt={`Foto ${index + 1}`} />
-                      <button type="button" className="os-photo-remove" onClick={() => removePhoto(index)}>✕</button>
+                  {photos.map((photo) => (
+                    <div key={photo.id} className="os-photo-item">
+                      <img src={photo.url} alt="Foto do veículo" />
                     </div>
                   ))}
                 </div>
               )}
-
-              <button className="btn-primary" onClick={handleSavePhotos} disabled={savingPhotos} style={{ marginTop: 20 }}>
-                {savingPhotos ? 'Salvando...' : 'Salvar Fotos'}
-              </button>
+              {photos.length === 0 && <p className="tab-hint">Nenhuma foto ainda.</p>}
             </div>
           )}
 

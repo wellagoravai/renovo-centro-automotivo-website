@@ -1,0 +1,80 @@
+.vehicle-damage-diagram {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.vehicle-damage-diagram-svg {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.damage-point {
+  fill: transparent;
+  stroke: #95a5a6;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: fill 0.15s, stroke 0.15s;
+}
+
+.damage-point:hover {
+  stroke: #3498db;
+}
+
+.damage-point:focus {
+  outline: none;
+  stroke: #3498db;
+  stroke-width: 3;
+}
+
+.damage-point.marked {
+  fill: #e74c3c;
+  stroke: #c0392b;
+}
+
+.damage-legend {
+  flex: 1;
+  min-width: 220px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  align-content: start;
+}
+
+.damage-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.damage-legend-item:hover {
+  background: white;
+}
+
+.damage-legend-item.marked {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.damage-legend-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .vehicle-damage-diagram {
+    flex-direction: column;
+    align-items: center;
+  }
+}

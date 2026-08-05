@@ -31,10 +31,43 @@ interface ServiceOrderData {
   responsibleUser: string;
 }
 
+interface TowDetailsData {
+  insuranceCompany: string;
+  assistanceCompany: string;
+  claimNumber: string;
+  pickupLocation: string;
+  deliveryDestination: string;
+  towUnit: string;
+  deliveredByName: string;
+  deliveredByDocument: string;
+  receivedByName: string;
+  receivedByDocument: string;
+}
+
+const emptyTowDetails: TowDetailsData = {
+  insuranceCompany: '',
+  assistanceCompany: '',
+  claimNumber: '',
+  pickupLocation: '',
+  deliveryDestination: '',
+  towUnit: '',
+  deliveredByName: '',
+  deliveredByDocument: '',
+  receivedByName: '',
+  receivedByDocument: '',
+};
+
 const NewServiceOrderMobile: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [serviceType, setServiceType] = useState<'Oficina' | 'Guincho'>('Oficina');
+  const [towDetails, setTowDetails] = useState<TowDetailsData>(emptyTowDetails);
+
+  const handleTowDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTowDetails({ ...towDetails, [e.target.name]: e.target.value });
+  };
 
   const [customer, setCustomer] = useState<CustomerData>({
     name: '',
@@ -122,9 +155,11 @@ const NewServiceOrderMobile: React.FC = () => {
         services: serviceOrder.services,
         notes: serviceOrder.observations,
         estimatedDate: serviceOrder.estimatedDelivery || null,
-        status: 'Recebido',
+        status: serviceType === 'Guincho' ? 'Chamado recebido' : 'Recebido',
         responsibleUser: serviceOrder.responsibleUser,
         photos: vehicle.photos.join(','),
+        serviceType,
+        towDetails: serviceType === 'Guincho' ? towDetails : null,
         customer: {
           name: customer.name,
           document: customer.document,
@@ -444,8 +479,97 @@ const NewServiceOrderMobile: React.FC = () => {
     window.scrollBy({ top: Math.round(window.innerHeight * 0.6), behavior: 'smooth' });
   };
 
+  const renderServiceTypeSelector = () => (
+    <div className="service-type-section">
+      <label className="service-type-title">Tipo de Atendimento</label>
+      <div className="service-type-toggle">
+        <button
+          type="button"
+          className={`service-type-btn ${serviceType === 'Oficina' ? 'active' : ''}`}
+          onClick={() => setServiceType('Oficina')}
+        >
+          🔧 Oficina
+        </button>
+        <button
+          type="button"
+          className={`service-type-btn service-type-btn-tow ${serviceType === 'Guincho' ? 'active' : ''}`}
+          onClick={() => setServiceType('Guincho')}
+        >
+          🚛 Guincho 24h
+        </button>
+      </div>
+
+      {serviceType === 'Guincho' && (
+        <div className="tow-details-grid">
+          <div className="form-group">
+            <label>Seguradora</label>
+            <input
+              type="text"
+              name="insuranceCompany"
+              value={towDetails.insuranceCompany}
+              onChange={handleTowDetailsChange}
+              placeholder="Ex: Porto Seguro"
+            />
+          </div>
+          <div className="form-group">
+            <label>Assistência</label>
+            <input
+              type="text"
+              name="assistanceCompany"
+              value={towDetails.assistanceCompany}
+              onChange={handleTowDetailsChange}
+              placeholder="Ex: Assist24"
+            />
+          </div>
+          <div className="form-group">
+            <label>Sinistro</label>
+            <input
+              type="text"
+              name="claimNumber"
+              value={towDetails.claimNumber}
+              onChange={handleTowDetailsChange}
+              placeholder="Número do sinistro"
+            />
+          </div>
+          <div className="form-group">
+            <label>Local do Atendimento</label>
+            <input
+              type="text"
+              name="pickupLocation"
+              value={towDetails.pickupLocation}
+              onChange={handleTowDetailsChange}
+              placeholder="Endereço do resgate"
+            />
+          </div>
+          <div className="form-group">
+            <label>Destino da Entrega</label>
+            <input
+              type="text"
+              name="deliveryDestination"
+              value={towDetails.deliveryDestination}
+              onChange={handleTowDetailsChange}
+              placeholder="Endereço de destino"
+            />
+          </div>
+          <div className="form-group">
+            <label>Viatura</label>
+            <input
+              type="text"
+              name="towUnit"
+              value={towDetails.towUnit}
+              onChange={handleTowDetailsChange}
+              placeholder="Identificação do guincho"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="new-service-order-mobile">
+      {renderServiceTypeSelector()}
+
       <div className="wizard-header">
         <h1>Nova Ordem de Serviço</h1>
         <div className="wizard-progress-bar">

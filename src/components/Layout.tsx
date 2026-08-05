@@ -17,6 +17,7 @@ const Layout: React.FC = () => {
     { path: '/dashboard', label: 'Dashboard', icon: '🏠', permission: 'dashboard.view' },
     { path: '/new-service-order', label: 'Nova Ordem', icon: '➕', permission: 'orders.write' },
     { path: '/service-orders', label: 'Ordens de Serviço', icon: '📋', permission: 'orders.read' },
+    { path: '/guincho', label: 'Guincho 24h', icon: '🚛', permission: 'orders.read' },
     { path: '/inventory', label: 'Estoque', icon: '📦', permission: 'inventory.read' },
     { path: '/users', label: 'Funcionários', icon: '👥', permission: 'users.manage' },
     { path: '/reports', label: 'Relatórios', icon: '📊', permission: 'dashboard.view' },

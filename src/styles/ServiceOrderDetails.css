@@ -35,6 +35,55 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.service-type-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.service-type-badge.workshop {
+  background: #34495e;
+  color: white;
+}
+
+.service-type-badge.tow {
+  background: #e67e22;
+  color: white;
+}
+
+.tow-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #ecf0f1;
+}
+
+.tow-section h4 {
+  color: #2c3e50;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.tow-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.tow-details-grid .form-group {
+  margin-bottom: 0;
+}
+
+.tow-convert-box {
+  margin-top: 25px;
+  padding: 15px;
+  background: #fef5e7;
+  border: 1px dashed #e67e22;
+  border-radius: 8px;
+}
+
 .os-header-actions {
   display: flex;
   gap: 10px;

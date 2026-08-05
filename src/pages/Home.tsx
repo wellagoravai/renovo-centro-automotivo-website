@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Home.css';
 
+const WHATSAPP_NUMBER = '551837222388';
+
+interface QuoteForm {
+    name: string;
+    phone: string;
+    service: string;
+    message: string;
+}
+
+const emptyQuoteForm: QuoteForm = { name: '', phone: '', service: '', message: '' };
+
 const Home: React.FC = () => {
+    const [quoteForm, setQuoteForm] = useState<QuoteForm>(emptyQuoteForm);
+
     const openVirtualAssistant = () => {
         const chatWindow = document.querySelector('.chat-window');
         const chatButton = document.querySelector<HTMLButtonElement>('.chat-button');
@@ -19,46 +32,93 @@ const Home: React.FC = () => {
         }
 
         // Fallback: open WhatsApp (loja number provided)
-        const whatsappNumber = '551837222388';
         const text = encodeURIComponent('Olá, quero solicitar um serviço.');
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
-        window.open(whatsappUrl, '_blank');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
     };
 
     const talkToAttendant = () => {
-        const whatsappNumber = '551837222388';
         const text = encodeURIComponent('Olá, gostaria de falar com um atendente.');
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
-        window.open(whatsappUrl, '_blank');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+    };
+
+    const handleQuoteChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setQuoteForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleQuoteSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const lines = [
+            'Olá! Gostaria de solicitar um orçamento.',
+            `Nome: ${quoteForm.name}`,
+            `Telefone: ${quoteForm.phone}`,
+            `Serviço: ${quoteForm.service}`,
+        ];
+        if (quoteForm.message.trim()) lines.push(`Mensagem: ${quoteForm.message}`);
+        const text = encodeURIComponent(lines.join('\n'));
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+        setQuoteForm(emptyQuoteForm);
     };
 
     return (
         <div className="home">
             <main>
-                <section className="banner">
-                    <div className="banner-content">
-                        <h1><span className="title-3d">B</span>em-vindo à Renovo Centro Automotivo</h1>
-                        <p>Falou em solucionar seu problema ou fazer sua manutenção preventiva, vem com a Renovo Centro Automotivo! Atendemos veículos a gasolina, álcool e diesel: troca de óleo de motor e câmbio, elétrica automotiva, ar condicionado veicular, sistema de arrefecimento e muito mais — e se seu carro quebrou na estrada, contamos com serviço de resgate para te ajudar. Segurança, confiança e qualidade!!! 🔧</p>
-                        <button className="button" type="button" onClick={openVirtualAssistant}>🚗 Solicitar Serviço</button>
-                    </div>
+                <section
+                    className="banner"
+                    style={{
+                        backgroundImage:
+                            "linear-gradient(100deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.88) 45%, rgba(68,0,0,0.8) 100%), url('/assets/equipamentos.jpg')",
+                    }}
+                >
+                    <span className="banner-chevron banner-chevron-1" aria-hidden="true"></span>
+                    <span className="banner-chevron banner-chevron-2" aria-hidden="true"></span>
 
-                    <div className="banner-scene" aria-hidden="true">
-                        <div className="dirt-road dirt-road-back"></div>
-                        <div className="dirt-road dirt-road-front"></div>
-                        <div className="truck-rig">
-                            <div className="truck-bob">
-                                <div className="dust-trail">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                                <div className="truck-visual">
-                                    <img src="/assets/truck-offroad.png" alt="" className="hero-truck" />
-                                    <img src="/assets/truck-wheel.png" alt="" className="wheel wheel-front" />
-                                    <img src="/assets/truck-wheel.png" alt="" className="wheel wheel-rear" />
-                                </div>
-                            </div>
+                    <div className="container banner-inner">
+                        <div className="banner-content">
+                            <span className="banner-eyebrow">Manutenção preventiva e corretiva</span>
+                            <h1>Cuidado de verdade <span className="highlight">com o seu carro</span></h1>
+                            <p>Atendemos veículos a gasolina, álcool e diesel: troca de óleo, elétrica automotiva, ar-condicionado, arrefecimento e muito mais. Quebrou na estrada? Contamos com guincho 24h.</p>
+                            <button className="button" type="button" onClick={openVirtualAssistant}>
+                                Quero solicitar um orçamento <span aria-hidden="true">→</span>
+                            </button>
                         </div>
+
+                        <form className="quote-card" onSubmit={handleQuoteSubmit}>
+                            <h2>Solicite um orçamento</h2>
+                            <input
+                                name="name"
+                                required
+                                placeholder="Nome completo"
+                                value={quoteForm.name}
+                                onChange={handleQuoteChange}
+                            />
+                            <input
+                                name="phone"
+                                required
+                                placeholder="Seu telefone"
+                                value={quoteForm.phone}
+                                onChange={handleQuoteChange}
+                            />
+                            <select name="service" required value={quoteForm.service} onChange={handleQuoteChange}>
+                                <option value="">O que você precisa?</option>
+                                <option>Troca de óleo</option>
+                                <option>Diagnóstico / revisão</option>
+                                <option>Elétrica automotiva</option>
+                                <option>Ar-condicionado</option>
+                                <option>Guincho 24h</option>
+                                <option>Outro serviço</option>
+                            </select>
+                            <textarea
+                                name="message"
+                                placeholder="Deixe sua mensagem (opcional)"
+                                rows={3}
+                                value={quoteForm.message}
+                                onChange={handleQuoteChange}
+                            ></textarea>
+                            <button type="submit" className="quote-submit">
+                                Solicitar orçamento <span aria-hidden="true">→</span>
+                            </button>
+                        </form>
                     </div>
                 </section>
 

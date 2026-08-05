@@ -7,6 +7,68 @@
   min-height: 100vh;
 }
 
+.service-type-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.service-type-title {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.service-type-toggle {
+  display: flex;
+  gap: 12px;
+}
+
+.service-type-btn {
+  flex: 1;
+  padding: 14px;
+  border: 2px solid #ecf0f1;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.service-type-btn:hover {
+  border-color: #bdc3c7;
+}
+
+.service-type-btn.active {
+  border-color: var(--accent-color, #CC0000);
+  background: var(--accent-color, #CC0000);
+  color: white;
+}
+
+.service-type-btn-tow.active {
+  border-color: #e67e22;
+  background: #e67e22;
+}
+
+.tow-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px 20px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #ecf0f1;
+}
+
+.tow-details-grid .form-group {
+  margin-bottom: 0;
+}
+
 .wizard-header {
   text-align: center;
   margin-bottom: 40px;

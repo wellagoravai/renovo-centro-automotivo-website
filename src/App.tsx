@@ -19,6 +19,7 @@ import UsersManagement from './pages/UsersManagement';
 import NewServiceOrder from './pages/NewServiceOrder';
 import NewServiceOrderMobile from './pages/NewServiceOrderMobile';
 import ServiceOrderDetails from './pages/ServiceOrderDetails';
+import TowDashboard from './pages/TowDashboard';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import './styles/globals.css';
@@ -73,6 +74,7 @@ const AppRoutes: React.FC = () => {
         <Route path="new-service-order" element={<NewServiceOrderMobile />} />
         <Route path="service-orders" element={<ServiceOrders />} />
         <Route path="service-orders/:id" element={<ServiceOrderDetails />} />
+        <Route path="guincho" element={<TowDashboard />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="users" element={<UsersManagement />} />
         <Route path="reports" element={<ReportsPage />} />

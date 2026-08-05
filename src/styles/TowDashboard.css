@@ -1,0 +1,125 @@
+.tow-dashboard-page {
+  padding: 20px;
+}
+
+.tow-dashboard-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.tow-dashboard-page .page-header h1 {
+  color: #2c3e50;
+  font-size: 26px;
+  margin: 0;
+}
+
+.tow-dashboard-page .btn-info {
+  color: #fff;
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.tow-dashboard-page .btn-info:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+.tow-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+  margin-bottom: 35px;
+}
+
+.tow-kpi-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-top: 4px solid #e67e22;
+}
+
+.tow-kpi-icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.tow-kpi-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.1;
+}
+
+.tow-kpi-label {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
+.tow-list-title {
+  color: #2c3e50;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.tow-orders-table-wrap {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.tow-orders-table-wrap .data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tow-orders-table-wrap .data-table th,
+.tow-orders-table-wrap .data-table td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #ecf0f1;
+  font-size: 14px;
+}
+
+.tow-orders-table-wrap .data-table th {
+  color: #7f8c8d;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  background: #f8f9fa;
+}
+
+.tow-order-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tow-order-row:hover {
+  background: #f8f9fa;
+}
+
+.tow-status-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 16px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .tow-dashboard-page {
+    padding: 12px;
+  }
+
+  .tow-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

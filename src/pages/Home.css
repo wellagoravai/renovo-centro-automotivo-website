@@ -5,220 +5,204 @@
   flex-direction: column;
 }
 
-/* Banner section */
+/* Banner / hero section — fundo escuro com foto, chevrons diagonais e um
+   card de cotação flutuando ao lado do título (inspirado num site de
+   referência do setor, adaptado com os dados e a paleta da Renovo). */
 .banner {
-  background: linear-gradient(135deg, #080808 0%, #1a1a1a 45%, #440000 100%);
-  color: white;
-  padding: 100px 20px 260px;
-  text-align: center;
   position: relative;
   overflow: hidden;
+  color: white;
+  padding: 72px 0;
+  background-color: #080808;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* A imagem de fundo (foto real da oficina) é aplicada via style inline em
+     Home.tsx — o webpack do CRA não resolve url('/assets/...') dentro de CSS,
+     só quando a string vem de fora (JSX/inline), igual as tags <img> do site. */
 }
 
-.banner::before {
-  content: '';
+.banner-chevron {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120"><path d="M0,60 C150,30 225,90 375,60 C450,30 525,90 600,60 L600,120 L0,120 Z" fill="rgba(255,255,255,0.1)"/></svg>') repeat-x;
-  background-size: 600px 120px;
-  background-position: 0 0;
-  animation: wave 12s linear infinite;
+  top: -25%;
+  bottom: -25%;
+  width: 160px;
+  background: var(--accent-color);
+  clip-path: polygon(35% 0, 100% 0, 65% 100%, 0 100%);
+  z-index: 0;
+  pointer-events: none;
 }
 
-@keyframes wave {
-  0% { background-position: 0 0; }
-  100% { background-position: -600px 0; }
+.banner-chevron-1 {
+  left: -70px;
+  opacity: 0.9;
+}
+
+.banner-chevron-2 {
+  left: 70px;
+  opacity: 0.25;
+}
+
+.banner-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 44px;
 }
 
 .banner-content {
-  position: relative;
-  z-index: 2;
-  max-width: 760px;
-  margin: 0 auto;
+  max-width: 620px;
+  text-align: center;
 }
 
-.banner-scene {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 200px;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.dirt-road {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background-repeat: repeat-x;
-}
-
-.dirt-road-back {
-  bottom: 40px;
-  height: 60px;
-  opacity: 0.35;
-  background-size: 400px 60px;
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60"><path d="M0,32 C50,8 90,52 140,28 C190,4 230,50 270,34 C310,14 350,46 400,32 L400,60 L0,60 Z" fill="rgb(107,74,43)"/><ellipse cx="45" cy="42" rx="10" ry="4" fill="rgb(84,58,32)"/><ellipse cx="175" cy="46" rx="13" ry="5" fill="rgb(84,58,32)"/><ellipse cx="330" cy="40" rx="9" ry="4" fill="rgb(84,58,32)"/></svg>');
-  animation: dirt-scroll-back 6s linear infinite;
-}
-
-.dirt-road-front {
-  bottom: 0;
-  height: 80px;
-  opacity: 0.65;
-  background-size: 260px 80px;
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 80"><path d="M0,38 C30,10 70,66 110,42 C150,14 190,70 230,36 C245,20 252,30 260,38 L260,80 L0,80 Z" fill="rgb(135,91,52)"/><ellipse cx="35" cy="58" rx="14" ry="6" fill="rgb(107,69,38)"/><ellipse cx="130" cy="66" rx="16" ry="7" fill="rgb(107,69,38)"/><ellipse cx="210" cy="52" rx="12" ry="5" fill="rgb(107,69,38)"/></svg>');
-  animation: dirt-scroll-front 3.2s linear infinite;
-}
-
-@keyframes dirt-scroll-back {
-  0% { background-position-x: 0; }
-  100% { background-position-x: 400px; }
-}
-
-@keyframes dirt-scroll-front {
-  0% { background-position-x: 0; }
-  100% { background-position-x: 260px; }
-}
-
-.truck-rig {
-  position: absolute;
-  left: 50%;
-  bottom: 34px;
-  width: 220px;
-  transform: translateX(-50%);
-}
-
-.truck-bob {
-  position: relative;
-  /* duration matches .dirt-road-front's scroll cycle so the truck's bounce reads as a reaction to the uneven ground passing beneath it */
-  animation: truck-bob 3.2s ease-in-out infinite;
-}
-
-@keyframes truck-bob {
-  0%   { transform: translateY(0) rotate(-1deg); }
-  12%  { transform: translateY(-7px) rotate(2deg); }
-  25%  { transform: translateY(3px) rotate(-2deg); }
-  40%  { transform: translateY(-4px) rotate(1deg); }
-  55%  { transform: translateY(-9px) rotate(2.5deg); }
-  70%  { transform: translateY(4px) rotate(-2.5deg); }
-  85%  { transform: translateY(-3px) rotate(1deg); }
-  100% { transform: translateY(0) rotate(-1deg); }
-}
-
-.truck-visual {
-  position: relative;
+.banner-eyebrow {
   display: inline-block;
-}
-
-.hero-truck {
-  position: relative;
-  display: block;
-  width: 220px;
-  height: auto;
-}
-
-.wheel {
-  position: absolute;
-  left: 9.5%;
-  top: 56%;
-  width: 15%;
-  height: 30%;
-  border-radius: 50%;
-  animation: wheel-spin 0.7s linear infinite;
-  transform-origin: 50% 50%;
-}
-
-.wheel-rear {
-  left: 69.1%;
-}
-
-@keyframes wheel-spin {
-  /* truck faces left, so rolling forward spins counter-clockwise */
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-
-.dust-trail {
-  position: absolute;
-  right: -6px;
-  bottom: 6px;
-  width: 30px;
-  height: 30px;
-  z-index: -1;
-}
-
-.dust-trail span {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(198, 163, 110, 0.6) 0%, rgba(198, 163, 110, 0) 70%);
-  animation: dust-puff 1.1s ease-out infinite;
-}
-
-.dust-trail span:nth-child(2) {
-  animation-delay: 0.35s;
-}
-
-.dust-trail span:nth-child(3) {
-  animation-delay: 0.7s;
-}
-
-@keyframes dust-puff {
-  0% { transform: translate(0, 0) scale(0.4); opacity: 0.6; }
-  100% { transform: translate(56px, -18px) scale(1.8); opacity: 0; }
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ffb020;
+  margin-bottom: 16px;
 }
 
 .banner h1 {
-  font-size: 3.5rem;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.15;
   margin-bottom: 20px;
-  font-weight: 900;
   color: #f8f8f8;
-  text-shadow:
-    0 2px 15px rgba(0, 0, 0, 0.35),
-    0 4px 20px rgba(0, 0, 0, 0.2);
-  line-height: 1.1;
 }
 
-.banner h1 .title-3d {
-  display: inline-block;
-  color: #fff;
-  text-shadow:
-    1px 1px 0 rgba(0, 0, 0, 0.15),
-    2px 2px 0 rgba(0, 0, 0, 0.12),
-    4px 4px 0 rgba(0, 0, 0, 0.08);
-  transform: translateZ(0);
+.banner h1 .highlight {
+  color: var(--accent-color);
 }
 
-.banner p {
-  font-size: 1.3rem;
-  margin-bottom: 40px;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  opacity: 0.95;
+.banner-content p {
+  font-size: 1.1rem;
+  margin: 0 auto 32px;
+  max-width: 560px;
+  opacity: 0.92;
 }
 
 .banner .button {
-  background: white;
-  color: #1a1a1a;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent-color);
+  color: white;
   font-weight: 700;
-  padding: 14px 40px;
-  font-size: 1.1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  padding: 16px 32px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(204, 0, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .banner .button:hover {
+  background: #a30000;
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 14px 30px rgba(204, 0, 0, 0.45);
+}
+
+/* Card de cotação flutuante */
+.quote-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  color: #1a1a1a;
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.quote-card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+  color: #1a1a1a;
+}
+
+.quote-card input,
+.quote-card select,
+.quote-card textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-size: 0.92rem;
+  color: #1a1a1a;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.quote-card input:focus,
+.quote-card select:focus,
+.quote-card textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: #ffffff;
+}
+
+.quote-card textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.quote-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent-color);
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.quote-submit:hover {
+  background: #a30000;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 960px) {
+  .banner {
+    padding: 100px 0;
+  }
+
+  .banner-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+
+  .banner-content {
+    text-align: left;
+  }
+
+  .banner-content p {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .quote-card {
+    flex-shrink: 0;
+  }
 }
 
 /* Store Photos Section */
@@ -438,7 +422,7 @@
     font-size: 2.2rem;
   }
 
-  .banner p {
+  .banner-content p {
     font-size: 1rem;
   }
 
@@ -465,7 +449,7 @@
 
 @media (max-width: 480px) {
   .banner {
-    padding: 60px 15px 170px;
+    padding: 48px 0;
   }
 
   .banner h1 {
@@ -473,18 +457,13 @@
     margin-bottom: 15px;
   }
 
-  .banner p {
+  .banner-content p {
     font-size: 0.95rem;
     margin-bottom: 25px;
   }
 
-  .banner-scene {
-    height: 130px;
-  }
-
-  .truck-rig,
-  .hero-truck {
-    width: 120px;
+  .quote-card {
+    padding: 22px;
   }
 
   .services-grid {

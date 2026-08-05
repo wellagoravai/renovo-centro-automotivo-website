@@ -60,7 +60,10 @@ const DashboardEnhanced: React.FC = () => {
 
   const loadDashboard = async () => {
     try {
-      const response = await api.get('/service-orders');
+      // Este Kanban só entende status de Oficina (o `match` dos estágios abaixo é
+      // baseado nesse fluxo) — OS de Guincho têm status próprios e são acompanhadas
+      // no dashboard dedicado (/guincho), então ficam de fora aqui.
+      const response = await api.get('/service-orders?serviceType=Oficina');
       if (response.ok) {
         const data = await response.json();
         setServiceOrders(data);
