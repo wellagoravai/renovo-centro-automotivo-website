@@ -268,6 +268,80 @@
   cursor: not-allowed;
 }
 
+/* Lead Form (dados antes de encaminhar pro WhatsApp) */
+.lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  border-radius: 0 0 16px 16px;
+}
+
+.lead-form input,
+.lead-form select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.lead-form input:focus,
+.lead-form select:focus {
+  border-color: #cc0000;
+}
+
+.lead-form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+}
+
+.lead-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lead-form-cancel {
+  flex: 1;
+  padding: 10px;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lead-form-cancel:hover {
+  background: #e2e2e2;
+}
+
+.lead-form-submit {
+  flex: 2;
+  padding: 10px;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lead-form-submit:hover {
+  background: #20ba5a;
+}
+
 /* WhatsApp Button */
 .whatsapp-button {
   display: flex;
