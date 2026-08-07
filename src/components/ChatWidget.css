@@ -280,7 +280,8 @@
 }
 
 .lead-form input,
-.lead-form select {
+.lead-form select,
+.lead-form textarea {
   width: 100%;
   padding: 9px 12px;
   border: 1px solid #ddd;
@@ -291,8 +292,13 @@
   font-family: inherit;
 }
 
+.lead-form textarea {
+  resize: none;
+}
+
 .lead-form input:focus,
-.lead-form select:focus {
+.lead-form select:focus,
+.lead-form textarea:focus {
   border-color: #cc0000;
 }
 
@@ -340,6 +346,33 @@
 
 .lead-form-submit:hover {
   background: #20ba5a;
+}
+
+/* Flow hint (fluxo guiado em andamento) */
+.flow-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #fff8e6;
+  border-top: 1px solid #f0e0b0;
+  font-size: 12px;
+  color: #8a6d1a;
+}
+
+.flow-hint button {
+  background: none;
+  border: none;
+  color: #cc0000;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.flow-hint button:hover {
+  text-decoration: underline;
 }
 
 /* WhatsApp Button */

@@ -14,9 +14,30 @@ interface LeadForm {
   subject: string;
   carModel: string;
   carYear: string;
+  details: string;
 }
 
-const emptyLeadForm: LeadForm = { name: '', phone: '', subject: '', carModel: '', carYear: '' };
+const emptyLeadForm: LeadForm = { name: '', phone: '', subject: '', carModel: '', carYear: '', details: '' };
+
+// Fluxo guiado: em vez de já mandar todo mundo pro WhatsApp, o bot faz umas
+// perguntas curtas pra entender o problema antes de preparar o atendimento.
+type FlowStep =
+  | 'idle'
+  | 'awaiting_problem'
+  | 'awaiting_vehicle_model'
+  | 'awaiting_vehicle_year'
+  | 'awaiting_name'
+  | 'awaiting_phone';
+
+interface FlowData {
+  problem: string;
+  carModel: string;
+  carYear: string;
+  name: string;
+  phone: string;
+}
+
+const emptyFlowData: FlowData = { problem: '', carModel: '', carYear: '', name: '', phone: '' };
 
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +53,8 @@ const ChatWidget: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [leadForm, setLeadForm] = useState<LeadForm>(emptyLeadForm);
+  const [flowStep, setFlowStep] = useState<FlowStep>('idle');
+  const [flowData, setFlowData] = useState<FlowData>(emptyFlowData);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -53,17 +76,12 @@ const ChatWidget: React.FC = () => {
     return emergencyKeywords.some((kw) => normalized.includes(kw));
   };
 
-  // Respostas mais soltas, tipo alguém que realmente lê a mensagem e responde —
-  // nada de "atendimento personalizado" ou textão de script de call center.
-  const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-
-    if (isEmergency(lowerMessage)) {
-      return 'Poxa, sinto muito, que chato isso acontecer! 😟 Fica tranquilo(a) que a gente resolve rapidinho. Já vou preparar um pedido de guincho pra você — só preciso de mais uns dadinhos ali embaixo. 🚛';
-    }
-
+  // Perguntas e respostas que não dependem de entender o problema do cliente
+  // (horário, endereço, preço em geral etc). Se nada bater aqui, o bot entende
+  // que a pessoa está descrevendo um problema e começa o fluxo guiado.
+  const matchFAQ = (lowerMessage: string): string | null => {
     if (lowerMessage.includes('preço') || lowerMessage.includes('valor') || lowerMessage.includes('custo')) {
-      return 'Depende bastante do carro e do que precisa ser feito, então prefiro não chutar um valor aqui 😅 Me conta rapidinho qual é o problema (ou preenche o formulário abaixo) que a gente te passa um orçamento certinho, sem enrolação.';
+      return 'Depende bastante do carro e do que precisa ser feito, então prefiro não chutar um valor aqui 😅 Me conta o que está acontecendo com o carro que eu já preparo tudo pro atendimento com um orçamento certinho.';
     }
 
     if (lowerMessage.includes('horário') || lowerMessage.includes('funcionamento') || lowerMessage.includes('aberto')) {
@@ -74,14 +92,6 @@ const ChatWidget: React.FC = () => {
       return 'A gente fica na Marechal Deodoro, 2305, aqui em Andradina/SP. 📍 Se quiser, dá uma olhada no mapa lá na página inicial pra ver certinho como chegar.';
     }
 
-    if (lowerMessage.includes('serviço') || lowerMessage.includes('manutenção') || lowerMessage.includes('reparo')) {
-      return 'Fazemos de tudo um pouco por aqui: manutenção preventiva, reparo geral, diagnóstico, elétrica, ar-condicionado... Me conta o que está pegando no seu carro que eu já te oriento melhor. 🔧';
-    }
-
-    if (lowerMessage.includes('agendar') || lowerMessage.includes('marcar')) {
-      return 'Bora marcar então! Preenche seus dados ali embaixo que eu te encaminho direto pro WhatsApp com tudo pronto, só combinar o melhor horário com a equipe. 🗓️';
-    }
-
     if (lowerMessage.includes('olá') || lowerMessage.includes('oi') || lowerMessage.includes('bom dia') || lowerMessage.includes('boa tarde') || lowerMessage.includes('boa noite')) {
       return 'Oi, tudo bem? 😊 Me conta, o que está pegando no seu carro ou como posso te ajudar hoje?';
     }
@@ -90,8 +100,83 @@ const ChatWidget: React.FC = () => {
       return 'Isso aí, disponha! Qualquer coisa é só chamar por aqui de novo. 🙏';
     }
 
-    // Resposta padrão: mais próxima de "deixa eu te passar pra equipe" do que um script
-    return 'Entendi! Pra te ajudar direito nisso, acho melhor eu já te encaminhar pra equipe no WhatsApp — clica no botão verde aí embaixo que é rapidinho. 🟢';
+    return null;
+  };
+
+  // A partir do que a pessoa descreveu, tenta adivinhar o assunto pra já
+  // deixar o formulário/mensagem pro WhatsApp mais certeiro.
+  const inferSubject = (text: string): string => {
+    const t = text.toLowerCase();
+    if (isEmergency(t)) return 'Guincho 24h';
+    if (t.includes('óleo') || t.includes('oleo')) return 'Troca de óleo';
+    if (t.includes('elétric') || t.includes('eletric') || t.includes('bateria')) return 'Elétrica automotiva';
+    if (t.includes('ar-condicionado') || t.includes('ar condicionado') || t.includes('ar cond')) return 'Ar-condicionado';
+    if (t.includes('diagnóstico') || t.includes('diagnostico') || t.includes('revisão') || t.includes('revisao')) {
+      return 'Diagnóstico / revisão';
+    }
+    return 'Outro serviço';
+  };
+
+  // Fluxo guiado: cada etapa registra o dado da mensagem anterior e pergunta
+  // o próximo. Só no final os dados coletados viram a mensagem do WhatsApp.
+  const advanceFlow = (
+    step: FlowStep,
+    data: FlowData,
+    message: string
+  ): { text: string; nextStep: FlowStep; data: FlowData; done: boolean } => {
+    switch (step) {
+      case 'awaiting_problem':
+        return {
+          data: { ...data, problem: message },
+          nextStep: 'awaiting_vehicle_model',
+          text: 'Entendi! Qual é o modelo do carro?',
+          done: false,
+        };
+      case 'awaiting_vehicle_model':
+        return {
+          data: { ...data, carModel: message },
+          nextStep: 'awaiting_vehicle_year',
+          text: 'Show. E o ano, mesmo que aproximado já ajuda bastante.',
+          done: false,
+        };
+      case 'awaiting_vehicle_year':
+        return {
+          data: { ...data, carYear: message },
+          nextStep: 'awaiting_name',
+          text: 'Perfeito. Qual é o seu nome?',
+          done: false,
+        };
+      case 'awaiting_name':
+        return {
+          data: { ...data, name: message },
+          nextStep: 'awaiting_phone',
+          text: `Prazer, ${message.split(' ')[0] || ''}! Me passa um telefone/WhatsApp pra contato?`,
+          done: false,
+        };
+      case 'awaiting_phone':
+        return {
+          data: { ...data, phone: message },
+          nextStep: 'idle',
+          text: 'Prontinho! Já deixei tudo preenchido aqui embaixo, é só conferir e enviar pro WhatsApp que a equipe te atende rapidinho. 👇',
+          done: true,
+        };
+      default:
+        return { data, nextStep: 'idle', text: '', done: false };
+    }
+  };
+
+  const resetFlow = () => {
+    setFlowStep('idle');
+    setFlowData(emptyFlowData);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        text: 'Sem problemas, cancelei por aqui. Pode me perguntar outra coisa quando quiser. 😊',
+        sender: 'bot',
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   const handleSendMessage = () => {
@@ -105,6 +190,8 @@ const ChatWidget: React.FC = () => {
     };
 
     const wasEmergency = isEmergency(inputValue);
+    const currentFlowStep = flowStep;
+    const currentFlowData = flowData;
 
     setMessages([...messages, userMessage]);
     setInputValue('');
@@ -112,21 +199,55 @@ const ChatWidget: React.FC = () => {
 
     // Simula delay de digitação do bot
     setTimeout(() => {
+      let botText: string;
+
+      if (wasEmergency) {
+        // Carro quebrado é urgência de verdade — não faz sentido ficar batendo
+        // papo, então já abre o formulário (com "Guincho 24h" e o relato) pra agilizar.
+        botText = 'Poxa, sinto muito, que chato isso acontecer! 😟 Fica tranquilo(a) que a gente resolve rapidinho. Já preparei um pedido de guincho pra você — só confere os dados ali embaixo. 🚛';
+        setFlowStep('idle');
+        setFlowData(emptyFlowData);
+        setShowLeadForm(true);
+        setLeadForm((prev) => ({ ...prev, subject: 'Guincho 24h', details: inputValue }));
+      } else if (currentFlowStep !== 'idle') {
+        // Já está no meio do fluxo guiado: registra a resposta e pergunta o próximo dado.
+        const result = advanceFlow(currentFlowStep, currentFlowData, inputValue);
+        botText = result.text;
+        setFlowStep(result.nextStep);
+        setFlowData(result.data);
+
+        if (result.done) {
+          setLeadForm({
+            name: result.data.name,
+            phone: result.data.phone,
+            subject: inferSubject(result.data.problem),
+            carModel: result.data.carModel,
+            carYear: result.data.carYear,
+            details: result.data.problem,
+          });
+          setShowLeadForm(true);
+        }
+      } else {
+        const faqAnswer = matchFAQ(inputValue.toLowerCase());
+        if (faqAnswer) {
+          botText = faqAnswer;
+        } else {
+          // Nenhuma pergunta frequente bateu — assume que é a descrição de um
+          // problema e começa o fluxo guiado em vez de já mandar pro WhatsApp.
+          setFlowStep('awaiting_vehicle_model');
+          setFlowData({ ...emptyFlowData, problem: inputValue });
+          botText = 'Entendi! Pra já deixar tudo certo pro atendimento, qual é o modelo do carro?';
+        }
+      }
+
       const botResponse: Message = {
         id: messages.length + 2,
-        text: generateBotResponse(inputValue),
+        text: botText,
         sender: 'bot',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botResponse]);
       setIsTyping(false);
-
-      // Carro quebrado é urgência de verdade — não faz sentido ficar batendo papo,
-      // então já abre o formulário (com "Guincho 24h" marcado) pra agilizar.
-      if (wasEmergency) {
-        setShowLeadForm(true);
-        setLeadForm((prev) => ({ ...prev, subject: 'Guincho 24h' }));
-      }
     }, 1500);
   };
 
@@ -137,23 +258,24 @@ const ChatWidget: React.FC = () => {
     }
   };
 
-  // Em vez de mandar pro WhatsApp com um texto genérico, pede alguns dados antes —
-  // assim quem atende já chega sabendo nome, contato, assunto e veículo, sem precisar
-  // perguntar tudo de novo.
+  // Em vez de já abrir o formulário (ou mandar pro WhatsApp) sem contexto nenhum,
+  // o bot começa o fluxo guiado perguntando qual é o problema primeiro — assim
+  // quem atende já chega sabendo o que houve, e não só nome/telefone.
   const openLeadForm = () => {
-    setShowLeadForm(true);
+    setFlowStep('awaiting_problem');
+    setFlowData(emptyFlowData);
     setMessages((prev) => [
       ...prev,
       {
         id: prev.length + 1,
-        text: 'Claro! Preencha os dados abaixo para eu te encaminhar direto pro WhatsApp com tudo já explicado. 📝',
+        text: 'Claro! Me conta rapidinho o que está acontecendo com o carro, ou o que você precisa, que eu já preparo tudo pro atendimento. 📝',
         sender: 'bot',
         timestamp: new Date(),
       },
     ]);
   };
 
-  const handleLeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleLeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setLeadForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -169,6 +291,7 @@ const ChatWidget: React.FC = () => {
     ];
     const vehicle = [leadForm.carModel, leadForm.carYear].filter(Boolean).join(' - ');
     if (vehicle) lines.push(`Veículo: ${vehicle}`);
+    if (leadForm.details.trim()) lines.push(`Problema relatado: ${leadForm.details.trim()}`);
 
     const whatsappNumber = '551837222388';
     const text = encodeURIComponent(lines.join('\n'));
@@ -185,6 +308,8 @@ const ChatWidget: React.FC = () => {
     ]);
     setShowLeadForm(false);
     setLeadForm(emptyLeadForm);
+    setFlowStep('idle');
+    setFlowData(emptyFlowData);
   };
 
   return (
@@ -296,8 +421,23 @@ const ChatWidget: React.FC = () => {
                   onChange={handleLeadChange}
                 />
               </div>
+              <textarea
+                name="details"
+                placeholder="Descreva o problema (opcional)"
+                rows={2}
+                value={leadForm.details}
+                onChange={handleLeadChange}
+              />
               <div className="lead-form-actions">
-                <button type="button" className="lead-form-cancel" onClick={() => setShowLeadForm(false)}>
+                <button
+                  type="button"
+                  className="lead-form-cancel"
+                  onClick={() => {
+                    setShowLeadForm(false);
+                    setFlowStep('idle');
+                    setFlowData(emptyFlowData);
+                  }}
+                >
                   Cancelar
                 </button>
                 <button type="submit" className="lead-form-submit">
@@ -307,6 +447,12 @@ const ChatWidget: React.FC = () => {
             </form>
           ) : (
             <>
+              {flowStep !== 'idle' && (
+                <div className="flow-hint">
+                  <span>Só mais um instante, quase lá... 🙂</span>
+                  <button type="button" onClick={resetFlow}>Cancelar</button>
+                </div>
+              )}
               <div className="chat-input-container">
                 <input
                   type="text"

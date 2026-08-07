@@ -16,7 +16,6 @@ import Dashboard from './pages/DashboardEnhanced';
 import ServiceOrders from './pages/ServiceOrders';
 import Inventory from './pages/Inventory';
 import UsersManagement from './pages/UsersManagement';
-import NewServiceOrder from './pages/NewServiceOrder';
 import NewServiceOrderMobile from './pages/NewServiceOrderMobile';
 import ServiceOrderDetails from './pages/ServiceOrderDetails';
 import TowDashboard from './pages/TowDashboard';
