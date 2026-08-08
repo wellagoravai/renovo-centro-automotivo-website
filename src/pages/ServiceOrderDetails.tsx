@@ -224,6 +224,7 @@ const ServiceOrderDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dados');
   const [serviceOrder, setServiceOrder] = useState<ServiceOrder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: '', services: '', estimatedTime: 0, laborValue: 0, notes: '',
@@ -570,6 +571,31 @@ const ServiceOrderDetails: React.FC = () => {
     }
   };
 
+  const handleGenerateQuotePdf = async () => {
+    if (!id || !serviceOrder) return;
+    setGeneratingQuotePdf(true);
+    try {
+      const response = await api.get(`/service-orders/${id}/quote-pdf`);
+      if (!response.ok) {
+        alert('❌ Erro ao gerar o PDF do orçamento');
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Orcamento-${serviceOrder.number}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert('❌ Erro ao gerar o PDF do orçamento');
+    } finally {
+      setGeneratingQuotePdf(false);
+    }
+  };
+
   const tabs = [
     { id: 'dados', label: 'Dados' },
     { id: 'diagnostico', label: 'Diagnóstico' },
@@ -607,6 +633,9 @@ const ServiceOrderDetails: React.FC = () => {
         <div className="os-header-actions">
           <button className="btn-print" onClick={() => window.print()}>
             🖨️ Imprimir Ordem
+          </button>
+          <button className="btn-print" onClick={handleGenerateQuotePdf} disabled={generatingQuotePdf}>
+            {generatingQuotePdf ? 'Gerando...' : '📄 Gerar Orçamento em PDF'}
           </button>
           <button className="btn-back" onClick={() => navigate('/service-orders')}>
             ← Voltar
