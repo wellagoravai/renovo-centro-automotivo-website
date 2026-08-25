@@ -481,9 +481,31 @@ textarea.form-control-tv {
 
 /* Monitores menores: preserva uma largura mínima legível para cada coluna. */
 @media (max-width: 1600px) {
+  .dashboard-tv {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: 8px;
+  }
+
+  .dashboard-tv-header {
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .dashboard-tv-header h1 {
+    font-size: 24px;
+    letter-spacing: 0;
+  }
+
+  .dashboard-tv-date {
+    font-size: 12px;
+  }
+
   .metrics-container {
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   .metric-card {
@@ -499,20 +521,26 @@ textarea.form-control-tv {
   }
 
   .kanban-board-tv {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    min-height: auto;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+    min-height: 0;
+    padding-bottom: 0;
   }
 
   .kanban-column-tv {
-    flex: 0 0 190px;
+    min-width: 0;
     max-width: none;
-    max-height: 440px;
-    padding: 12px;
+    max-height: none;
+    min-height: 0;
+    padding: 8px 6px;
+    border-radius: 7px;
   }
 
   .kanban-column-cancelled {
-    flex: 0 0 170px;
+    min-width: 0;
     max-width: none;
   }
 
@@ -522,7 +550,10 @@ textarea.form-control-tv {
   }
 
   .column-header-tv h3 {
-    font-size: 16px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .column-count-tv {
@@ -531,8 +562,19 @@ textarea.form-control-tv {
   }
 
   .empty-column-tv {
-    padding: 35px 8px;
-    font-size: 14px;
+    padding: 20px 4px;
+    font-size: 10px;
+  }
+
+  .column-content-tv {
+    min-height: 0;
+    gap: 6px;
+  }
+
+  .kanban-card-tv {
+    padding: 8px;
+    border-radius: 6px;
+    border-left-width: 3px;
   }
 }
 
@@ -556,11 +598,11 @@ textarea.form-control-tv {
   }
 
   .kanban-column-tv {
-    flex-basis: 170px;
+    min-width: 0;
   }
 
   .kanban-column-cancelled {
-    flex-basis: 150px;
+    min-width: 0;
   }
 }
 
@@ -581,10 +623,14 @@ textarea.form-control-tv {
 
   .kanban-board-tv {
     flex-direction: column;
+    display: flex;
+    overflow: visible;
+    height: auto;
   }
 
   .kanban-column-tv {
     flex: 1;
+    width: 100%;
     max-height: none;
   }
 }
