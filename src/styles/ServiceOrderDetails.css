@@ -233,6 +233,17 @@
   color: #2c3e50;
 }
 
+.initial-checkin-editor {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #ecf0f1;
+}
+
+.initial-checkin-editor h4 {
+  color: #2c3e50;
+  margin: 0 0 15px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }

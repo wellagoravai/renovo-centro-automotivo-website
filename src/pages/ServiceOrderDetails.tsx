@@ -224,9 +224,20 @@ const ServiceOrderDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dados');
   const [serviceOrder, setServiceOrder] = useState<ServiceOrder | null>(null);
   const [customerName, setCustomerName] = useState('');
+  const [initialCheckinForm, setInitialCheckinForm] = useState({
+    customerName: '',
+    vehiclePlate: '',
+    vehicleBrand: '',
+    vehicleModel: '',
+    vehicleColor: '',
+    vehicleYear: 0,
+    vehicleMileage: 0,
+    problemReported: '',
+  });
   const [loading, setLoading] = useState(true);
   const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
   const [savingCustomerName, setSavingCustomerName] = useState(false);
+  const [savingInitialCheckin, setSavingInitialCheckin] = useState(false);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: '', services: '', estimatedTime: 0, laborValue: 0, notes: '',
@@ -282,6 +293,16 @@ const ServiceOrderDetails: React.FC = () => {
         const data: ServiceOrder = await orderResponse.json();
         setServiceOrder(data);
         setCustomerName(data.customerName || '');
+        setInitialCheckinForm({
+          customerName: data.customerName || '',
+          vehiclePlate: data.vehiclePlate || '',
+          vehicleBrand: data.vehicleBrand || '',
+          vehicleModel: data.vehicleModel || '',
+          vehicleColor: data.vehicleColor || '',
+          vehicleYear: data.vehicleYear || 0,
+          vehicleMileage: data.vehicleMileage || 0,
+          problemReported: data.problemReported || '',
+        });
         setDiagnosisForm({
           diagnosis: data.diagnosis || '',
           services: data.services || '',
@@ -376,6 +397,34 @@ const ServiceOrderDetails: React.FC = () => {
       alert('❌ Erro ao atualizar nome do cliente');
     } finally {
       setSavingCustomerName(false);
+    }
+  };
+
+  const canEditInitialCheckin = user?.role === 'Administrador' || user?.role === 'Gerente';
+
+  const handleSaveInitialCheckin = async () => {
+    if (!serviceOrder) return;
+    setSavingInitialCheckin(true);
+    try {
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
+        ...initialCheckinForm,
+        vehicleYear: Number(initialCheckinForm.vehicleYear) || 0,
+        vehicleMileage: Number(initialCheckinForm.vehicleMileage) || 0,
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setServiceOrder(updated);
+        setCustomerName(updated.customerName || initialCheckinForm.customerName);
+        setInitialCheckinForm(prev => ({ ...prev, ...updated }));
+        alert('✅ Dados do check-in inicial atualizados com sucesso!');
+      } else {
+        alert('❌ Erro ao atualizar os dados do check-in inicial');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar dados do check-in inicial:', error);
+      alert('❌ Erro ao atualizar os dados do check-in inicial');
+    } finally {
+      setSavingInitialCheckin(false);
     }
   };
 
@@ -750,6 +799,49 @@ const ServiceOrderDetails: React.FC = () => {
                   <span>{serviceOrder.responsibleUser || '—'}</span>
                 </div>
               </div>
+
+              {canEditInitialCheckin && (
+                <div className="initial-checkin-editor">
+                  <h4>Editar dados do check-in inicial</h4>
+                  <div className="checklist-meta-grid">
+                    <div className="form-group">
+                      <label>Cliente</label>
+                      <input value={initialCheckinForm.customerName} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, customerName: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Placa</label>
+                      <input value={initialCheckinForm.vehiclePlate} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehiclePlate: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Marca</label>
+                      <input value={initialCheckinForm.vehicleBrand} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleBrand: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Modelo</label>
+                      <input value={initialCheckinForm.vehicleModel} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleModel: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Cor</label>
+                      <input value={initialCheckinForm.vehicleColor} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleColor: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Ano</label>
+                      <input type="number" min="0" value={initialCheckinForm.vehicleYear} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleYear: Number(e.target.value) || 0 }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Quilometragem</label>
+                      <input type="number" min="0" value={initialCheckinForm.vehicleMileage} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleMileage: Number(e.target.value) || 0 }))} />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Problema relatado no check-in</label>
+                    <textarea rows={3} value={initialCheckinForm.problemReported} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, problemReported: e.target.value }))} />
+                  </div>
+                  <button className="os-action-button" onClick={handleSaveInitialCheckin} disabled={savingInitialCheckin}>
+                    {savingInitialCheckin ? 'Salvando...' : 'Salvar Dados do Check-in'}
+                  </button>
+                </div>
+              )}
 
               <div className="form-group" style={{ marginTop: 20 }}>
                 <label>Atribuir a (app mobile da equipe)</label>

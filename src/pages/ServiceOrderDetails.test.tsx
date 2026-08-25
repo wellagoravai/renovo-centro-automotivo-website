@@ -6,7 +6,7 @@ import { api } from '../services/api';
 
 jest.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
-    user: { fullName: 'Administrador' },
+    user: { fullName: 'Administrador', role: 'Administrador' },
   }),
 }));
 
@@ -86,9 +86,9 @@ describe('ServiceOrderDetails', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByDisplayValue('João da Silva')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByDisplayValue('João da Silva').length).toBeGreaterThan(0));
 
-    const customerInput = screen.getByDisplayValue('João da Silva');
+    const customerInput = screen.getAllByDisplayValue('João da Silva')[0];
     fireEvent.change(customerInput, { target: { value: 'Maria da Silva' } });
     fireEvent.click(screen.getByRole('button', { name: /salvar cliente/i }));
 
@@ -97,5 +97,18 @@ describe('ServiceOrderDetails', () => {
         customerName: 'Maria da Silva',
       });
     });
+  });
+
+  it('exibe edição dos dados do check-in para administrador', async () => {
+    render(
+      <MemoryRouter initialEntries={['/service-orders/os-1']}>
+        <Routes>
+          <Route path="/service-orders/:id" element={<ServiceOrderDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByDisplayValue('ABC-1234')).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /salvar dados do check-in/i })).toBeInTheDocument();
   });
 });
