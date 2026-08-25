@@ -479,9 +479,7 @@ textarea.form-control-tv {
   }
 }
 
-/* Monitores menores (notebook 1366x768, 1440x900...): em vez de forçar
-   scroll horizontal gigante nas 6-7 colunas, deixa quebrar em várias
-   linhas pra dar pra ver o fluxo inteiro sem rolar a tela inteira. */
+/* Monitores menores: preserva uma largura mínima legível para cada coluna. */
 @media (max-width: 1600px) {
   .metrics-container {
     gap: 8px;
@@ -501,20 +499,40 @@ textarea.form-control-tv {
   }
 
   .kanban-board-tv {
-    flex-wrap: wrap;
-    overflow-x: visible;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     min-height: auto;
   }
 
   .kanban-column-tv {
-    flex: 1 1 240px;
-    max-width: 280px;
+    flex: 0 0 190px;
+    max-width: none;
     max-height: 440px;
+    padding: 12px;
   }
 
   .kanban-column-cancelled {
-    flex: 1 1 200px;
-    max-width: 240px;
+    flex: 0 0 170px;
+    max-width: none;
+  }
+
+  .column-header-tv {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+
+  .column-header-tv h3 {
+    font-size: 16px;
+  }
+
+  .column-count-tv {
+    padding: 4px 9px;
+    font-size: 14px;
+  }
+
+  .empty-column-tv {
+    padding: 35px 8px;
+    font-size: 14px;
   }
 }
 
@@ -529,6 +547,20 @@ textarea.form-control-tv {
 
   .metric-value {
     font-size: 48px;
+  }
+
+  .metric-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .kanban-column-tv {
+    flex-basis: 170px;
+  }
+
+  .kanban-column-cancelled {
+    flex-basis: 150px;
   }
 }
 
