@@ -41,14 +41,14 @@
 .metrics-container {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
 .metric-card {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 25px 20px;
+  border-radius: 10px;
+  padding: 12px 8px;
   text-align: center;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -61,7 +61,7 @@
 }
 
 .metric-value {
-  font-size: 64px;
+  font-size: 42px;
   font-weight: 800;
   margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -69,12 +69,12 @@
 }
 
 .metric-label {
-  font-size: 20px;
+  font-size: 12px;
   font-weight: 600;
-  margin-top: 10px;
+  margin-top: 6px;
   opacity: 0.95;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 .metric-card.total { background: rgba(52, 152, 219, 0.3); }
@@ -483,6 +483,23 @@ textarea.form-control-tv {
    scroll horizontal gigante nas 6-7 colunas, deixa quebrar em várias
    linhas pra dar pra ver o fluxo inteiro sem rolar a tela inteira. */
 @media (max-width: 1600px) {
+  .metrics-container {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .metric-card {
+    padding: 10px 6px;
+  }
+
+  .metric-value {
+    font-size: 36px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+
   .kanban-board-tv {
     flex-wrap: wrap;
     overflow-x: visible;
