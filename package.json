@@ -25,8 +25,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "concurrently": "^10.0.5",
-    "sharp": "^0.34.5",
-    "concurrently": "^9.2.1"
+    "sharp": "^0.34.5"
   },
   "keywords": [
     "website",
