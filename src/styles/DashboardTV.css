@@ -572,9 +572,57 @@ textarea.form-control-tv {
   }
 
   .kanban-card-tv {
-    padding: 8px;
+    padding: 6px;
     border-radius: 6px;
     border-left-width: 3px;
+  }
+
+  .card-header-tv {
+    margin-bottom: 6px;
+    gap: 4px;
+  }
+
+  .os-number-tv {
+    font-size: 12px;
+  }
+
+  .status-badge-tv {
+    padding: 3px 6px;
+    border-radius: 10px;
+    font-size: 9px;
+  }
+
+  .card-body-tv {
+    margin-bottom: 6px;
+  }
+
+  .vehicle-info-tv {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .customer-name-tv {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .problem-info-tv {
+    font-size: 9px;
+  }
+
+  .card-footer-tv {
+    padding-top: 5px;
+    border-top-width: 1px;
+  }
+
+  .entry-date-tv {
+    font-size: 9px;
+  }
+
+  .btn-status-update-tv {
+    padding: 4px 7px;
+    border-radius: 5px;
+    font-size: 9px;
   }
 }
 
