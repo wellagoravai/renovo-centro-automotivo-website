@@ -223,8 +223,10 @@ const ServiceOrderDetails: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dados');
   const [serviceOrder, setServiceOrder] = useState<ServiceOrder | null>(null);
+  const [customerName, setCustomerName] = useState('');
   const [loading, setLoading] = useState(true);
   const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
+  const [savingCustomerName, setSavingCustomerName] = useState(false);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: '', services: '', estimatedTime: 0, laborValue: 0, notes: '',
@@ -279,6 +281,7 @@ const ServiceOrderDetails: React.FC = () => {
       if (orderResponse.ok) {
         const data: ServiceOrder = await orderResponse.json();
         setServiceOrder(data);
+        setCustomerName(data.customerName || '');
         setDiagnosisForm({
           diagnosis: data.diagnosis || '',
           services: data.services || '',
@@ -342,6 +345,38 @@ const ServiceOrderDetails: React.FC = () => {
       'Em transporte': '#e67e22',
     };
     return colors[status] || '#7f8c8d';
+  };
+
+  const handleSaveCustomerName = async () => {
+    if (!serviceOrder) return;
+
+    const trimmedName = customerName.trim();
+    if (!trimmedName) {
+      alert('❌ Nome do cliente não pode ficar vazio');
+      return;
+    }
+
+    setSavingCustomerName(true);
+    try {
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
+        customerName: trimmedName,
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setServiceOrder(updated);
+        setCustomerName(updated.customerName || trimmedName);
+        alert('✅ Nome do cliente atualizado com sucesso!');
+      } else {
+        const error = await response.json().catch(() => null);
+        alert(`❌ ${error?.message || 'Erro ao atualizar nome do cliente'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar nome do cliente:', error);
+      alert('❌ Erro ao atualizar nome do cliente');
+    } finally {
+      setSavingCustomerName(false);
+    }
   };
 
   const handleSaveDiagnosis = async () => {
@@ -646,7 +681,15 @@ const ServiceOrderDetails: React.FC = () => {
       <div className="os-info-cards">
         <div className="info-card">
           <h3>Cliente</h3>
-          <p>{serviceOrder.customerName}</p>
+          <input
+            type="text"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            style={{ width: '100%', marginBottom: 10 }}
+          />
+          <button className="os-action-button" onClick={handleSaveCustomerName} disabled={savingCustomerName}>
+            {savingCustomerName ? 'Salvando...' : 'Salvar Cliente'}
+          </button>
         </div>
         <div className="info-card">
           <h3>Veículo</h3>
@@ -717,8 +760,7 @@ const ServiceOrderDetails: React.FC = () => {
                   ))}
                 </select>
                 <button
-                  className="btn-primary"
-                  style={{ marginTop: 10 }}
+                  className="os-action-button"
                   onClick={handleSaveAssignment}
                   disabled={savingAssignment}
                 >
@@ -902,7 +944,7 @@ const ServiceOrderDetails: React.FC = () => {
               <p className="tab-hint">
                 Total do orçamento (mão de obra + peças lançadas na aba "Peças Usadas"): <strong>R$ {(serviceOrder.value || 0).toFixed(2)}</strong>
               </p>
-              <button className="btn-primary" onClick={handleSaveDiagnosis} disabled={savingDiagnosis}>
+              <button className="os-action-button" onClick={handleSaveDiagnosis} disabled={savingDiagnosis}>
                 {savingDiagnosis ? 'Salvando...' : 'Salvar Diagnóstico'}
               </button>
             </div>
@@ -1039,7 +1081,7 @@ const ServiceOrderDetails: React.FC = () => {
                     />
                   </div>
 
-                  <button className="btn-primary" onClick={handleSaveChecklist} disabled={savingChecklist}>
+                  <button className="os-action-button" onClick={handleSaveChecklist} disabled={savingChecklist}>
                     {savingChecklist ? 'Salvando...' : 'Salvar Checklist'}
                   </button>
                 </>

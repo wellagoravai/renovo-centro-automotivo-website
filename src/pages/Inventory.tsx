@@ -16,6 +16,7 @@ interface InventoryItem {
   purchaseValue: number;
   averageValue: number;
   saleValue: number;
+  marginPercent: number;
   createdAt: string;
   isLowStock: boolean;
 }
@@ -30,6 +31,7 @@ interface InventoryFormData {
   minimumQuantity: number;
   location: string;
   purchaseValue: number;
+  marginPercent: number;
   saleValue: number;
 }
 
@@ -44,6 +46,12 @@ const Inventory: React.FC = () => {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const { hasPermission } = useAuth();
 
+  const calculateSaleValue = (purchaseValue: number, marginPercent: number) => {
+    const safePurchaseValue = Number(purchaseValue) || 0;
+    const safeMarginPercent = Number(marginPercent) || 0;
+    return Number((safePurchaseValue * (1 + safeMarginPercent / 100)).toFixed(2));
+  };
+
   const [formData, setFormData] = useState<InventoryFormData>({
     code: '',
     description: '',
@@ -54,6 +62,7 @@ const Inventory: React.FC = () => {
     minimumQuantity: 0,
     location: '',
     purchaseValue: 0,
+    marginPercent: 0,
     saleValue: 0,
   });
 
@@ -107,6 +116,7 @@ const Inventory: React.FC = () => {
       minimumQuantity: 0,
       location: '',
       purchaseValue: 0,
+      marginPercent: 0,
       saleValue: 0,
     });
     setShowModal(true);
@@ -114,6 +124,7 @@ const Inventory: React.FC = () => {
 
   const openEditModal = (item: InventoryItem) => {
     setEditingItem(item);
+    const marginPercent = item.purchaseValue > 0 ? Number((((item.saleValue - item.purchaseValue) / item.purchaseValue) * 100).toFixed(2)) : 0;
     setFormData({
       code: item.code,
       description: item.description,
@@ -124,6 +135,7 @@ const Inventory: React.FC = () => {
       minimumQuantity: item.minimumQuantity,
       location: item.location,
       purchaseValue: item.purchaseValue,
+      marginPercent,
       saleValue: item.saleValue,
     });
     setShowModal(true);
@@ -180,13 +192,22 @@ const Inventory: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'code' || name === 'description' || name === 'supplier' || 
-              name === 'brand' || name === 'category' || name === 'location' 
-              ? value 
-              : parseFloat(value) || 0
-    }));
+
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        [name]: name === 'code' || name === 'description' || name === 'supplier' ||
+          name === 'brand' || name === 'category' || name === 'location'
+          ? value
+          : parseFloat(value) || 0,
+      } as InventoryFormData;
+
+      if (name === 'purchaseValue' || name === 'marginPercent') {
+        next.saleValue = calculateSaleValue(next.purchaseValue, next.marginPercent);
+      }
+
+      return next;
+    });
   };
 
   if (loading) {
@@ -314,8 +335,9 @@ const Inventory: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Código *</label>
+                  <label htmlFor="inventory-code">Código *</label>
                   <input
+                    id="inventory-code"
                     type="text"
                     name="code"
                     value={formData.code}
@@ -327,8 +349,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Descrição *</label>
+                  <label htmlFor="inventory-description">Descrição *</label>
                   <input
+                    id="inventory-description"
                     type="text"
                     name="description"
                     value={formData.description}
@@ -339,8 +362,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Categoria *</label>
+                  <label htmlFor="inventory-category">Categoria *</label>
                   <input
+                    id="inventory-category"
                     type="text"
                     name="category"
                     value={formData.category}
@@ -357,8 +381,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Marca *</label>
+                  <label htmlFor="inventory-brand">Marca *</label>
                   <input
+                    id="inventory-brand"
                     type="text"
                     name="brand"
                     value={formData.brand}
@@ -369,8 +394,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Fornecedor</label>
+                  <label htmlFor="inventory-supplier">Fornecedor</label>
                   <input
+                    id="inventory-supplier"
                     type="text"
                     name="supplier"
                     value={formData.supplier}
@@ -380,8 +406,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Localização</label>
+                  <label htmlFor="inventory-location">Localização</label>
                   <input
+                    id="inventory-location"
                     type="text"
                     name="location"
                     value={formData.location}
@@ -391,8 +418,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Quantidade *</label>
+                  <label htmlFor="inventory-quantity">Quantidade *</label>
                   <input
+                    id="inventory-quantity"
                     type="number"
                     name="quantity"
                     value={formData.quantity}
@@ -404,8 +432,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Quantidade Mínima *</label>
+                  <label htmlFor="inventory-minimumQuantity">Quantidade Mínima *</label>
                   <input
+                    id="inventory-minimumQuantity"
                     type="number"
                     name="minimumQuantity"
                     value={formData.minimumQuantity}
@@ -417,8 +446,9 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Valor de Compra (R$) *</label>
+                  <label htmlFor="inventory-purchaseValue">Valor de Compra (R$) *</label>
                   <input
+                    id="inventory-purchaseValue"
                     type="number"
                     name="purchaseValue"
                     value={formData.purchaseValue}
@@ -431,13 +461,29 @@ const Inventory: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Valor de Venda (R$) *</label>
+                  <label htmlFor="inventory-marginPercent">Margem (%) *</label>
                   <input
+                    id="inventory-marginPercent"
+                    type="number"
+                    name="marginPercent"
+                    value={formData.marginPercent}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="inventory-saleValue">Valor de Venda (R$) *</label>
+                  <input
+                    id="inventory-saleValue"
                     type="number"
                     name="saleValue"
                     value={formData.saleValue}
-                    onChange={handleInputChange}
                     className="form-control"
+                    readOnly
                     required
                     min="0"
                     step="0.01"

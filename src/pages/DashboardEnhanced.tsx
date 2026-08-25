@@ -21,6 +21,7 @@ const DashboardEnhanced: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<ServiceOrder | null>(null);
+  const [customerName, setCustomerName] = useState('');
   const [newStatus, setNewStatus] = useState('');
   const [notes, setNotes] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -91,16 +92,73 @@ const DashboardEnhanced: React.FC = () => {
     return false;
   };
 
+  const updateCustomerName = async (orderId: string, newCustomerName: string) => {
+    const trimmedName = newCustomerName.trim();
+    if (!trimmedName) {
+      alert('❌ Nome do cliente não pode ficar vazio');
+      return false;
+    }
+
+    const response = await api.put(`/service-orders/${orderId}`, {
+      customerName: trimmedName,
+    });
+
+    if (response.ok) {
+      loadDashboard();
+      return true;
+    }
+
+    const error = await response.json().catch(() => null);
+    alert(`❌ Erro: ${error?.message || 'Erro ao atualizar cliente'}`);
+    return false;
+  };
+
+  const handleRestoreCancelledOrder = async () => {
+    if (!selectedOrder) return;
+
+    const confirmed = window.confirm('Deseja restaurar esta OS cancelada para o status "Recebido"?');
+    if (!confirmed) return;
+
+    setUpdating(true);
+    try {
+      const ok = await updateOrderStatus(selectedOrder.id, 'Recebido', notes || 'OS restaurada após cancelamento acidental');
+      if (ok) {
+        setShowStatusModal(false);
+        setSelectedOrder(null);
+        setCustomerName('');
+        setNewStatus('');
+        setNotes('');
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar ordem cancelada:', error);
+      alert('❌ Erro ao restaurar ordem cancelada');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handleUpdateStatus = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder || !newStatus) return;
 
+    if (newStatus === 'Cancelado') {
+      const confirmed = window.confirm('Tem certeza que deseja cancelar esta ordem de serviço?');
+      if (!confirmed) return;
+    }
+
     setUpdating(true);
     try {
+      const customerChanged = selectedOrder.customerName.trim() !== customerName.trim();
+      if (customerChanged) {
+        const customerUpdated = await updateCustomerName(selectedOrder.id, customerName);
+        if (!customerUpdated) return;
+      }
+
       const ok = await updateOrderStatus(selectedOrder.id, newStatus, notes);
       if (ok) {
         setShowStatusModal(false);
         setSelectedOrder(null);
+        setCustomerName('');
         setNewStatus('');
         setNotes('');
       }
@@ -114,6 +172,7 @@ const DashboardEnhanced: React.FC = () => {
 
   const openStatusModal = (order: ServiceOrder) => {
     setSelectedOrder(order);
+    setCustomerName(order.customerName);
     setNewStatus(order.status);
     setNotes('');
     setShowStatusModal(true);
@@ -353,9 +412,10 @@ const DashboardEnhanced: React.FC = () => {
                 <label>Cliente:</label>
                 <input
                   type="text"
-                  value={selectedOrder.customerName}
-                  disabled
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
                   className="form-control-tv"
+                  disabled={updating}
                 />
               </div>
               <div className="form-group-tv">
@@ -391,10 +451,26 @@ const DashboardEnhanced: React.FC = () => {
                 />
               </div>
               <div className="modal-actions-tv">
+                {selectedOrder.status === 'Cancelado' && (
+                  <button
+                    type="button"
+                    className="btn-tv btn-secondary-tv"
+                    onClick={handleRestoreCancelledOrder}
+                    disabled={updating}
+                  >
+                    ♻️ Restaurar para Recebido
+                  </button>
+                )}
                 <button
                   type="button"
                   className="btn-tv btn-secondary-tv"
-                  onClick={() => setShowStatusModal(false)}
+                  onClick={() => {
+                    setShowStatusModal(false);
+                    setCustomerName('');
+                    setSelectedOrder(null);
+                    setNewStatus('');
+                    setNotes('');
+                  }}
                 >
                   Cancelar
                 </button>

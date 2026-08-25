@@ -122,6 +122,7 @@ const ServiceOrderPrintView: React.FC<Props> = ({ order, checklist, checklistBoo
   const isTow = order.serviceType === 'Guincho';
   const damagePoints = checklist?.damagePoints ? checklist.damagePoints.split(',').filter(Boolean) : [];
   const towDetails = order.towDetails;
+  const items = order.items || [];
 
   return (
     <div className="print-only os-print">
@@ -172,7 +173,7 @@ const ServiceOrderPrintView: React.FC<Props> = ({ order, checklist, checklistBoo
         <p>{order.services || '—'}</p>
       </section>
 
-      {order.items.length > 0 && (
+      {items.length > 0 && (
         <section>
           <h3>Peças e Insumos Utilizados</h3>
           <table className="os-print-table">
@@ -180,7 +181,7 @@ const ServiceOrderPrintView: React.FC<Props> = ({ order, checklist, checklistBoo
               <tr><th>Código</th><th>Descrição</th><th>Qtd</th><th>Valor Unit.</th><th>Total</th></tr>
             </thead>
             <tbody>
-              {order.items.map(item => (
+              {items.map(item => (
                 <tr key={item.id}>
                   <td>{item.itemCode}</td>
                   <td>{item.itemDescription}</td>
