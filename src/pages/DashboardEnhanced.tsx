@@ -8,7 +8,8 @@ interface ServiceOrder {
   id: string;
   number: string;
   status: string;
-  customerName: string;
+  customerName?: string;
+  customer?: { name?: string };
   vehicleInfo: string;
   entryDate: string;
   problemReported: string;
@@ -51,6 +52,10 @@ const DashboardEnhanced: React.FC = () => {
 
   const getOrdersForStage = (stage: { match: readonly string[] }) => {
     return serviceOrders.filter(order => (stage.match as readonly string[]).includes(order.status));
+  };
+
+  const getCustomerName = (order: ServiceOrder) => {
+    return order.customerName?.trim() || order.customer?.name?.trim() || 'Cliente não informado';
   };
 
   useEffect(() => {
@@ -148,7 +153,7 @@ const DashboardEnhanced: React.FC = () => {
 
     setUpdating(true);
     try {
-      const customerChanged = selectedOrder.customerName.trim() !== customerName.trim();
+      const customerChanged = getCustomerName(selectedOrder) !== customerName.trim();
       if (customerChanged) {
         const customerUpdated = await updateCustomerName(selectedOrder.id, customerName);
         if (!customerUpdated) return;
@@ -172,7 +177,7 @@ const DashboardEnhanced: React.FC = () => {
 
   const openStatusModal = (order: ServiceOrder) => {
     setSelectedOrder(order);
-    setCustomerName(order.customerName);
+    setCustomerName(getCustomerName(order));
     setNewStatus(order.status);
     setNotes('');
     setShowStatusModal(true);
@@ -324,7 +329,7 @@ const DashboardEnhanced: React.FC = () => {
                     </div>
                     <div className="card-body-tv">
                       <p className="vehicle-info-tv">🚗 {order.vehicleInfo}</p>
-                      <p className="customer-name-tv">👤 {order.customerName}</p>
+                      <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                       <p className="problem-info-tv">🔧 {order.problemReported || 'Não informado'}</p>
                     </div>
                     <div className="card-footer-tv">
@@ -378,7 +383,7 @@ const DashboardEnhanced: React.FC = () => {
                   </div>
                   <div className="card-body-tv">
                     <p className="vehicle-info-tv">🚗 {order.vehicleInfo}</p>
-                    <p className="customer-name-tv">👤 {order.customerName}</p>
+                    <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                   </div>
                 </div>
               ))}

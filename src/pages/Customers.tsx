@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../services/api';
+import { validateCpfOrCnpj } from '../utils/helpers';
 import '../styles/Customers.css';
 
 interface Customer {
@@ -54,6 +55,11 @@ const Customers: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateCpfOrCnpj(formData.document)) {
+      alert('Informe um CPF ou CNPJ válido.');
+      return;
+    }
     
     try {
       if (editingCustomer) {

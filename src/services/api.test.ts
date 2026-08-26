@@ -1,4 +1,4 @@
-import api from './api';
+import api, { normalizeApiBaseUrl, buildApiUrl } from './api';
 
 describe('api service', () => {
   const originalLocation = window.location;
@@ -62,5 +62,17 @@ describe('api service', () => {
     expect(localStorage.getItem('token')).toBeNull();
     expect(localStorage.getItem('user')).toBeNull();
     expect(window.location.href).toBe('/login');
+  });
+
+  it('normalizes backend base URLs with or without the /api suffix', () => {
+    expect(normalizeApiBaseUrl('https://api.example.com')).toBe('https://api.example.com/api');
+    expect(normalizeApiBaseUrl('https://api.example.com/')).toBe('https://api.example.com/api');
+    expect(normalizeApiBaseUrl('https://api.example.com/api')).toBe('https://api.example.com/api');
+    expect(normalizeApiBaseUrl('https://api.example.com/api/')).toBe('https://api.example.com/api');
+  });
+
+  it('builds a valid login URL even when the configured base URL is missing the /api segment', () => {
+    expect(buildApiUrl('/Auth/login', 'https://api.example.com')).toBe('https://api.example.com/api/Auth/login');
+    expect(buildApiUrl('/Auth/login', 'https://api.example.com/api/')).toBe('https://api.example.com/api/Auth/login');
   });
 });

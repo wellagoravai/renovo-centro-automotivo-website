@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { validateCpfOrCnpj } from '../utils/helpers';
 import '../styles/NewServiceOrder.css';
 
 interface CustomerData {
@@ -135,6 +136,14 @@ const NewServiceOrderMobile: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === 1) {
+      const trimmedDocument = customer.document.trim();
+      if (!validateCpfOrCnpj(trimmedDocument)) {
+        alert('❌ Informe um CPF ou CNPJ válido antes de continuar.');
+        return;
+      }
+    }
+
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -147,6 +156,12 @@ const NewServiceOrderMobile: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    const trimmedDocument = customer.document.trim();
+    if (!validateCpfOrCnpj(trimmedDocument)) {
+      alert('❌ CPF/CNPJ inválido ou ausente. Não é possível abrir o check-in sem documento válido.');
+      return;
+    }
+
     setLoading(true);
 
     try {
