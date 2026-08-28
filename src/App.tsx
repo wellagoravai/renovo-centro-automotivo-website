@@ -15,6 +15,7 @@ import Portal from './pages/Portal';
 import Dashboard from './pages/DashboardEnhanced';
 import ServiceOrders from './pages/ServiceOrders';
 import Inventory from './pages/Inventory';
+import Customers from './pages/Customers';
 import UsersManagement from './pages/UsersManagement';
 import NewServiceOrderMobile from './pages/NewServiceOrderMobile';
 import ServiceOrderDetails from './pages/ServiceOrderDetails';
@@ -75,6 +76,7 @@ const AppRoutes: React.FC = () => {
         <Route path="service-orders/:id" element={<ServiceOrderDetails />} />
         <Route path="guincho" element={<TowDashboard />} />
         <Route path="inventory" element={<Inventory />} />
+        <Route path="customers" element={<Customers />} />
         <Route path="users" element={<UsersManagement />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="settings" element={<SettingsPage />} />
