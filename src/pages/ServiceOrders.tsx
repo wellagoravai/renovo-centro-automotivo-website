@@ -18,6 +18,7 @@ interface ServiceOrder {
   vehicleModel: string;
   problemReported: string;
   value: number;
+  responsibleUser?: string;
 }
 
 const ServiceOrders: React.FC = () => {
@@ -26,6 +27,7 @@ const ServiceOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [responsibleUserFilter, setResponsibleUserFilter] = useState('');
   const [showMine, setShowMine] = useState(false);
   const { user, hasPermission } = useAuth();
 
@@ -33,7 +35,7 @@ const ServiceOrders: React.FC = () => {
 
   useEffect(() => {
     loadOrders();
-  }, [statusFilter, search, showMine]);
+  }, [statusFilter, search, responsibleUserFilter, showMine]);
 
   const loadOrders = async () => {
     try {
@@ -42,6 +44,7 @@ const ServiceOrders: React.FC = () => {
 
       if (statusFilter) params.append('status', statusFilter);
       if (search) params.append('search', search);
+      if (responsibleUserFilter) params.append('responsibleUser', responsibleUserFilter);
       if (showMine && isMechanic && user) params.append('assignedUserId', user.id);
 
       if (params.toString()) {
@@ -117,7 +120,15 @@ const ServiceOrders: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="form-control search-input"
         />
-        
+
+        <input
+          type="text"
+          placeholder="Buscar por responsável de abertura..."
+          value={responsibleUserFilter}
+          onChange={(e) => setResponsibleUserFilter(e.target.value)}
+          className="form-control search-input"
+        />
+
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -187,6 +198,12 @@ const ServiceOrders: React.FC = () => {
                   <span className="info-label">Entrada:</span>
                   <span className="info-value">{new Date(order.entryDate).toLocaleDateString('pt-BR')}</span>
                 </div>
+                {order.responsibleUser && (
+                  <div className="info-row">
+                    <span className="info-label">Responsável:</span>
+                    <span className="info-value">{order.responsibleUser}</span>
+                  </div>
+                )}
                 {order.estimatedDate && (
                   <div className="info-row">
                     <span className="info-label">Previsão:</span>

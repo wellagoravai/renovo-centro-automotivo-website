@@ -232,6 +232,7 @@ const ServiceOrderDetails: React.FC = () => {
     vehicleYear: 0,
     vehicleMileage: 0,
     problemReported: '',
+    responsibleUser: '',
   });
   const [loading, setLoading] = useState(true);
   const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
@@ -299,6 +300,7 @@ const ServiceOrderDetails: React.FC = () => {
           vehicleYear: data.vehicleYear || 0,
           vehicleMileage: data.vehicleMileage || 0,
           problemReported: data.problemReported || '',
+          responsibleUser: data.responsibleUser || '',
         });
         setDiagnosisForm({
           diagnosis: data.diagnosis || '',
@@ -367,11 +369,22 @@ const ServiceOrderDetails: React.FC = () => {
 
   const canEditInitialCheckin = user?.role === 'Administrador' || user?.role === 'Gerente';
 
+  // Diagnosis/Services/Parts/Oils/Filters/EstimatedTime/LaborValue/Notes/Photos/AssignedUserId
+  // são sempre sobrescritos pelo PUT (não são "opcionais" como os campos de check-in) —
+  // por isso todo save nesta página precisa reenviar o valor atual deles, senão o backend
+  // grava vazio/nulo por cima do que já existia.
+  const buildBasePayload = () => ({
+    ...diagnosisForm,
+    photos: serviceOrder?.photos || '',
+    assignedUserId: assignedUserId || null,
+  });
+
   const handleSaveInitialCheckin = async () => {
     if (!serviceOrder) return;
     setSavingInitialCheckin(true);
     try {
       const response = await api.put(`/service-orders/${serviceOrder.id}`, {
+        ...buildBasePayload(),
         ...initialCheckinForm,
         vehicleYear: Number(initialCheckinForm.vehicleYear) || 0,
         vehicleMileage: Number(initialCheckinForm.vehicleMileage) || 0,
@@ -396,7 +409,7 @@ const ServiceOrderDetails: React.FC = () => {
     if (!serviceOrder) return;
     setSavingDiagnosis(true);
     try {
-      const response = await api.put(`/service-orders/${serviceOrder.id}`, diagnosisForm);
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, buildBasePayload());
       if (response.ok) {
         const updated = await response.json();
         setServiceOrder(updated);
@@ -416,11 +429,7 @@ const ServiceOrderDetails: React.FC = () => {
     if (!serviceOrder) return;
     setSavingAssignment(true);
     try {
-      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
-        ...diagnosisForm,
-        photos: serviceOrder.photos || '',
-        assignedUserId: assignedUserId || null,
-      });
+      const response = await api.put(`/service-orders/${serviceOrder.id}`, buildBasePayload());
       if (response.ok) {
         const updated = await response.json();
         setServiceOrder(updated);
@@ -445,8 +454,7 @@ const ServiceOrderDetails: React.FC = () => {
     setSavingTowDetails(true);
     try {
       const response = await api.put(`/service-orders/${serviceOrder.id}`, {
-        ...diagnosisForm,
-        photos: serviceOrder.photos || '',
+        ...buildBasePayload(),
         towDetails: towDetailsForm,
       });
       if (response.ok) {
@@ -787,6 +795,10 @@ const ServiceOrderDetails: React.FC = () => {
                     <div className="form-group">
                       <label>Quilometragem</label>
                       <input type="number" min="0" value={initialCheckinForm.vehicleMileage} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehicleMileage: Number(e.target.value) || 0 }))} />
+                    </div>
+                    <div className="form-group">
+                      <label>Responsável pela Abertura</label>
+                      <input value={initialCheckinForm.responsibleUser} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, responsibleUser: e.target.value }))} />
                     </div>
                   </div>
                   <div className="form-group">
