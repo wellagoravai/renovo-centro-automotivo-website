@@ -63,6 +63,23 @@ const DashboardEnhanced: React.FC = () => {
 
   const getVehiclePlate = (order: ServiceOrder) => order.vehiclePlate?.trim() || '';
 
+  const formatPlate = (plate: string) => {
+    const clean = plate.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    // Mercosul (LLL0L00) e padrão antigo (LLL0000) têm o mesmo tamanho e só
+    // diferem no 5º caractere — em ambos o traço entra depois das 3 letras.
+    if (clean.length === 7) {
+      return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    }
+    return clean;
+  };
+
+  const renderPlate = (plate: string) => (
+    <div className="vehicle-plate-mercosul">
+      <span className="plate-top-bar">Placa</span>
+      <span className="plate-number">{formatPlate(plate)}</span>
+    </div>
+  );
+
   const getVehicleInfo = (order: ServiceOrder) => {
     const brandModel = [order.vehicleBrand, order.vehicleModel].filter(Boolean).join(' ').trim();
     return brandModel || order.vehicleInfo?.trim() || 'Veículo não informado';
@@ -338,9 +355,7 @@ const DashboardEnhanced: React.FC = () => {
                       </span>
                     </div>
                     <div className="card-body-tv">
-                      {getVehiclePlate(order) && (
-                        <p className="vehicle-plate-tv">🔖 {getVehiclePlate(order)}</p>
-                      )}
+                      {getVehiclePlate(order) && renderPlate(getVehiclePlate(order))}
                       <p className="vehicle-info-tv">🚗 {getVehicleInfo(order)}</p>
                       <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                       <p className="problem-info-tv">🔧 {order.problemReported || 'Não informado'}</p>
@@ -395,9 +410,7 @@ const DashboardEnhanced: React.FC = () => {
                     <span className="os-number-tv">OS {order.number}</span>
                   </div>
                   <div className="card-body-tv">
-                    {getVehiclePlate(order) && (
-                      <p className="vehicle-plate-tv">🔖 {getVehiclePlate(order)}</p>
-                    )}
+                    {getVehiclePlate(order) && renderPlate(getVehiclePlate(order))}
                     <p className="vehicle-info-tv">🚗 {getVehicleInfo(order)}</p>
                     <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                   </div>
