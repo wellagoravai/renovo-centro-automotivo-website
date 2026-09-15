@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import ServiceOrderPrintView from '../components/ServiceOrderPrintView';
 import VehicleDamageDiagram from '../components/VehicleDamageDiagram';
+import FreightQuoteCalculator, { FreightQuoteValue } from '../components/FreightQuoteCalculator';
 import '../styles/ServiceOrderDetails.css';
 
 interface HistoryEntry {
@@ -35,6 +36,15 @@ interface TowServiceDetails {
   deliveredByDocument: string;
   receivedByName: string;
   receivedByDocument: string;
+  originCity: string;
+  originState: string;
+  destinationCity: string;
+  destinationState: string;
+  pricePerKm: number | null;
+  axleCount: number | null;
+  distanceKm: number | null;
+  tollsValue: number | null;
+  freightTotal: number | null;
 }
 
 const emptyTowDetails: TowServiceDetails = {
@@ -48,6 +58,15 @@ const emptyTowDetails: TowServiceDetails = {
   deliveredByDocument: '',
   receivedByName: '',
   receivedByDocument: '',
+  originCity: '',
+  originState: '',
+  destinationCity: '',
+  destinationState: '',
+  pricePerKm: null,
+  axleCount: null,
+  distanceKm: null,
+  tollsValue: null,
+  freightTotal: null,
 };
 
 const TOW_STATUS_LIST = [
@@ -447,6 +466,10 @@ const ServiceOrderDetails: React.FC = () => {
 
   const handleTowDetailsChange = (key: keyof TowServiceDetails, value: string) => {
     setTowDetailsForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleFreightQuoteChange = (patch: Partial<FreightQuoteValue>) => {
+    setTowDetailsForm(prev => ({ ...prev, ...patch }));
   };
 
   const handleSaveTowDetails = async () => {
@@ -931,6 +954,9 @@ const ServiceOrderDetails: React.FC = () => {
                       />
                     </div>
                   </div>
+
+                  <FreightQuoteCalculator value={towDetailsForm} onChange={handleFreightQuoteChange} />
+
                   <button
                     className="btn-primary"
                     onClick={handleSaveTowDetails}

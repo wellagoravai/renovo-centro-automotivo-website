@@ -10,6 +10,65 @@
   max-width: 500px;
 }
 
+.consulta-veiculo-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.consulta-veiculo-card h2 {
+  font-size: 16px;
+  margin: 0 0 4px;
+  color: #2c3e50;
+}
+
+.consulta-veiculo-hint {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin: 0 0 14px;
+}
+
+.consulta-veiculo-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.consulta-veiculo-form input {
+  max-width: 220px;
+  text-transform: uppercase;
+}
+
+.consulta-veiculo-erro {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fdecea;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.consulta-veiculo-resultado {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  font-size: 14px;
+  color: #2c3e50;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px 16px;
+}
+
+.consulta-veiculo-fonte {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
 .table-container {
   background: white;
   border-radius: 10px;

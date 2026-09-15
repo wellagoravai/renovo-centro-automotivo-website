@@ -103,4 +103,75 @@ describe('ServiceOrderDetails', () => {
     await waitFor(() => expect(screen.getByDisplayValue('ABC-1234')).toBeInTheDocument());
     expect(screen.getByRole('button', { name: /salvar dados do check-in/i })).toBeInTheDocument();
   });
+
+  // Regressão: uma OS de Guincho carrega o bloco "Dados do Guincho" (com a
+  // cotação de frete rodoviário) na aba padrão — precisa renderizar sem quebrar
+  // mesmo quando towDetails vem com os campos novos de origem/destino/pedágio.
+  it('renderiza a seção de guincho e a cotação de frete para uma OS do tipo Guincho', async () => {
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('/service-orders/')) {
+        if (url.includes('/photos')) {
+          return Promise.resolve({ ok: true, json: async () => [] });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            id: 'os-2',
+            number: '20260901',
+            status: 'Chamado recebido',
+            serviceType: 'Guincho',
+            customerName: 'Carlos Souza',
+            vehiclePlate: 'XYZ9A87',
+            vehicleBrand: 'Fiat',
+            vehicleModel: 'Uno',
+            vehicleColor: 'Branco',
+            vehicleYear: 2018,
+            vehicleMileage: 50000,
+            problemReported: 'Pane seca',
+            diagnosis: '',
+            services: '',
+            estimatedTime: 0,
+            laborValue: 0,
+            notes: '',
+            entryDate: '2026-09-01T00:00:00.000Z',
+            estimatedDate: null,
+            finalDate: null,
+            photos: '',
+            responsibleUser: 'Recepção',
+            assignedUserId: '',
+            assignedUserName: '',
+            hasChecklist: false,
+            vehicleId: 'veh-2',
+            towDetails: {
+              insuranceCompany: '', assistanceCompany: '', claimNumber: '',
+              pickupLocation: 'Rua A, 100', deliveryDestination: 'Rua B, 200', towUnit: '',
+              deliveredByName: '', deliveredByDocument: '', receivedByName: '', receivedByDocument: '',
+              originCity: 'Uberlândia', originState: 'MG',
+              destinationCity: 'São Paulo', destinationState: 'SP',
+              pricePerKm: 4.5, axleCount: 2, distanceKm: 100, tollsValue: 30, freightTotal: 480,
+            },
+            history: [],
+            items: [],
+            value: 0,
+          }),
+        });
+      }
+      if (url.includes('/Users/assignable')) {
+        return Promise.resolve({ ok: true, json: async () => [] });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/service-orders/os-2']}>
+        <Routes>
+          <Route path="/service-orders/:id" element={<ServiceOrderDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Dados do Guincho')).toBeInTheDocument();
+    expect(screen.getByText('Cotação de Frete Rodoviário')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Rua A, 100')).toBeInTheDocument();
+  });
 });

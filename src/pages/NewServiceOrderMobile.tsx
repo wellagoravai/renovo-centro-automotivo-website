@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { validateCpfOrCnpj } from '../utils/helpers';
+import FreightQuoteCalculator, { emptyFreightQuoteValue } from '../components/FreightQuoteCalculator';
 import '../styles/NewServiceOrder.css';
 
 interface CustomerData {
@@ -43,6 +44,15 @@ interface TowDetailsData {
   deliveredByDocument: string;
   receivedByName: string;
   receivedByDocument: string;
+  originCity: string;
+  originState: string;
+  destinationCity: string;
+  destinationState: string;
+  pricePerKm: number | null;
+  axleCount: number | null;
+  distanceKm: number | null;
+  tollsValue: number | null;
+  freightTotal: number | null;
 }
 
 const emptyTowDetails: TowDetailsData = {
@@ -56,7 +66,13 @@ const emptyTowDetails: TowDetailsData = {
   deliveredByDocument: '',
   receivedByName: '',
   receivedByDocument: '',
+  ...emptyFreightQuoteValue,
 };
+
+interface FipeMarca {
+  codigo: string;
+  nome: string;
+}
 
 const NewServiceOrderMobile: React.FC = () => {
   const navigate = useNavigate();
@@ -68,6 +84,10 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const handleTowDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTowDetails({ ...towDetails, [e.target.name]: e.target.value });
+  };
+
+  const handleFreightQuoteChange = (patch: Partial<TowDetailsData>) => {
+    setTowDetails(prev => ({ ...prev, ...patch }));
   };
 
   const [customer, setCustomer] = useState<CustomerData>({
@@ -106,6 +126,43 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
+  };
+
+  // Marcas/modelos vêm da tabela FIPE pública (sem chave, sem custo) — a lista de
+  // marcas carrega uma vez ao montar a tela; os modelos de cada marca só são
+  // buscados quando o operador digita/seleciona uma marca reconhecida (o campo
+  // continua aceitando texto livre pra marcas fora da tabela FIPE).
+  const [fipeMarcas, setFipeMarcas] = useState<FipeMarca[]>([]);
+  const [fipeModelosCache, setFipeModelosCache] = useState<Record<string, string[]>>({});
+  const [loadingFipeModelos, setLoadingFipeModelos] = useState(false);
+
+  useEffect(() => {
+    fetch('https://parallelum.com.br/fipe/api/v1/carros/marcas')
+      .then(res => res.json())
+      .then(data => setFipeMarcas(Array.isArray(data) ? data : []))
+      .catch(error => console.error('Erro ao carregar marcas FIPE:', error));
+  }, []);
+
+  const currentFipeMarca = fipeMarcas.find(m => m.nome.toLowerCase() === vehicle.brand.trim().toLowerCase());
+  const fipeModelOptions = currentFipeMarca ? (fipeModelosCache[currentFipeMarca.codigo] || []) : [];
+
+  const handleBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleVehicleChange(e);
+
+    const marca = fipeMarcas.find(m => m.nome.toLowerCase() === e.target.value.trim().toLowerCase());
+    if (!marca || fipeModelosCache[marca.codigo]) return;
+
+    setLoadingFipeModelos(true);
+    fetch(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marca.codigo}/modelos`)
+      .then(res => res.json())
+      .then(data => {
+        const nomes = Array.isArray(data?.modelos)
+          ? data.modelos.map((m: { nome: string }) => m.nome).sort((a: string, b: string) => a.localeCompare(b, 'pt-BR'))
+          : [];
+        setFipeModelosCache(prev => ({ ...prev, [marca.codigo]: nomes }));
+      })
+      .catch(error => console.error('Erro ao carregar modelos FIPE:', error))
+      .finally(() => setLoadingFipeModelos(false));
   };
 
   const handleServiceOrderChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -299,23 +356,35 @@ const NewServiceOrderMobile: React.FC = () => {
         <label>Marca *</label>
         <input
           type="text"
+          list="fipe-marcas-list"
           name="brand"
           value={vehicle.brand}
-          onChange={handleVehicleChange}
-          placeholder="Ex: Toyota"
+          onChange={handleBrandChange}
+          placeholder="Digite para buscar (Ex: Toyota)"
           required
         />
+        <datalist id="fipe-marcas-list">
+          {fipeMarcas.map(marca => (
+            <option key={marca.codigo} value={marca.nome} />
+          ))}
+        </datalist>
       </div>
       <div className="form-group">
         <label>Modelo *</label>
         <input
           type="text"
+          list="fipe-modelos-list"
           name="model"
           value={vehicle.model}
           onChange={handleVehicleChange}
-          placeholder="Ex: Corolla"
+          placeholder={loadingFipeModelos ? 'Carregando modelos...' : 'Digite para buscar (Ex: Corolla)'}
           required
         />
+        <datalist id="fipe-modelos-list">
+          {fipeModelOptions.map(modelo => (
+            <option key={modelo} value={modelo} />
+          ))}
+        </datalist>
       </div>
       <div className="form-group">
         <label>Ano *</label>
@@ -577,6 +646,10 @@ const NewServiceOrderMobile: React.FC = () => {
             />
           </div>
         </div>
+      )}
+
+      {serviceType === 'Guincho' && (
+        <FreightQuoteCalculator value={towDetails} onChange={handleFreightQuoteChange} />
       )}
     </div>
   );
