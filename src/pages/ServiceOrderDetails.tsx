@@ -223,7 +223,6 @@ const ServiceOrderDetails: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dados');
   const [serviceOrder, setServiceOrder] = useState<ServiceOrder | null>(null);
-  const [customerName, setCustomerName] = useState('');
   const [initialCheckinForm, setInitialCheckinForm] = useState({
     customerName: '',
     vehiclePlate: '',
@@ -236,7 +235,6 @@ const ServiceOrderDetails: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
-  const [savingCustomerName, setSavingCustomerName] = useState(false);
   const [savingInitialCheckin, setSavingInitialCheckin] = useState(false);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
@@ -292,7 +290,6 @@ const ServiceOrderDetails: React.FC = () => {
       if (orderResponse.ok) {
         const data: ServiceOrder = await orderResponse.json();
         setServiceOrder(data);
-        setCustomerName(data.customerName || '');
         setInitialCheckinForm({
           customerName: data.customerName || '',
           vehiclePlate: data.vehiclePlate || '',
@@ -368,38 +365,6 @@ const ServiceOrderDetails: React.FC = () => {
     return colors[status] || '#7f8c8d';
   };
 
-  const handleSaveCustomerName = async () => {
-    if (!serviceOrder) return;
-
-    const trimmedName = customerName.trim();
-    if (!trimmedName) {
-      alert('❌ Nome do cliente não pode ficar vazio');
-      return;
-    }
-
-    setSavingCustomerName(true);
-    try {
-      const response = await api.put(`/service-orders/${serviceOrder.id}`, {
-        customerName: trimmedName,
-      });
-
-      if (response.ok) {
-        const updated = await response.json();
-        setServiceOrder(updated);
-        setCustomerName(updated.customerName || trimmedName);
-        alert('✅ Nome do cliente atualizado com sucesso!');
-      } else {
-        const error = await response.json().catch(() => null);
-        alert(`❌ ${error?.message || 'Erro ao atualizar nome do cliente'}`);
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar nome do cliente:', error);
-      alert('❌ Erro ao atualizar nome do cliente');
-    } finally {
-      setSavingCustomerName(false);
-    }
-  };
-
   const canEditInitialCheckin = user?.role === 'Administrador' || user?.role === 'Gerente';
 
   const handleSaveInitialCheckin = async () => {
@@ -414,7 +379,6 @@ const ServiceOrderDetails: React.FC = () => {
       if (response.ok) {
         const updated = await response.json();
         setServiceOrder(updated);
-        setCustomerName(updated.customerName || initialCheckinForm.customerName);
         setInitialCheckinForm(prev => ({ ...prev, ...updated }));
         alert('✅ Dados do check-in inicial atualizados com sucesso!');
       } else {
@@ -730,15 +694,7 @@ const ServiceOrderDetails: React.FC = () => {
       <div className="os-info-cards">
         <div className="info-card">
           <h3>Cliente</h3>
-          <input
-            type="text"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            style={{ width: '100%', marginBottom: 10 }}
-          />
-          <button className="os-action-button" onClick={handleSaveCustomerName} disabled={savingCustomerName}>
-            {savingCustomerName ? 'Salvando...' : 'Salvar Cliente'}
-          </button>
+          <p>{serviceOrder.customerName}</p>
         </div>
         <div className="info-card">
           <h3>Veículo</h3>

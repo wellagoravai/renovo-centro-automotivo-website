@@ -208,6 +208,18 @@
   margin-bottom: 15px;
 }
 
+.vehicle-plate-tv {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #2c3e50;
+  background: #f1c40f;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin: 0 0 6px 0;
+}
+
 .vehicle-info-tv {
   font-size: 22px;
   font-weight: 700;

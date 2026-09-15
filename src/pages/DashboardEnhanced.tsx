@@ -10,7 +10,10 @@ interface ServiceOrder {
   status: string;
   customerName?: string;
   customer?: { name?: string };
-  vehicleInfo: string;
+  vehiclePlate?: string;
+  vehicleBrand?: string;
+  vehicleModel?: string;
+  vehicleInfo?: string;
   entryDate: string;
   problemReported: string;
 }
@@ -56,6 +59,13 @@ const DashboardEnhanced: React.FC = () => {
 
   const getCustomerName = (order: ServiceOrder) => {
     return order.customerName?.trim() || order.customer?.name?.trim() || 'Cliente não informado';
+  };
+
+  const getVehiclePlate = (order: ServiceOrder) => order.vehiclePlate?.trim() || '';
+
+  const getVehicleInfo = (order: ServiceOrder) => {
+    const brandModel = [order.vehicleBrand, order.vehicleModel].filter(Boolean).join(' ').trim();
+    return brandModel || order.vehicleInfo?.trim() || 'Veículo não informado';
   };
 
   useEffect(() => {
@@ -328,7 +338,10 @@ const DashboardEnhanced: React.FC = () => {
                       </span>
                     </div>
                     <div className="card-body-tv">
-                      <p className="vehicle-info-tv">🚗 {order.vehicleInfo}</p>
+                      {getVehiclePlate(order) && (
+                        <p className="vehicle-plate-tv">🔖 {getVehiclePlate(order)}</p>
+                      )}
+                      <p className="vehicle-info-tv">🚗 {getVehicleInfo(order)}</p>
                       <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                       <p className="problem-info-tv">🔧 {order.problemReported || 'Não informado'}</p>
                     </div>
@@ -382,7 +395,10 @@ const DashboardEnhanced: React.FC = () => {
                     <span className="os-number-tv">OS {order.number}</span>
                   </div>
                   <div className="card-body-tv">
-                    <p className="vehicle-info-tv">🚗 {order.vehicleInfo}</p>
+                    {getVehiclePlate(order) && (
+                      <p className="vehicle-plate-tv">🔖 {getVehiclePlate(order)}</p>
+                    )}
+                    <p className="vehicle-info-tv">🚗 {getVehicleInfo(order)}</p>
                     <p className="customer-name-tv">👤 {getCustomerName(order)}</p>
                   </div>
                 </div>

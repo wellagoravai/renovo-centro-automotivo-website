@@ -77,7 +77,7 @@ describe('ServiceOrderDetails', () => {
     });
   });
 
-  it('permite alterar o nome do cliente na tela de detalhes da OS', async () => {
+  it('exibe o nome do cliente somente leitura na tela de detalhes da OS', async () => {
     render(
       <MemoryRouter initialEntries={['/service-orders/os-1']}>
         <Routes>
@@ -86,17 +86,9 @@ describe('ServiceOrderDetails', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getAllByDisplayValue('João da Silva').length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText('João da Silva').length).toBeGreaterThan(0));
 
-    const customerInput = screen.getAllByDisplayValue('João da Silva')[0];
-    fireEvent.change(customerInput, { target: { value: 'Maria da Silva' } });
-    fireEvent.click(screen.getByRole('button', { name: /salvar cliente/i }));
-
-    await waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith('/service-orders/os-1', {
-        customerName: 'Maria da Silva',
-      });
-    });
+    expect(screen.queryByRole('button', { name: /salvar cliente/i })).not.toBeInTheDocument();
   });
 
   it('exibe edição dos dados do check-in para administrador', async () => {
