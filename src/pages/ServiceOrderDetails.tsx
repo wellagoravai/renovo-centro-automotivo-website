@@ -83,6 +83,7 @@ interface ServiceOrder {
   number: string;
   status: string;
   serviceType: string;
+  customerId: string;
   customerName: string;
   vehiclePlate: string;
   vehicleBrand: string;
@@ -223,6 +224,13 @@ interface InventoryResult {
   quantity: number;
 }
 
+interface CustomerResult {
+  id: string;
+  name: string;
+  document: string;
+  phone: string;
+}
+
 interface AssignableUser {
   id: string;
   fullName: string;
@@ -256,6 +264,13 @@ const ServiceOrderDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [generatingQuotePdf, setGeneratingQuotePdf] = useState(false);
   const [savingInitialCheckin, setSavingInitialCheckin] = useState(false);
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [showCustomerSearch, setShowCustomerSearch] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [customerResults, setCustomerResults] = useState<CustomerResult[]>([]);
+  const [searchingCustomers, setSearchingCustomers] = useState(false);
+  const [customerSearchDone, setCustomerSearchDone] = useState(false);
 
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: '', services: '', estimatedTime: 0, laborValue: 0, notes: '',
@@ -321,6 +336,7 @@ const ServiceOrderDetails: React.FC = () => {
           problemReported: data.problemReported || '',
           responsibleUser: data.responsibleUser || '',
         });
+        setSelectedCustomerId(data.customerId || '');
         setDiagnosisForm({
           diagnosis: data.diagnosis || '',
           services: data.services || '',
@@ -402,9 +418,11 @@ const ServiceOrderDetails: React.FC = () => {
     if (!serviceOrder) return;
     setSavingInitialCheckin(true);
     try {
+      const { customerName, ...checkinFieldsWithoutCustomerName } = initialCheckinForm;
       const response = await api.put(`/service-orders/${serviceOrder.id}`, {
         ...buildBasePayload(),
-        ...initialCheckinForm,
+        ...checkinFieldsWithoutCustomerName,
+        customerId: selectedCustomerId || undefined,
         vehicleYear: Number(initialCheckinForm.vehicleYear) || 0,
         vehicleMileage: Number(initialCheckinForm.vehicleMileage) || 0,
       });
@@ -412,6 +430,7 @@ const ServiceOrderDetails: React.FC = () => {
         const updated = await response.json();
         setServiceOrder(updated);
         setInitialCheckinForm(prev => ({ ...prev, ...updated }));
+        setSelectedCustomerId(updated.customerId || '');
         alert('✅ Dados do check-in inicial atualizados com sucesso!');
       } else {
         alert('❌ Erro ao atualizar os dados do check-in inicial');
@@ -601,6 +620,35 @@ const ServiceOrderDetails: React.FC = () => {
       setUploadingPhoto(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
+  };
+
+  const handleSearchCustomers = async () => {
+    if (!customerSearch.trim()) return;
+    setSearchingCustomers(true);
+    try {
+      const response = await api.get(`/Customers?search=${encodeURIComponent(customerSearch)}`);
+      if (response.ok) {
+        setCustomerResults(await response.json());
+      }
+    } catch (error) {
+      console.error('Erro ao buscar clientes:', error);
+    } finally {
+      setSearchingCustomers(false);
+      setCustomerSearchDone(true);
+    }
+  };
+
+  const handleSelectCustomer = (customer: CustomerResult) => {
+    setSelectedCustomerId(customer.id);
+    setInitialCheckinForm(prev => ({ ...prev, customerName: customer.name }));
+    setShowCustomerSearch(false);
+    setCustomerSearch('');
+    setCustomerResults([]);
+    setCustomerSearchDone(false);
+  };
+
+  const handleGoToNewCustomer = () => {
+    navigate('/customers?new=1');
   };
 
   const handleSearchItems = async () => {
@@ -793,7 +841,46 @@ const ServiceOrderDetails: React.FC = () => {
                   <div className="checklist-meta-grid">
                     <div className="form-group">
                       <label>Cliente</label>
-                      <input value={initialCheckinForm.customerName} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, customerName: e.target.value }))} />
+                      <div className="customer-picker">
+                        <input value={initialCheckinForm.customerName} readOnly onClick={() => setShowCustomerSearch(true)} />
+                        <button type="button" className="btn-secondary btn-sm" onClick={() => setShowCustomerSearch(prev => !prev)}>
+                          Alterar cliente
+                        </button>
+                      </div>
+                      {showCustomerSearch && (
+                        <div className="item-search-bar" style={{ marginTop: 8 }}>
+                          <input
+                            type="text"
+                            placeholder="Buscar cliente por nome, CPF/CNPJ ou telefone..."
+                            value={customerSearch}
+                            onChange={(e) => { setCustomerSearch(e.target.value); setCustomerSearchDone(false); }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearchCustomers()}
+                          />
+                          <button type="button" className="btn-secondary" onClick={handleSearchCustomers} disabled={searchingCustomers}>
+                            {searchingCustomers ? 'Buscando...' : 'Buscar'}
+                          </button>
+                        </div>
+                      )}
+                      {showCustomerSearch && customerResults.length > 0 && (
+                        <div className="item-search-results">
+                          {customerResults.map(result => (
+                            <div key={result.id} className="item-search-row">
+                              <span>{result.name} — {result.document || 'sem documento'}</span>
+                              <button type="button" className="btn-primary btn-sm" onClick={() => handleSelectCustomer(result)}>
+                                Selecionar
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {showCustomerSearch && customerSearchDone && customerResults.length === 0 && (
+                        <p className="tab-hint">
+                          Cliente não encontrado.{' '}
+                          <button type="button" className="btn-link" onClick={handleGoToNewCustomer}>
+                            Cadastrar novo cliente
+                          </button>
+                        </p>
+                      )}
                     </div>
                     <div className="form-group">
                       <label>Placa</label>

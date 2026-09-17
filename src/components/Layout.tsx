@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { ThemeProvider, useTheme } from '../hooks/useTheme';
 import '../styles/Layout.css';
 
-const Layout: React.FC = () => {
+const LayoutContent: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,7 +36,7 @@ const Layout: React.FC = () => {
   });
 
   return (
-    <div className="layout">
+    <div className="layout" data-theme={theme}>
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <img src="/assets/logo.png" alt="Renovo" className="sidebar-logo" />
@@ -80,6 +82,14 @@ const Layout: React.FC = () => {
             ☰
           </button>
           <h1> Sistema de Gestão de Oficina</h1>
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+            aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
         </header>
 
         <main className="content">
@@ -96,5 +106,11 @@ const Layout: React.FC = () => {
     </div>
   );
 };
+
+const Layout: React.FC = () => (
+  <ThemeProvider>
+    <LayoutContent />
+  </ThemeProvider>
+);
 
 export default Layout;

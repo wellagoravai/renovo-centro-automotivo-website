@@ -1,12 +1,12 @@
 .freight-quote-box {
   margin-bottom: 20px;
   padding: 15px;
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   border-radius: 8px;
 }
 
 .freight-quote-box h4 {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 16px;
   margin-bottom: 15px;
 }
@@ -15,8 +15,8 @@
   margin-top: 12px;
   padding: 10px 14px;
   border-radius: 6px;
-  background: #fdecea;
-  color: #c0392b;
+  background: var(--alert-danger-bg);
+  color: var(--color-danger-dark);
   font-size: 14px;
 }
 
@@ -24,10 +24,10 @@
   margin-top: 14px;
   padding: 14px 16px;
   border-radius: 6px;
-  background: white;
-  border: 1px solid #e9ecef;
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   font-size: 14px;
-  color: #2c3e50;
+  color: var(--text-strong);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -42,13 +42,13 @@
 .freight-quote-aviso {
   padding: 8px 12px;
   border-radius: 6px;
-  background: #fff3cd;
-  color: #856404;
+  background: var(--alert-warning-bg);
+  color: var(--alert-warning-text);
   font-size: 13px;
 }
 
 .freight-quote-box .tab-hint {
   font-size: 12px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin: 0;
 }

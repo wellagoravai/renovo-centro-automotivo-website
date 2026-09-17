@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../hooks/useTheme';
 import '../styles/DashboardTV.css';
 
 interface ServiceOrder {
@@ -21,6 +22,7 @@ interface ServiceOrder {
 const DashboardEnhanced: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [serviceOrders, setServiceOrders] = useState<ServiceOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -30,6 +32,18 @@ const DashboardEnhanced: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [updating, setUpdating] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'pc' | 'tv'>(() => {
+    const stored = localStorage.getItem('renovo-dashboard-view');
+    return stored === 'tv' ? 'tv' : 'pc';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('renovo-dashboard-view', viewMode);
+  }, [viewMode]);
+
+  const toggleViewMode = () => {
+    setViewMode(prev => (prev === 'tv' ? 'pc' : 'tv'));
+  };
 
   // O backend ainda guarda ~15 status granulares (histórico da OS mostra o detalhe),
   // mas o board só faz sentido visualmente com poucas colunas: agrupamos em estágios.
@@ -231,7 +245,7 @@ const DashboardEnhanced: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     const colors: any = {
-      'Recebido': '#3498db',
+      'Recebido': '#7f8c8d',
       'Checklist realizado': '#9b59b6',
       'Em diagnóstico': '#f39c12',
       'Orçamento elaborado': '#1abc9c',
@@ -239,10 +253,10 @@ const DashboardEnhanced: React.FC = () => {
       'Aprovado': '#27ae60',
       'Aguardando peças': '#e67e22',
       'Peças recebidas': '#16a085',
-      'Em manutenção': '#3498db',
+      'Em manutenção': '#c0392b',
       'Montagem': '#8e44ad',
       'Testes': '#1abc9c',
-      'Lavagem': '#3498db',
+      'Lavagem': '#566573',
       'Pronto para retirada': '#27ae60',
       'Entregue': '#95a5a6',
       'Cancelado': '#e74c3c',
@@ -275,19 +289,36 @@ const DashboardEnhanced: React.FC = () => {
   const metrics = getMetrics();
 
   return (
-    <div className="dashboard-tv">
+    <div className={`dashboard-tv view-${viewMode}`}>
       {/* Header Principal */}
       <div className="dashboard-tv-header">
         <h1>🔧 RENOVO WORKSHOP - DASHBOARD</h1>
-        <div className="dashboard-tv-date">
-          {currentTime.toLocaleString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          })}
+        <div className="dashboard-tv-header-actions">
+          <div className="dashboard-tv-date">
+            {currentTime.toLocaleString('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            })}
+          </div>
+          <button
+            className="view-mode-toggle"
+            onClick={toggleViewMode}
+            title={viewMode === 'tv' ? 'Mudar para modo Computador' : 'Mudar para modo Painel TV'}
+          >
+            {viewMode === 'tv' ? '📺 Modo TV' : '💻 Modo PC'}
+          </button>
+          <button
+            className="view-mode-toggle"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+            aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
         </div>
       </div>
 

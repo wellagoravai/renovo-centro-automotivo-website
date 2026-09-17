@@ -110,7 +110,7 @@ const UsersManagement: React.FC = () => {
   };
 
   const handleDelete = async (user: User) => {
-    if (!confirm(`Tem certeza que deseja excluir o usuário ${user.fullName}?`)) {
+    if (!window.confirm(`Tem certeza que deseja excluir o usuário ${user.fullName}?`)) {
       return;
     }
 

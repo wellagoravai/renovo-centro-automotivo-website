@@ -20,4 +20,107 @@
     --border-radius: 4px;
     --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     --container-width: 1280px;
+
+    /* Tema do app interno (Dashboard, Clientes, Veículos, OS, etc.)
+       Sobrescrito em .layout[data-theme="dark"] logo abaixo. */
+    --app-bg: #f5f6fa;
+    --surface-bg: #ffffff;
+    --surface-bg-alt: #f8f9fa;
+    --surface-hover: #ecf0f1;
+    --surface-border: #e9ecef;
+    --surface-border-strong: #ddd;
+
+    --text-strong: #2c3e50;
+    --text-body: #495057;
+    --text-secondary: #7f8c8d;
+    --text-muted: #95a5a6;
+
+    --sidebar-bg: #2c3e50;
+    --sidebar-bg-darker: #1a252f;
+    --sidebar-hover: #34495e;
+    --sidebar-text: #ecf0f1;
+    --sidebar-text-muted: #95a5a6;
+
+    --color-info: #3498db;
+    --color-info-dark: #2980b9;
+    --color-success: #27ae60;
+    --color-success-dark: #229954;
+    --color-danger: #e74c3c;
+    --color-danger-dark: #c0392b;
+    --color-warning: #e67e22;
+    --color-warning-dark: #d35400;
+    --color-secondary: #6c757d;
+    --color-secondary-dark: #5a6268;
+
+    --alert-danger-bg: #f8d7da;
+    --alert-danger-text: #721c24;
+    --alert-danger-border: #f5c6cb;
+    --alert-success-bg: #d4edda;
+    --alert-success-text: #155724;
+    --alert-success-border: #c3e6cb;
+    --alert-warning-bg: #fff3cd;
+    --alert-warning-text: #856404;
+    --alert-warning-border: #ffeaa7;
+
+    --shadow-sm: rgba(0, 0, 0, 0.1);
+    --shadow-md: rgba(0, 0, 0, 0.2);
+    --shadow-lg: rgba(0, 0, 0, 0.3);
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #888;
+    --scrollbar-thumb-hover: #555;
+}
+
+.layout[data-theme="dark"] {
+    --app-bg: #14161a;
+    --surface-bg: #1e2126;
+    --surface-bg-alt: #23262c;
+    --surface-hover: #2a2e35;
+    --surface-border: #333941;
+    --surface-border-strong: #3d434c;
+
+    --text-strong: #e8eaed;
+    --text-body: #c7ccd1;
+    --text-secondary: #9aa4ab;
+    --text-muted: #7a8388;
+
+    --sidebar-bg: #16181c;
+    --sidebar-bg-darker: #0d0f11;
+    --sidebar-hover: #23262c;
+    --sidebar-text: #c7ccd1;
+    --sidebar-text-muted: #7a8388;
+
+    --color-info: #4aa3e0;
+    --color-info-dark: #63b3e0;
+    --color-success: #34c775;
+    --color-success-dark: #2fae68;
+    --color-danger: #ff6b5b;
+    --color-danger-dark: #e0584a;
+    --color-warning: #f2994a;
+    --color-warning-dark: #d3823a;
+    --color-secondary: #8a939c;
+    --color-secondary-dark: #6f7780;
+
+    --alert-danger-bg: rgba(255, 107, 91, 0.15);
+    --alert-danger-text: #ff8a7a;
+    --alert-danger-border: rgba(255, 107, 91, 0.35);
+    --alert-success-bg: rgba(52, 199, 117, 0.15);
+    --alert-success-text: #5fdb95;
+    --alert-success-border: rgba(52, 199, 117, 0.35);
+    --alert-warning-bg: rgba(242, 153, 74, 0.15);
+    --alert-warning-text: #f5b876;
+    --alert-warning-border: rgba(242, 153, 74, 0.35);
+
+    --shadow-sm: rgba(0, 0, 0, 0.4);
+    --shadow-md: rgba(0, 0, 0, 0.5);
+    --shadow-lg: rgba(0, 0, 0, 0.6);
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+
+    --scrollbar-track: #1a1d22;
+    --scrollbar-thumb: #454b53;
+    --scrollbar-thumb-hover: #5a6169;
+
+    background: var(--app-bg);
+    color-scheme: dark;
 }

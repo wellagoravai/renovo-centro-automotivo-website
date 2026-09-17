@@ -11,13 +11,13 @@
 .page-header h1 {
   margin: 0;
   font-size: 28px;
-  color: #2c3e50;
+  color: var(--text-strong);
 }
 
 /* Tabs */
 .tabs-container {
   margin-bottom: 24px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--surface-border);
 }
 
 .tabs {
@@ -30,7 +30,7 @@
   padding: 12px 20px;
   border: none;
   background: none;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -40,13 +40,13 @@
 }
 
 .tab:hover {
-  color: #3498db;
-  background: #f8f9fa;
+  color: var(--color-info);
+  background: var(--surface-bg-alt);
 }
 
 .tab.active {
-  color: #3498db;
-  border-bottom-color: #3498db;
+  color: var(--color-info);
+  border-bottom-color: var(--color-info);
   font-weight: 600;
 }
 
@@ -57,10 +57,10 @@
 
 .report-section h2 {
   font-size: 22px;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--surface-border);
 }
 
 /* Filters */
@@ -70,10 +70,10 @@
   margin-bottom: 20px;
   flex-wrap: wrap;
   align-items: flex-end;
-  background: white;
+  background: var(--surface-bg);
   padding: 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .filter-group {
@@ -85,7 +85,7 @@
 .filter-group label {
   font-size: 13px;
   font-weight: 600;
-  color: #495057;
+  color: var(--text-body);
 }
 
 .button-group {
@@ -102,16 +102,16 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--surface-bg);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   text-align: center;
 }
 
 .summary-card h3 {
   font-size: 14px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin: 0 0 8px 0;
   font-weight: 500;
 }
@@ -119,7 +119,7 @@
 .summary-value {
   font-size: 28px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0;
 }
 
@@ -132,15 +132,15 @@
 }
 
 .report-card {
-  background: white;
+  background: var(--surface-bg);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .report-card h3 {
   font-size: 18px;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0 0 16px 0;
 }
 
@@ -156,9 +156,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   border-radius: 6px;
-  border-left: 3px solid #3498db;
+  border-left: 3px solid var(--color-info);
 }
 
 .service-info {
@@ -170,18 +170,18 @@
 
 .service-name {
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
 .service-count {
   font-size: 12px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .service-value {
   font-weight: 600;
-  color: #27ae60;
+  color: var(--color-success);
   font-size: 14px;
 }
 
@@ -197,7 +197,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 12px;
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   border-radius: 6px;
 }
 
@@ -211,15 +211,15 @@
 
 .status-count {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 16px;
 }
 
 /* Table */
 .report-table-container {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   overflow-x: auto;
   margin-bottom: 20px;
 }
@@ -228,8 +228,8 @@
   padding: 16px 20px;
   margin: 0;
   font-size: 18px;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
+  color: var(--text-strong);
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .data-table {
@@ -238,27 +238,27 @@
 }
 
 .data-table thead {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
 }
 
 .data-table th {
   padding: 14px 16px;
   text-align: left;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--surface-border);
 }
 
 .data-table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #e9ecef;
-  color: #495057;
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--text-body);
   font-size: 14px;
 }
 
 .data-table tbody tr:hover {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
 }
 
 /* Progress Bar */
@@ -266,14 +266,14 @@
   position: relative;
   width: 100%;
   height: 24px;
-  background: #e9ecef;
+  background: var(--surface-border);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3498db, #2980b9);
+  background: linear-gradient(90deg, var(--color-info), var(--color-info-dark));
   transition: width 0.3s;
 }
 
@@ -284,7 +284,7 @@
   transform: translate(-50%, -50%);
   font-size: 12px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-strong);
 }
 
 /* Revenue Chart */
@@ -309,7 +309,7 @@
 .revenue-bar-container {
   width: 100%;
   height: 250px;
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   border-radius: 6px;
   position: relative;
   display: flex;
@@ -319,7 +319,7 @@
 
 .revenue-bar {
   width: 100%;
-  background: linear-gradient(180deg, #3498db, #2980b9);
+  background: linear-gradient(180deg, var(--color-info), var(--color-info-dark));
   border-radius: 6px 6px 0 0;
   transition: height 0.3s;
   min-height: 4px;
@@ -335,19 +335,19 @@
 
 .revenue-date {
   font-size: 11px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .revenue-amount {
   font-size: 12px;
-  color: #27ae60;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .revenue-count {
   font-size: 11px;
-  color: #95a5a6;
+  color: var(--text-muted);
 }
 
 /* Actions */
@@ -368,19 +368,19 @@
 }
 
 .badge-primary {
-  background: #3498db;
+  background: var(--color-info);
   color: white;
 }
 
 tr.low-stock {
-  background: #fdecea;
+  background: var(--alert-danger-bg);
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .empty-state p {
@@ -393,7 +393,7 @@ tr.low-stock {
   text-align: center;
   padding: 40px;
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 /* Buttons */
@@ -413,30 +413,30 @@ tr.low-stock {
 }
 
 .btn-primary {
-  background: #3498db;
+  background: var(--color-info);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2980b9;
+  background: var(--color-info-dark);
 }
 
 .btn-secondary {
-  background: #6c757d;
+  background: var(--color-secondary);
   color: white;
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
+  background: var(--color-secondary-dark);
 }
 
 .btn-success {
-  background: #27ae60;
+  background: var(--color-success);
   color: white;
 }
 
 .btn-success:hover {
-  background: #229954;
+  background: var(--color-success-dark);
 }
 
 .btn-sm {
@@ -445,12 +445,12 @@ tr.low-stock {
 }
 
 .btn-danger {
-  background: #e74c3c;
+  background: var(--color-danger);
   color: white;
 }
 
 .btn-danger:hover {
-  background: #c0392b;
+  background: var(--color-danger-dark);
 }
 
 .btn:disabled {
@@ -461,7 +461,7 @@ tr.low-stock {
 /* Form Controls */
 .form-control {
   padding: 10px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border-strong);
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -469,7 +469,7 @@ tr.low-stock {
 
 .form-control:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--color-info);
 }
 
 /* Responsive */

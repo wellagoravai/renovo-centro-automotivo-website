@@ -174,7 +174,7 @@ const Inventory: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este item?')) return;
+    if (!window.confirm('Tem certeza que deseja excluir este item?')) return;
     
     try {
       const response = await api.delete(`/Inventory/${id}`);

@@ -11,9 +11,9 @@
 }
 
 .consulta-veiculo-card {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -21,12 +21,12 @@
 .consulta-veiculo-card h2 {
   font-size: 16px;
   margin: 0 0 4px;
-  color: #2c3e50;
+  color: var(--text-strong);
 }
 
 .consulta-veiculo-hint {
   font-size: 13px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin: 0 0 14px;
 }
 
@@ -45,8 +45,8 @@
   margin-top: 14px;
   padding: 10px 14px;
   border-radius: 6px;
-  background: #fdecea;
-  color: #c0392b;
+  background: var(--alert-danger-bg);
+  color: var(--color-danger-dark);
   font-size: 14px;
 }
 
@@ -54,9 +54,9 @@
   margin-top: 16px;
   padding: 14px 16px;
   border-radius: 6px;
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   font-size: 14px;
-  color: #2c3e50;
+  color: var(--text-strong);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 8px 16px;
@@ -65,14 +65,14 @@
 .consulta-veiculo-fonte {
   grid-column: 1 / -1;
   font-size: 12px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 
 .table-container {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   overflow-x: auto;
 }
 
@@ -82,46 +82,46 @@
 }
 
 .data-table thead {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
 }
 
 .data-table th {
   padding: 14px 16px;
   text-align: left;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--surface-border);
 }
 
 .data-table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #e9ecef;
-  color: #495057;
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--text-body);
   font-size: 14px;
 }
 
 .data-table tbody tr:hover {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
 }
 
 .loading {
   text-align: center;
   padding: 40px;
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .empty-state p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 

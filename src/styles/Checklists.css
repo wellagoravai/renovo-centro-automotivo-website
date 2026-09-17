@@ -9,16 +9,16 @@
 }
 
 .checklist-card {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   overflow: hidden;
   transition: transform 0.2s;
 }
 
 .checklist-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px var(--shadow-sm);
 }
 
 .checklist-header {
@@ -26,19 +26,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--surface-bg-alt);
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .checklist-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #2c3e50;
+  color: var(--text-strong);
 }
 
 .checklist-date {
   font-size: 13px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .checklist-body {
@@ -53,7 +53,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid var(--surface-bg-alt);
 }
 
 .info-item:last-child {
@@ -62,49 +62,49 @@
 
 .info-label {
   font-weight: 500;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .info-value {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
 .checklist-state {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   padding: 12px;
   border-radius: 6px;
-  border-left: 3px solid #27ae60;
+  border-left: 3px solid var(--color-success);
   margin-bottom: 12px;
 }
 
 .checklist-state strong {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
 .checklist-state p {
   margin: 6px 0 0 0;
-  color: #495057;
+  color: var(--text-body);
   font-size: 14px;
 }
 
 .checklist-observations {
-  background: #fff3cd;
+  background: var(--alert-warning-bg);
   padding: 12px;
   border-radius: 6px;
   border-left: 3px solid #ffc107;
 }
 
 .checklist-observations strong {
-  color: #856404;
+  color: var(--alert-warning-text);
   font-size: 14px;
 }
 
 .checklist-observations p {
   margin: 6px 0 0 0;
-  color: #856404;
+  color: var(--alert-warning-text);
   font-size: 14px;
 }
 
@@ -112,19 +112,19 @@
   text-align: center;
   padding: 40px;
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .empty-state p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 

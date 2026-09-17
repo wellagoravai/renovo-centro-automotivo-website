@@ -25,9 +25,9 @@
 }
 
 .order-card {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
@@ -40,7 +40,7 @@
 
 .order-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px var(--shadow-sm);
 }
 
 .order-header {
@@ -48,8 +48,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--surface-bg-alt);
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .order-number {
@@ -58,7 +58,7 @@
   gap: 6px;
   font-size: 18px;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-strong);
 }
 
 .order-type-emoji {
@@ -86,7 +86,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid var(--surface-bg-alt);
 }
 
 .info-row:last-child {
@@ -95,36 +95,36 @@
 
 .info-label {
   font-weight: 500;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .info-value {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
   text-align: right;
 }
 
 .info-value.value {
   font-weight: bold;
-  color: #27ae60;
+  color: var(--color-success);
 }
 
 .order-problem {
-  background: #f8f9fa;
+  background: var(--surface-bg-alt);
   padding: 12px;
   border-radius: 6px;
-  border-left: 3px solid #3498db;
+  border-left: 3px solid var(--color-info);
 }
 
 .order-problem strong {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
 .order-problem p {
   margin: 6px 0 0 0;
-  color: #495057;
+  color: var(--text-body);
   font-size: 14px;
 }
 
@@ -132,20 +132,20 @@
   display: flex;
   gap: 8px;
   padding: 16px 20px;
-  border-top: 1px solid #e9ecef;
-  background: #f8f9fa;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface-bg-alt);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .empty-state p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 

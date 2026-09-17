@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../services/api';
 import { validateCpfOrCnpj } from '../utils/helpers';
@@ -25,6 +26,9 @@ const Customers: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const { hasPermission } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const returnTo = searchParams.get('returnTo');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -72,6 +76,7 @@ const Customers: React.FC = () => {
         return;
       }
 
+      const wasNewCustomer = !editingCustomer;
       setShowModal(false);
       setEditingCustomer(null);
       setFormData({
@@ -83,6 +88,14 @@ const Customers: React.FC = () => {
         address: '',
         notes: '',
       });
+
+      // Veio de um rascunho de OS que ficou esperando o cliente ser cadastrado (ver
+      // NewServiceOrderMobile.handleGoRegisterCustomer) — volta pra lá pra retomar.
+      if (wasNewCustomer && returnTo) {
+        navigate(`${returnTo}?resume=1`);
+        return;
+      }
+
       loadCustomers();
     } catch (error) {
       console.error('Erro ao salvar cliente:', error);
@@ -105,7 +118,7 @@ const Customers: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+    if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return;
     
     try {
       await api.delete(`/Customers/${id}`);
@@ -130,6 +143,22 @@ const Customers: React.FC = () => {
     setShowModal(true);
   };
 
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      const prefillDocument = searchParams.get('document') || '';
+      openNewModal();
+      if (prefillDocument) {
+        setFormData(prev => ({ ...prev, document: prefillDocument }));
+      }
+      setSearchParams(params => {
+        params.delete('new');
+        params.delete('document');
+        return params;
+      }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   if (loading) {
     return <div className="loading">Carregando...</div>;
   }
@@ -140,7 +169,7 @@ const Customers: React.FC = () => {
         <h1>Clientes</h1>
         {hasPermission('customers.write') && (
           <button className="btn btn-primary" onClick={openNewModal}>
-            + Novo Cliente
+            + Cadastrar Novo Cliente
           </button>
         )}
       </div>

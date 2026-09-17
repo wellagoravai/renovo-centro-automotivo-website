@@ -74,6 +74,17 @@ interface FipeMarca {
   nome: string;
 }
 
+interface ServiceOrderDraft {
+  currentStep: number;
+  serviceType: 'Oficina' | 'Guincho';
+  customer: CustomerData;
+  vehicle: VehicleData;
+  serviceOrder: ServiceOrderData;
+  towDetails: TowDetailsData;
+}
+
+const DRAFT_STORAGE_KEY = 'renovo:newServiceOrderDraft';
+
 const NewServiceOrderMobile: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -120,8 +131,103 @@ const NewServiceOrderMobile: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [checkingDocument, setCheckingDocument] = useState(false);
+  const [customerChecked, setCustomerChecked] = useState(false);
+  const [customerFound, setCustomerFound] = useState(false);
+
+  // Restaura o rascunho salvo antes de mandar o operador cadastrar o cliente (ver
+  // handleGoRegisterCustomer) e já reverifica o documento — a essa altura o cliente
+  // deve existir de verdade, cadastrado na tela de Clientes.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+      const draft: ServiceOrderDraft = JSON.parse(raw);
+      setServiceType(draft.serviceType);
+      setCustomer(draft.customer);
+      setVehicle(draft.vehicle);
+      setServiceOrder(draft.serviceOrder);
+      setTowDetails(draft.towDetails);
+      setCurrentStep(draft.currentStep);
+      if (draft.customer.document) {
+        checkCustomerDocument(draft.customer.document);
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar rascunho da OS:', error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const checkCustomerDocument = async (documentToCheck: string) => {
+    const trimmedDocument = documentToCheck.trim();
+    if (!validateCpfOrCnpj(trimmedDocument)) return;
+
+    setCheckingDocument(true);
+    try {
+      const response = await api.get(`/Customers/lookup?document=${encodeURIComponent(trimmedDocument)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.customer) {
+          setCustomer(prev => ({
+            ...prev,
+            document: trimmedDocument,
+            name: data.customer.name || '',
+            whatsapp: data.customer.whatsApp || '',
+            phone: data.customer.phone || '',
+            email: data.customer.email || '',
+            address: data.customer.address || '',
+          }));
+          setCustomerFound(true);
+          return;
+        }
+      }
+      setCustomerFound(false);
+    } catch (error) {
+      console.error('Erro ao verificar cliente:', error);
+      setCustomerFound(false);
+    } finally {
+      setCheckingDocument(false);
+      setCustomerChecked(true);
+    }
+  };
+
+  const handleCheckDocument = () => {
+    if (!validateCpfOrCnpj(customer.document.trim())) {
+      alert('❌ Informe um CPF ou CNPJ válido.');
+      return;
+    }
+    checkCustomerDocument(customer.document);
+  };
+
+  // Cliente com esse CPF/CNPJ ainda não existe: em vez de criar um cadastro
+  // incompleto na hora, guarda o progresso do wizard e manda o operador cadastrar
+  // o cliente de verdade na tela de Clientes. A OS só é criada de fato depois que
+  // o operador volta pra cá e o documento é reverificado com sucesso.
+  const handleGoRegisterCustomer = () => {
+    const draft: ServiceOrderDraft = {
+      currentStep,
+      serviceType,
+      customer,
+      vehicle: { ...vehicle, photos: [] },
+      serviceOrder,
+      towDetails,
+    };
+    try {
+      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    } catch (error) {
+      console.error('Erro ao salvar rascunho da OS:', error);
+    }
+    const trimmedDocument = customer.document.trim();
+    navigate(`/customers?new=1&document=${encodeURIComponent(trimmedDocument)}&returnTo=${encodeURIComponent('/new-service-order')}`);
+  };
+
   const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
+    if (e.target.name === 'document') {
+      setCustomerChecked(false);
+      setCustomerFound(false);
+    }
   };
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -193,12 +299,11 @@ const NewServiceOrderMobile: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (currentStep === 1) {
-      const trimmedDocument = customer.document.trim();
-      if (!validateCpfOrCnpj(trimmedDocument)) {
-        alert('❌ Informe um CPF ou CNPJ válido antes de continuar.');
-        return;
-      }
+    if (currentStep === 1 && !customerFound) {
+      alert(customerChecked
+        ? '❌ Cadastre o cliente antes de continuar.'
+        : '❌ Verifique o cliente pelo CPF/CNPJ antes de continuar.');
+      return;
     }
 
     if (currentStep < 3) {
@@ -216,6 +321,10 @@ const NewServiceOrderMobile: React.FC = () => {
     const trimmedDocument = customer.document.trim();
     if (!validateCpfOrCnpj(trimmedDocument)) {
       alert('❌ CPF/CNPJ inválido ou ausente. Não é possível abrir o check-in sem documento válido.');
+      return;
+    }
+    if (!customerFound) {
+      alert('❌ Cliente ainda não verificado. Volte ao passo 1 e verifique/cadastre o cliente antes de continuar.');
       return;
     }
 
@@ -272,69 +381,44 @@ const NewServiceOrderMobile: React.FC = () => {
   const renderStep1 = () => (
     <div className="wizard-step">
       <h2>Dados do Cliente</h2>
-      <div className="form-group">
-        <label>Nome Completo *</label>
-        <input
-          type="text"
-          name="name"
-          value={customer.name}
-          onChange={handleCustomerChange}
-          placeholder="Digite o nome completo"
-          required
-        />
-      </div>
+      <p className="tab-hint">
+        O cadastro do cliente é feito na tela de Clientes. Aqui você só confere se ele já existe pelo CPF/CNPJ.
+      </p>
       <div className="form-group">
         <label>CPF/CNPJ *</label>
-        <input
-          type="text"
-          name="document"
-          value={customer.document}
-          onChange={handleCustomerChange}
-          placeholder="000.000.000-00"
-          required
-        />
+        <div className="customer-picker">
+          <input
+            type="text"
+            name="document"
+            value={customer.document}
+            onChange={handleCustomerChange}
+            onKeyDown={(e) => e.key === 'Enter' && handleCheckDocument()}
+            placeholder="000.000.000-00"
+            required
+          />
+          <button type="button" className="btn-secondary" onClick={handleCheckDocument} disabled={checkingDocument}>
+            {checkingDocument ? 'Verificando...' : 'Verificar Cliente'}
+          </button>
+        </div>
       </div>
-      <div className="form-group">
-        <label>WhatsApp *</label>
-        <input
-          type="tel"
-          name="whatsapp"
-          value={customer.whatsapp}
-          onChange={handleCustomerChange}
-          placeholder="(00) 00000-0000"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Telefone</label>
-        <input
-          type="tel"
-          name="phone"
-          value={customer.phone}
-          onChange={handleCustomerChange}
-          placeholder="(00) 0000-0000"
-        />
-      </div>
-      <div className="form-group">
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={customer.email}
-          onChange={handleCustomerChange}
-          placeholder="cliente@email.com"
-        />
-      </div>
-      <div className="form-group">
-        <label>Endereço</label>
-        <input
-          type="text"
-          name="address"
-          value={customer.address}
-          onChange={handleCustomerChange}
-          placeholder="Rua, número, bairro, cidade - UF"
-        />
-      </div>
+
+      {customerChecked && customerFound && (
+        <div className="customer-found-card">
+          <p>✅ Cliente encontrado: <strong>{customer.name}</strong></p>
+          <p>
+            {[customer.phone, customer.whatsapp, customer.email].filter(Boolean).join(' · ') || 'Sem contato cadastrado'}
+          </p>
+        </div>
+      )}
+
+      {customerChecked && !customerFound && (
+        <div className="customer-not-found-card">
+          <p>⚠️ Nenhum cliente cadastrado com este CPF/CNPJ.</p>
+          <button type="button" className="btn-primary" onClick={handleGoRegisterCustomer}>
+            Cadastrar Cliente
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -548,7 +632,7 @@ const NewServiceOrderMobile: React.FC = () => {
         </button>
       )}
       {currentStep < 3 ? (
-        <button className="btn-primary" onClick={handleNext}>
+        <button className="btn-primary" onClick={handleNext} disabled={currentStep === 1 && !customerFound}>
           Próximo →
         </button>
       ) : (

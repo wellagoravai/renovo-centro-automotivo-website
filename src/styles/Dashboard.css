@@ -1,6 +1,6 @@
 .dashboard {
   padding: 20px;
-  background: #f5f6fa;
+  background: var(--app-bg);
   min-height: 100vh;
 }
 
@@ -14,7 +14,7 @@
 }
 
 .dashboard-header h1 {
-  color: #2c3e50;
+  color: var(--text-strong);
   font-size: 28px;
   margin: 0;
 }
@@ -23,19 +23,19 @@
   padding: 15px 30px;
   font-size: 16px;
   font-weight: bold;
-  background: #27ae60;
+  background: var(--color-success);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px var(--shadow-sm);
   transition: all 0.3s;
 }
 
 .btn-new-order:hover {
-  background: #229954;
+  background: var(--color-success-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px var(--shadow-sm);
 }
 
 .kanban-board {
@@ -48,7 +48,7 @@
 
 .kanban-column {
   flex: 0 0 280px;
-  background: #ecf0f1;
+  background: var(--surface-hover);
   border-radius: 12px;
   padding: 15px;
   display: flex;
@@ -62,18 +62,18 @@
   align-items: center;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #bdc3c7;
+  border-bottom: 2px solid var(--surface-border-strong);
 }
 
 .column-header h3 {
   font-size: 16px;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0;
   font-weight: 600;
 }
 
 .column-count {
-  background: #3498db;
+  background: var(--color-info);
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -90,18 +90,18 @@
 }
 
 .kanban-card {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 8px;
   padding: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px var(--shadow-sm);
   cursor: pointer;
   transition: all 0.2s;
-  border-left: 4px solid #3498db;
+  border-left: 4px solid var(--color-info);
 }
 
 .kanban-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px var(--shadow-sm);
 }
 
 .card-header {
@@ -110,7 +110,7 @@
 
 .os-number {
   font-weight: bold;
-  color: #3498db;
+  color: var(--color-info);
   font-size: 14px;
 }
 
@@ -121,30 +121,30 @@
 .vehicle-info {
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0 0 5px 0;
 }
 
 .customer-name {
   font-size: 14px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .card-footer {
   padding-top: 8px;
-  border-top: 1px solid #ecf0f1;
+  border-top: 1px solid var(--surface-hover);
 }
 
 .entry-date {
   font-size: 12px;
-  color: #95a5a6;
+  color: var(--text-muted);
 }
 
 .empty-column {
   text-align: center;
   padding: 40px 20px;
-  color: #95a5a6;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -152,19 +152,19 @@
   text-align: center;
   padding: 40px;
   font-size: 18px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .error {
   text-align: center;
   padding: 40px;
   font-size: 18px;
-  color: #e74c3c;
+  color: var(--color-danger);
 }
 
 .btn-primary {
   padding: 12px 24px;
-  background: #3498db;
+  background: var(--color-info);
   color: white;
   border: none;
   border-radius: 6px;
@@ -175,17 +175,17 @@
 }
 
 .btn-primary:hover {
-  background: #2980b9;
+  background: var(--color-info-dark);
 }
 
 .btn-primary:disabled {
-  background: #95a5a6;
+  background: var(--text-muted);
   cursor: not-allowed;
 }
 
 .btn-secondary {
   padding: 12px 24px;
-  background: #95a5a6;
+  background: var(--text-muted);
   color: white;
   border: none;
   border-radius: 6px;
@@ -196,7 +196,7 @@
 }
 
 .btn-secondary:hover {
-  background: #7f8c8d;
+  background: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

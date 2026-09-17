@@ -9,7 +9,7 @@ body {
   font-family: var(--font-family), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f6fa;
+  background: var(--app-bg);
   color: var(--text-color);
 }
 
@@ -54,46 +54,46 @@ code {
 
 .btn-primary {
   color: #fff;
-  background-color: #3498db;
-  border-color: #3498db;
+  background-color: var(--color-info);
+  border-color: var(--color-info);
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
-  border-color: #2980b9;
+  background-color: var(--color-info-dark);
+  border-color: var(--color-info-dark);
 }
 
 .btn-secondary {
   color: #fff;
-  background-color: #6c757d;
-  border-color: #6c757d;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .btn-secondary:hover {
-  background-color: #5a6268;
-  border-color: #5a6268;
+  background-color: var(--color-secondary-dark);
+  border-color: var(--color-secondary-dark);
 }
 
 .btn-success {
   color: #fff;
-  background-color: #27ae60;
-  border-color: #27ae60;
+  background-color: var(--color-success);
+  border-color: var(--color-success);
 }
 
 .btn-success:hover {
-  background-color: #229954;
-  border-color: #229954;
+  background-color: var(--color-success-dark);
+  border-color: var(--color-success-dark);
 }
 
 .btn-danger {
   color: #fff;
-  background-color: #e74c3c;
-  border-color: #e74c3c;
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .btn-danger:hover {
-  background-color: #c0392b;
-  border-color: #c0392b;
+  background-color: var(--color-danger-dark);
+  border-color: var(--color-danger-dark);
 }
 
 .btn-sm {
@@ -112,16 +112,16 @@ code {
   padding: 10px 14px;
   font-size: 14px;
   line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  color: var(--text-body);
+  background-color: var(--surface-bg);
+  border: 1px solid var(--surface-border-strong);
   border-radius: 6px;
   transition: border-color 0.2s;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--color-info);
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -133,21 +133,21 @@ code {
 }
 
 .alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  color: var(--alert-danger-text);
+  background-color: var(--alert-danger-bg);
+  border-color: var(--alert-danger-border);
 }
 
 .alert-success {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
+  color: var(--alert-success-text);
+  background-color: var(--alert-success-bg);
+  border-color: var(--alert-success-border);
 }
 
 .alert-warning {
-  color: #856404;
-  background-color: #fff3cd;
-  border-color: #ffeaa7;
+  color: var(--alert-warning-text);
+  background-color: var(--alert-warning-bg);
+  border-color: var(--alert-warning-border);
 }
 
 .badge {
@@ -164,17 +164,17 @@ code {
 
 .badge-success {
   color: #fff;
-  background-color: #27ae60;
+  background-color: var(--color-success);
 }
 
 .badge-danger {
   color: #fff;
-  background-color: #e74c3c;
+  background-color: var(--color-danger);
 }
 
 .badge-info {
   color: #fff;
-  background-color: #3498db;
+  background-color: var(--color-info);
 }
 
 .badge-warning {
@@ -186,19 +186,19 @@ code {
   text-align: center;
   padding: 40px;
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
+  background: var(--surface-bg);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
 }
 
 .empty-state p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 
@@ -206,7 +206,7 @@ code {
   text-align: center;
   padding: 40px;
   font-size: 18px;
-  color: #e74c3c;
+  color: var(--color-danger);
 }
 
 /* Scrollbar */
@@ -216,16 +216,16 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Responsive */

@@ -5,7 +5,7 @@
 
 .dashboard-tv {
   padding: 30px;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--sidebar-bg-darker) 100%);
   min-height: 100vh;
   color: white;
 }
@@ -20,21 +20,44 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px var(--shadow-md);
 }
 
 .dashboard-tv-header h1 {
   font-size: 56px;
   margin: 0;
   font-weight: 800;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px var(--shadow-lg);
   letter-spacing: 2px;
+}
+
+.dashboard-tv-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .dashboard-tv-date {
   font-size: 28px;
   font-weight: 600;
   opacity: 0.95;
+}
+
+.view-mode-toggle {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.view-mode-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* ========== MÉTRICAS PRINCIPAIS ========== */
@@ -51,7 +74,7 @@
   padding: 12px 8px;
   text-align: center;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px var(--shadow-md);
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s;
 }
@@ -64,7 +87,7 @@
   font-size: 42px;
   font-weight: 800;
   margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px var(--shadow-lg);
   line-height: 1;
 }
 
@@ -77,7 +100,7 @@
   letter-spacing: 0;
 }
 
-.metric-card.total { background: rgba(52, 152, 219, 0.3); }
+.metric-card.total { background: rgba(255, 255, 255, 0.15); }
 .metric-card.received { background: rgba(155, 89, 182, 0.3); }
 .metric-card.in-progress { background: rgba(243, 156, 18, 0.3); }
 .metric-card.waiting { background: rgba(231, 76, 60, 0.3); }
@@ -102,7 +125,7 @@
   flex-direction: column;
   max-height: calc(100vh - 400px);
   border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px var(--shadow-md);
 }
 
 .column-header-tv {
@@ -119,7 +142,7 @@
   color: white;
   margin: 0;
   font-weight: 700;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 2px var(--shadow-lg);
 }
 
 .column-count-tv {
@@ -129,7 +152,7 @@
   border-radius: 25px;
   font-size: 22px;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--shadow-md);
 }
 
 .column-content-tv {
@@ -142,19 +165,19 @@
 
 /* ========== CARDS GRANDES ========== */
 .kanban-card-tv {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px var(--shadow-md);
   cursor: pointer;
   transition: all 0.3s;
-  border-left: 6px solid #3498db;
-  color: #2c3e50;
+  border-left: 6px solid var(--accent-color, #CC0000);
+  color: var(--text-strong);
 }
 
 .kanban-card-tv:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px var(--shadow-lg);
 }
 
 .kanban-card-tv.dragging {
@@ -191,7 +214,7 @@
 
 .os-number-tv {
   font-weight: 800;
-  color: #3498db;
+  color: var(--accent-color, #CC0000);
   font-size: 22px;
 }
 
@@ -201,7 +224,7 @@
   font-size: 16px;
   font-weight: 700;
   color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px var(--shadow-md);
 }
 
 .card-body-tv {
@@ -215,9 +238,9 @@
   border-radius: 6px;
   overflow: hidden;
   border: 1px solid #999;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px var(--shadow-md);
   margin: 0 0 6px 0;
-  background: #fff;
+  background: #ffffff;
 }
 
 .vehicle-plate-mercosul .plate-top-bar {
@@ -238,19 +261,19 @@
   color: #111;
   text-align: center;
   padding: 2px 10px 3px;
-  background: #fff;
+  background: #ffffff;
 }
 
 .vehicle-info-tv {
   font-size: 22px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0 0 10px 0;
 }
 
 .customer-name-tv {
   font-size: 18px;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin: 0 0 8px 0;
   font-weight: 600;
 }
@@ -267,18 +290,18 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 2px solid #ecf0f1;
+  border-top: 2px solid var(--surface-hover);
 }
 
 .entry-date-tv {
   font-size: 16px;
-  color: #95a5a6;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .btn-status-update-tv {
   padding: 10px 20px;
-  background: #27ae60;
+  background: var(--color-success);
   color: white;
   border: none;
   border-radius: 8px;
@@ -286,11 +309,11 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px var(--shadow-md);
 }
 
 .btn-status-update-tv:hover {
-  background: #229954;
+  background: var(--color-success-dark);
   transform: scale(1.05);
 }
 
@@ -319,7 +342,7 @@
 }
 
 .modal-content-tv {
-  background: white;
+  background: var(--surface-bg);
   border-radius: 20px;
   padding: 40px;
   width: 90%;
@@ -335,18 +358,18 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 3px solid #ecf0f1;
+  border-bottom: 3px solid var(--surface-hover);
 }
 
 .modal-header-tv h2 {
   font-size: 36px;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin: 0;
   font-weight: 800;
 }
 
 .modal-close-tv {
-  background: #e74c3c;
+  background: var(--color-danger);
   color: white;
   border: none;
   border-radius: 50%;
@@ -356,11 +379,11 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px var(--shadow-md);
 }
 
 .modal-close-tv:hover {
-  background: #c0392b;
+  background: var(--color-danger-dark);
   transform: scale(1.1);
 }
 
@@ -372,7 +395,7 @@
   display: block;
   font-size: 20px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-strong);
   margin-bottom: 10px;
 }
 
@@ -382,20 +405,20 @@
   font-size: 18px;
   border: 2px solid #bdc3c7;
   border-radius: 10px;
-  background: #f8f9fa;
-  color: #2c3e50;
+  background: var(--surface-bg-alt);
+  color: var(--text-strong);
   font-weight: 600;
 }
 
 .form-control-tv:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  border-color: var(--accent-color, #CC0000);
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.2);
 }
 
 .form-control-tv:disabled {
-  background: #ecf0f1;
-  color: #7f8c8d;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
 
@@ -410,7 +433,7 @@ textarea.form-control-tv {
   justify-content: flex-end;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 2px solid #ecf0f1;
+  border-top: 2px solid var(--surface-hover);
 }
 
 .btn-tv {
@@ -421,31 +444,31 @@ textarea.form-control-tv {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px var(--shadow-md);
 }
 
 .btn-primary-tv {
-  background: #3498db;
+  background: var(--accent-color, #CC0000);
   color: white;
 }
 
 .btn-primary-tv:hover:not(:disabled) {
-  background: #2980b9;
+  background: #a30000;
   transform: translateY(-2px);
 }
 
 .btn-primary-tv:disabled {
-  background: #95a5a6;
+  background: var(--text-muted);
   cursor: not-allowed;
 }
 
 .btn-secondary-tv {
-  background: #95a5a6;
+  background: var(--text-muted);
   color: white;
 }
 
 .btn-secondary-tv:hover {
-  background: #7f8c8d;
+  background: var(--text-secondary);
 }
 
 /* ========== LOADING ========== */
@@ -714,4 +737,200 @@ textarea.form-control-tv {
     width: 100%;
     max-height: none;
   }
+}
+
+/* ============================================
+   MODO COMPUTADOR — mesmas informações do modo TV,
+   em escala compacta para uso no dia a dia no PC.
+   As seletoras usam duas classes (.view-pc .algo) de
+   propósito: isso as deixa mais específicas que as regras
+   de @media acima, então vencem mesmo em monitores 1920px+.
+   ============================================ */
+.dashboard-tv.view-pc {
+  padding: 20px;
+  background: var(--app-bg);
+  color: var(--text-strong);
+}
+
+.view-pc .dashboard-tv-header {
+  background: var(--sidebar-bg);
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  backdrop-filter: none;
+  box-shadow: 0 2px 8px var(--shadow-sm);
+}
+
+.view-pc .dashboard-tv-header h1 {
+  font-size: 20px;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+.view-pc .dashboard-tv-date {
+  font-size: 13px;
+}
+
+.view-pc .view-mode-toggle {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 14px;
+}
+
+.view-pc .metrics-container {
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.view-pc .metric-card {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  padding: 8px 6px;
+  backdrop-filter: none;
+  box-shadow: 0 1px 4px var(--shadow-sm);
+}
+
+.view-pc .metric-value {
+  font-size: 22px;
+  color: var(--text-strong);
+  text-shadow: none;
+}
+
+.view-pc .metric-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+.view-pc .metric-card.total { background: var(--surface-bg); }
+.view-pc .metric-card.received { background: rgba(155, 89, 182, 0.12); }
+.view-pc .metric-card.in-progress { background: rgba(192, 57, 43, 0.12); }
+.view-pc .metric-card.waiting { background: rgba(231, 76, 60, 0.12); }
+.view-pc .metric-card.ready { background: rgba(39, 174, 96, 0.12); }
+.view-pc .metric-card.delivered { background: rgba(149, 165, 166, 0.12); }
+
+.view-pc .kanban-board-tv {
+  gap: 12px;
+  min-height: 0;
+  padding-bottom: 10px;
+}
+
+.view-pc .kanban-column-tv {
+  flex: 0 0 240px;
+  background: var(--surface-hover);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: calc(100vh - 260px);
+  box-shadow: none;
+}
+
+.view-pc .column-header-tv {
+  background: var(--sidebar-bg);
+  margin: -10px -10px 10px -10px;
+  padding: 8px 10px;
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+}
+
+.view-pc .column-header-tv h3 {
+  font-size: 13px;
+  text-shadow: none;
+}
+
+.view-pc .column-count-tv {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 9px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.view-pc .kanban-card-tv {
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px var(--shadow-sm);
+}
+
+.view-pc .kanban-card-tv:hover {
+  transform: none;
+  box-shadow: 0 2px 6px var(--shadow-sm);
+}
+
+.view-pc .card-header-tv {
+  margin-bottom: 8px;
+  gap: 6px;
+}
+
+.view-pc .os-number-tv {
+  font-size: 13px;
+}
+
+.view-pc .status-badge-tv {
+  padding: 3px 8px;
+  font-size: 10px;
+  box-shadow: none;
+}
+
+.view-pc .card-body-tv {
+  margin-bottom: 8px;
+}
+
+.view-pc .vehicle-plate-mercosul .plate-number {
+  font-size: 13px;
+}
+
+.view-pc .vehicle-info-tv {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.view-pc .customer-name-tv {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.view-pc .problem-info-tv {
+  font-size: 11px;
+}
+
+.view-pc .card-footer-tv {
+  padding-top: 6px;
+}
+
+.view-pc .entry-date-tv {
+  font-size: 11px;
+}
+
+.view-pc .btn-status-update-tv {
+  padding: 5px 10px;
+  font-size: 11px;
+  box-shadow: none;
+}
+
+.view-pc .empty-column-tv {
+  padding: 20px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.view-pc .modal-content-tv {
+  padding: 24px;
+}
+
+.view-pc .modal-header-tv h2 {
+  font-size: 20px;
+}
+
+.view-pc .form-group-tv label {
+  font-size: 14px;
+}
+
+.view-pc .form-control-tv {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.view-pc .btn-tv {
+  padding: 10px 20px;
+  font-size: 14px;
 }
