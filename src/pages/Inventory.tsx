@@ -69,6 +69,7 @@ const Inventory: React.FC = () => {
   useEffect(() => {
     loadCategories();
     loadItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, categoryFilter, showLowStock]);
 
   const loadCategories = async () => {

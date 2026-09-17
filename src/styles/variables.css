@@ -80,6 +80,7 @@
     --surface-border: #333941;
     --surface-border-strong: #3d434c;
 
+    --text-color: #e8eaed;
     --text-strong: #e8eaed;
     --text-body: #c7ccd1;
     --text-secondary: #9aa4ab;
@@ -99,8 +100,8 @@
     --color-danger-dark: #e0584a;
     --color-warning: #f2994a;
     --color-warning-dark: #d3823a;
-    --color-secondary: #8a939c;
-    --color-secondary-dark: #6f7780;
+    --color-secondary: #5a6268;
+    --color-secondary-dark: #4a5158;
 
     --alert-danger-bg: rgba(255, 107, 91, 0.15);
     --alert-danger-text: #ff8a7a;

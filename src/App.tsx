@@ -46,8 +46,6 @@ const PublicLayout: React.FC = () => (
 );
 
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-
   return (
     <Routes>
       <Route path="/" element={<PublicLayout />}>

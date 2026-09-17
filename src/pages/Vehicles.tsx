@@ -47,6 +47,7 @@ const Vehicles: React.FC = () => {
 
   useEffect(() => {
     loadVehicles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const loadVehicles = async () => {

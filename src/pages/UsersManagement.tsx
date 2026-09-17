@@ -31,6 +31,7 @@ const UsersManagement: React.FC = () => {
 
   useEffect(() => {
     loadUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const loadUsers = async () => {

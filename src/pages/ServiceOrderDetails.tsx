@@ -303,6 +303,7 @@ const ServiceOrderDetails: React.FC = () => {
   useEffect(() => {
     loadServiceOrder();
     loadMechanics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadMechanics = async () => {
