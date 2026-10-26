@@ -1,0 +1,513 @@
+/* Formulário de orçamento de guincho — mesmo layout do app da equipe
+   (renovo-workshop-mobile), com as cores do tema do painel. */
+.tq-editor {
+  --tqe-bg: var(--surface-bg-alt);
+  --tqe-surface: var(--surface-bg);
+  --tqe-text: var(--text-body);
+  --tqe-heading: var(--text-strong);
+  --tqe-muted: var(--text-secondary);
+  --tqe-border: var(--surface-border-strong);
+  --tqe-accent: var(--brand-red);
+  --tqe-accent-hover: #a30000;
+  --tqe-danger: var(--color-danger);
+  --tqe-success: var(--color-success);
+
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--tqe-text);
+}
+
+.tq-editor * {
+  box-sizing: border-box;
+}
+
+.tq-editor h2,
+.tq-editor h3 {
+  margin: 0 0 12px;
+  font-family: var(--font-family-heading);
+  color: var(--tqe-heading);
+}
+
+.tq-editor h3 {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.tq-editor .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tq-editor .hint {
+  color: var(--tqe-muted);
+  font-size: 14px;
+}
+
+.tq-editor .error-text {
+  color: var(--tqe-danger);
+  font-size: 14px;
+}
+
+.tq-editor input,
+.tq-editor select,
+.tq-editor textarea {
+  width: 100%;
+  font-family: inherit;
+  padding: 10px 14px;
+  border: 1px solid var(--tqe-border);
+  border-radius: 6px;
+  background: var(--tqe-surface);
+  color: var(--tqe-text);
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.tq-editor input[readonly] {
+  background: var(--tqe-bg);
+}
+
+.tq-editor input:focus,
+.tq-editor select:focus,
+.tq-editor textarea:focus {
+  outline: none;
+  border-color: var(--tqe-accent);
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15);
+}
+
+.tq-editor .form-group {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.tq-editor .form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.tq-editor .form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.tq-editor .form-group label {
+  font-size: 14px;
+  color: var(--tqe-muted);
+}
+
+.tq-editor .form-group-uf {
+  flex: 0 0 42% !important;
+}
+
+.tq-editor .compact-fields .form-group {
+  margin-bottom: 8px;
+}
+
+.tq-editor .compact-fields .form-group label {
+  font-size: 12px;
+}
+
+.tq-editor .compact-fields input {
+  padding: 7px 10px;
+  margin-top: 2px;
+}
+
+.tq-editor .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--tqe-muted);
+  margin-bottom: 14px;
+}
+
+.tq-editor .checkbox-row input {
+  width: auto;
+  margin: 0;
+}
+
+/* Botões */
+.tq-editor button {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.tq-editor button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.tq-editor .btn-primary {
+  background: var(--tqe-accent);
+  border-color: var(--tqe-accent);
+  color: #fff;
+  width: 100%;
+}
+
+.tq-editor .btn-primary:hover:not(:disabled) {
+  background: var(--tqe-accent-hover);
+  border-color: var(--tqe-accent-hover);
+}
+
+.tq-editor .btn-secondary {
+  background: var(--tqe-surface);
+  color: var(--tqe-text);
+  border: 1px solid var(--tqe-border);
+}
+
+.tq-editor .btn-link {
+  background: none;
+  border: none;
+  color: var(--tqe-accent);
+  padding: 4px;
+  text-decoration: underline;
+}
+
+/* Autocomplete (marca/modelo FIPE e endereços) */
+.tq-editor .autocomplete-field {
+  position: relative;
+}
+
+.tq-editor .autocomplete-list {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px var(--shadow-sm);
+}
+
+.tq-editor .autocomplete-list li {
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.tq-editor .autocomplete-list li:hover {
+  background: var(--tqe-bg);
+}
+
+.tq-editor .autocomplete-list .place-option-name,
+.tq-editor .autocomplete-list .place-option-address {
+  display: block;
+}
+
+.tq-editor .autocomplete-list .place-option-address,
+.tq-editor .autocomplete-list .autocomplete-status {
+  color: var(--tqe-muted);
+}
+
+.tq-editor .autocomplete-list .autocomplete-status {
+  cursor: default;
+}
+
+/* Caixas de rota e valores */
+.tq-editor .freight-quote-box {
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  border-radius: 12px;
+}
+
+.tq-editor .freight-quote-box h3 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--tqe-border);
+}
+
+.tq-editor .freight-quote-box [role="status"] {
+  margin: 10px 0 0;
+}
+
+.tq-editor .route-step {
+  padding: 10px 12px 2px;
+  margin-bottom: 10px;
+  border: 1px solid var(--tqe-border);
+  border-left: 4px solid var(--tqe-accent);
+  border-radius: 10px;
+  background: var(--tqe-bg);
+}
+
+.tq-editor .route-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tq-editor .route-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--tqe-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tq-editor .route-step-kind {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  font-weight: 600;
+}
+
+.tq-editor .route-step-remove {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  color: var(--tqe-muted);
+}
+
+.tq-editor .btn-add-stop {
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border-style: dashed;
+  font-weight: 600;
+}
+
+.tq-editor .route-return {
+  margin-bottom: 8px;
+}
+
+.tq-editor .route-summary {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--tqe-bg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tq-editor .quote-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--tqe-accent);
+  border-radius: 8px;
+  background: var(--tqe-bg);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.tq-editor .quote-price-lines {
+  margin: 12px 0 10px;
+  font-size: 14px;
+}
+
+.tq-editor .quote-price-lines > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--tqe-border);
+}
+
+.tq-editor .cost-summary-total {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border-bottom: 4px solid var(--tqe-accent);
+  color: #fff;
+}
+
+.tq-editor .cost-summary-total small {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.tq-editor .cost-summary-total strong {
+  font-family: var(--font-family-heading);
+  font-size: 24px;
+}
+
+/* Nota fiscal (recolhível) */
+.tq-editor .quote-invoice summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.tq-editor .quote-invoice summary::-webkit-details-marker {
+  display: none;
+}
+
+.tq-editor .quote-invoice summary::after {
+  content: '\FF0B  Preencher';
+  margin-top: 6px;
+  color: var(--tqe-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tq-editor .quote-invoice[open] summary::after {
+  content: '\2212  Fechar';
+}
+
+.tq-editor .quote-invoice[open] summary {
+  margin-bottom: 12px;
+}
+
+/* Situação e ações */
+.tq-editor .quote-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  border-left: 4px solid var(--tqe-accent);
+  border-radius: 6px;
+}
+
+.tq-editor .status-badge {
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.tq-editor .btn-generate-pdf {
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tq-editor .btn-approve {
+  width: 100%;
+  margin-top: 10px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--tqe-success);
+  border-color: var(--tqe-success);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tq-editor .btn-reject-quote {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Orçamento numa tela só: no computador as 3 etapas (dados, rota/locação,
+   valores) ficam lado a lado; abaixo de 1100px voltam a ser uma coluna. */
+.tq-editor.tq-wide {
+  max-width: 1600px;
+}
+
+.tq-editor .tq-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--tqe-muted);
+}
+
+.tq-editor .tq-step span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--tqe-accent);
+  color: #fff;
+  font-size: 12px;
+}
+
+@media (min-width: 1100px) {
+  .tq-editor .tq-columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .tq-editor .tq-col {
+    min-width: 0;
+  }
+
+  .tq-editor .tq-col > h3:first-of-type {
+    margin-top: 8px;
+  }
+
+  .tq-editor .tq-col > .freight-quote-box:first-of-type {
+    margin-top: 8px;
+  }
+
+  /* Valores e botões acompanham a rolagem quando a rota fica comprida. */
+  .tq-editor .tq-col-sticky {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+
+  .tq-editor.tq-wide h3 {
+    margin-top: 14px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 1099px) {
+  .tq-editor .tq-step {
+    margin-top: 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .tq-editor {
+    padding: 12px;
+  }
+
+  .tq-editor .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tq-editor .form-group-uf {
+    flex: 1 1 auto !important;
+  }
+}

@@ -76,9 +76,10 @@ export const api = {
   async put(url: string, data: any) {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
+    const isFormData = data instanceof FormData;
     console.log('PUT request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -87,7 +88,7 @@ export const api = {
     const response = await fetch(fullUrl, {
       method: 'PUT',
       headers,
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     });
     
     console.log('PUT response status:', response.status);

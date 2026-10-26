@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import NewServiceOrderMobile from './NewServiceOrderMobile';
 import { api } from '../services/api';
 
@@ -68,18 +68,21 @@ describe('NewServiceOrderMobile', () => {
     expect(screen.getByText('Tipo de Atendimento')).toBeInTheDocument();
   });
 
-  it('mostra os campos de guincho e a cotação de frete ao selecionar "Guincho 24h"', async () => {
+  // OS de guincho só nasce de orçamento aprovado: o botão leva ao orçamento novo.
+  it('o botão de guincho abre um orçamento de guincho em vez de criar a OS direto', async () => {
     render(
-      <MemoryRouter>
-        <NewServiceOrderMobile />
+      <MemoryRouter initialEntries={['/new-service-order']}>
+        <Routes>
+          <Route path="/new-service-order" element={<NewServiceOrderMobile />} />
+          <Route path="/orcamentos-guincho/novo" element={<p>Tela do orçamento</p>} />
+        </Routes>
       </MemoryRouter>
     );
 
     await screen.findByText('Nova Ordem de Serviço');
-    fireEvent.click(screen.getByRole('button', { name: /guincho 24h/i }));
+    fireEvent.click(screen.getByRole('button', { name: /guincho/i }));
 
-    expect(screen.getByText('Local do Atendimento')).toBeInTheDocument();
-    expect(screen.getByText('Cotação de Frete Rodoviário')).toBeInTheDocument();
+    expect(await screen.findByText('Tela do orçamento')).toBeInTheDocument();
   });
 
   it('busca modelos FIPE quando a marca digitada corresponde a uma marca conhecida', async () => {
@@ -121,39 +124,5 @@ describe('NewServiceOrderMobile', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
     const datalist = document.getElementById('fipe-modelos-list');
     expect(datalist?.querySelectorAll('option').length).toBe(0);
-  });
-
-  it('inclui os campos de cotação de frete no payload ao criar uma OS de Guincho', async () => {
-    (api.post as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ id: 'os-1' }) });
-
-    render(
-      <MemoryRouter>
-        <NewServiceOrderMobile />
-      </MemoryRouter>
-    );
-
-    await screen.findByText('Nova Ordem de Serviço');
-    fireEvent.click(screen.getByRole('button', { name: /guincho 24h/i }));
-
-    await goToVehicleStep();
-    fireEvent.change(screen.getByPlaceholderText('ABC-1234'), { target: { value: 'ABC1D23' } });
-    fireEvent.change(screen.getByPlaceholderText('Digite para buscar (Ex: Toyota)'), { target: { value: 'Fiat' } });
-    fireEvent.change(screen.getByPlaceholderText('Digite para buscar (Ex: Corolla)'), { target: { value: 'Uno' } });
-    fireEvent.change(screen.getByPlaceholderText('2024'), { target: { value: '2020' } });
-
-    clickProximo();
-    // "Recepção" também aparece como rótulo no breadcrumb de progresso do wizard,
-    // então precisa mirar no heading do passo pra não colidir com múltiplos matches.
-    await screen.findByRole('heading', { name: 'Recepção' });
-    fireEvent.change(screen.getByPlaceholderText('Descreva o problema relatado pelo cliente'), { target: { value: 'Pane seca' } });
-
-    fireEvent.click(screen.getAllByRole('button', { name: /criar ordem de serviço/i })[0]);
-
-    await waitFor(() => expect(api.post).toHaveBeenCalled());
-    const [, payload] = (api.post as jest.Mock).mock.calls[0];
-    expect(payload.towDetails).toMatchObject({
-      originCity: '', originState: '', destinationCity: '', destinationState: '',
-      pricePerKm: null, axleCount: null, distanceKm: null, tollsValue: null, freightTotal: null,
-    });
   });
 });

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { validateCpfOrCnpj } from '../utils/helpers';
+import { formatCpfCnpj, formatPlate, validateCpfOrCnpj } from '../utils/helpers';
 import FreightQuoteCalculator, { emptyFreightQuoteValue } from '../components/FreightQuoteCalculator';
+import { TOW_QUOTES_PATH } from '../utils/towQuote/quoteKind';
 import '../styles/NewServiceOrder.css';
 
 interface CustomerData {
@@ -223,15 +224,17 @@ const NewServiceOrderMobile: React.FC = () => {
   };
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setCustomer({ ...customer, [e.target.name]: e.target.value });
-    if (e.target.name === 'document') {
+    const { name, value } = e.target;
+    setCustomer({ ...customer, [name]: name === 'document' ? formatCpfCnpj(value) : value });
+    if (name === 'document') {
       setCustomerChecked(false);
       setCustomerFound(false);
     }
   };
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setVehicle({ ...vehicle, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setVehicle({ ...vehicle, [name]: name === 'plate' ? formatPlate(value) : value });
   };
 
   // Marcas/modelos vêm da tabela FIPE pública (sem chave, sem custo) — a lista de
@@ -432,7 +435,8 @@ const NewServiceOrderMobile: React.FC = () => {
           name="plate"
           value={vehicle.plate}
           onChange={handleVehicleChange}
-          placeholder="ABC-1234"
+          placeholder="ABC-1D23"
+          maxLength={8}
           required
         />
       </div>
@@ -658,12 +662,14 @@ const NewServiceOrderMobile: React.FC = () => {
         >
           🔧 Oficina
         </button>
+        {/* OS de guincho só nasce de orçamento aprovado (já preenchida), como no app. */}
         <button
           type="button"
-          className={`service-type-btn service-type-btn-tow ${serviceType === 'Guincho' ? 'active' : ''}`}
-          onClick={() => setServiceType('Guincho')}
+          className="service-type-btn service-type-btn-tow"
+          onClick={() => navigate(`${TOW_QUOTES_PATH}/novo`)}
+          title="OS de guincho é aberta ao aprovar o orçamento"
         >
-          🚛 Guincho 24h
+          🚛 Guincho → orçamento
         </button>
       </div>
 

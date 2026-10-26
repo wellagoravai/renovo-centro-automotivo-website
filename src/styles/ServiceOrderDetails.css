@@ -644,3 +644,58 @@
     font-size: 18px;
   }
 }
+/* Aba "Dados" numa tela só: no computador, abertura, check-in inicial e
+   guincho ficam em colunas lado a lado; abaixo de 1100px voltam a empilhar. */
+.os-notes-text {
+  white-space: pre-line;
+  font-size: 14px !important;
+}
+
+@media (min-width: 1100px) {
+  .os-open-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .os-open-col {
+    min-width: 0;
+  }
+
+  .os-open-col + .os-open-col {
+    padding-left: 24px;
+    border-left: 2px solid var(--surface-hover);
+  }
+
+  .os-open-grid .initial-checkin-editor,
+  .os-open-grid .tow-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .os-open-grid .tab-pane h3,
+  .os-open-grid h3 {
+    font-size: 17px;
+    margin-bottom: 14px;
+  }
+
+  .os-open-grid .data-grid {
+    gap: 10px;
+  }
+
+  .os-open-grid .data-item span {
+    font-size: 15px;
+  }
+
+  .os-open-grid .form-group {
+    margin-bottom: 12px;
+  }
+
+  .os-open-grid .checklist-meta-grid,
+  .os-open-grid .tow-details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+  }
+}

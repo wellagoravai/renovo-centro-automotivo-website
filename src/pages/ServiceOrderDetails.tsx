@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { formatPlate } from '../utils/helpers';
 import { useAuth } from '../hooks/useAuth';
 import ServiceOrderPrintView from '../components/ServiceOrderPrintView';
 import VehicleDamageDiagram from '../components/VehicleDamageDiagram';
@@ -762,6 +763,11 @@ const ServiceOrderDetails: React.FC = () => {
           <button className="btn-print" onClick={() => window.print()}>
             🖨️ Imprimir Ordem
           </button>
+          {serviceOrder.serviceType !== 'Guincho' && (
+            <button className="btn-print" onClick={() => navigate(`/orcamentos/${serviceOrder.id}`)}>
+              💰 Montar Orçamento
+            </button>
+          )}
           <button className="btn-print" onClick={handleGenerateQuotePdf} disabled={generatingQuotePdf}>
             {generatingQuotePdf ? 'Gerando...' : '📄 Gerar Orçamento em PDF'}
           </button>
@@ -812,6 +818,10 @@ const ServiceOrderDetails: React.FC = () => {
         <div className="tab-content">
           {activeTab === 'dados' && (
             <div className="tab-pane">
+              {/* No computador, abertura, check-in e guincho ficam lado a lado:
+                  todos os dados de abertura da OS numa tela só. */}
+              <div className="os-open-grid">
+              <section className="os-open-col">
               <h3>Dados da Ordem de Serviço</h3>
               <div className="data-grid">
                 <div className="data-item">
@@ -834,9 +844,34 @@ const ServiceOrderDetails: React.FC = () => {
                   <label>Mecânico Responsável:</label>
                   <span>{serviceOrder.responsibleUser || '—'}</span>
                 </div>
+                {serviceOrder.notes?.trim() && (
+                  <div className="data-item">
+                    <label>Observações:</label>
+                    <span className="os-notes-text">{serviceOrder.notes}</span>
+                  </div>
+                )}
               </div>
 
+              <div className="form-group" style={{ marginTop: 20 }}>
+                <label>Atribuir a (app mobile da equipe)</label>
+                <select value={assignedUserId} onChange={(e) => setAssignedUserId(e.target.value)}>
+                  <option value="">Não atribuído</option>
+                  {mechanics.map(m => (
+                    <option key={m.id} value={m.id}>{m.fullName}</option>
+                  ))}
+                </select>
+                <button
+                  className="os-action-button"
+                  onClick={handleSaveAssignment}
+                  disabled={savingAssignment}
+                >
+                  {savingAssignment ? 'Salvando...' : 'Salvar Atribuição'}
+                </button>
+              </div>
+              </section>
+
               {canEditInitialCheckin && (
+                <section className="os-open-col">
                 <div className="initial-checkin-editor">
                   <h4>Editar dados do check-in inicial</h4>
                   <div className="checklist-meta-grid">
@@ -885,7 +920,7 @@ const ServiceOrderDetails: React.FC = () => {
                     </div>
                     <div className="form-group">
                       <label>Placa</label>
-                      <input value={initialCheckinForm.vehiclePlate} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehiclePlate: e.target.value }))} />
+                      <input value={initialCheckinForm.vehiclePlate} onChange={(e) => setInitialCheckinForm(prev => ({ ...prev, vehiclePlate: formatPlate(e.target.value) }))} maxLength={8} placeholder="ABC-1D23" />
                     </div>
                     <div className="form-group">
                       <label>Marca</label>
@@ -920,26 +955,11 @@ const ServiceOrderDetails: React.FC = () => {
                     {savingInitialCheckin ? 'Salvando...' : 'Salvar Dados do Check-in'}
                   </button>
                 </div>
+                </section>
               )}
 
-              <div className="form-group" style={{ marginTop: 20 }}>
-                <label>Atribuir a (app mobile da equipe)</label>
-                <select value={assignedUserId} onChange={(e) => setAssignedUserId(e.target.value)}>
-                  <option value="">Não atribuído</option>
-                  {mechanics.map(m => (
-                    <option key={m.id} value={m.id}>{m.fullName}</option>
-                  ))}
-                </select>
-                <button
-                  className="os-action-button"
-                  onClick={handleSaveAssignment}
-                  disabled={savingAssignment}
-                >
-                  {savingAssignment ? 'Salvando...' : 'Salvar Atribuição'}
-                </button>
-              </div>
-
               {serviceOrder.serviceType === 'Guincho' && (
+                <section className="os-open-col">
                 <div className="tow-section">
                   <h4>Atualizar Status do Guincho</h4>
                   <div className="form-group" style={{ maxWidth: 320 }}>
@@ -1066,7 +1086,9 @@ const ServiceOrderDetails: React.FC = () => {
                     </button>
                   </div>
                 </div>
+                </section>
               )}
+              </div>
             </div>
           )}
 

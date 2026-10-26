@@ -135,3 +135,17 @@
     padding: 10px 8px;
   }
 }
+.vehicle-chassis {
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+/* Duplo clique na placa leva para a consulta de dados veiculares. */
+.plate-cell {
+  cursor: pointer;
+  user-select: none;
+}
+
+.plate-cell:hover strong {
+  text-decoration: underline dotted;
+}

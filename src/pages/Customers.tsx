@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../services/api';
-import { validateCpfOrCnpj } from '../utils/helpers';
+import { formatCpfCnpj, validateCpfOrCnpj } from '../utils/helpers';
 import '../styles/Customers.css';
 
 interface Customer {
@@ -49,8 +49,9 @@ const Customers: React.FC = () => {
     try {
       const url = search ? `/Customers?search=${encodeURIComponent(search)}` : '/Customers';
       const response = await api.get(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      setCustomers(data);
+      setCustomers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Erro ao carregar clientes:', error);
     } finally {
@@ -149,7 +150,7 @@ const Customers: React.FC = () => {
       const prefillDocument = searchParams.get('document') || '';
       openNewModal();
       if (prefillDocument) {
-        setFormData(prev => ({ ...prev, document: prefillDocument }));
+        setFormData(prev => ({ ...prev, document: formatCpfCnpj(prefillDocument) }));
       }
       setSearchParams(params => {
         params.delete('new');
@@ -260,7 +261,8 @@ const Customers: React.FC = () => {
                     type="text"
                     className="form-control"
                     value={formData.document}
-                    onChange={(e) => setFormData({...formData, document: e.target.value})}
+                    onChange={(e) => setFormData({...formData, document: formatCpfCnpj(e.target.value)})}
+                    placeholder="000.000.000-00"
                     required
                   />
                 </div>

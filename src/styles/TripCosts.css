@@ -1,0 +1,258 @@
+/* Custos de viagem do guincho — mesmo layout do app da equipe
+   (renovo-workshop-mobile). Usa a base do formulário de orçamento (.tq-editor). */
+.trip-costs-page .page-header .btn-link {
+  text-decoration: none;
+}
+
+.trip-costs-page .field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--tqe-muted);
+}
+
+.trip-costs-page .filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.trip-costs-page .filter-chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  color: var(--tqe-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.trip-costs-page .filter-chip.active {
+  background: var(--tqe-accent);
+  border-color: var(--tqe-accent);
+  color: #fff;
+}
+
+/* Categorias: botões quadrados com ícone grande. */
+.trip-costs-page .cost-categories {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.trip-costs-page .cost-category {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 84px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  background: var(--tqe-bg);
+  border: 1px solid var(--tqe-border);
+  box-shadow: 0 3px 0 var(--tqe-border);
+  color: var(--tqe-text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.trip-costs-page .cost-category span {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.trip-costs-page .cost-category:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.trip-costs-page .cost-category.active {
+  background: var(--tqe-accent);
+  border-color: var(--tqe-accent);
+  box-shadow: 0 3px 0 var(--tqe-accent-hover);
+  color: #fff;
+}
+
+.trip-costs-page .cost-amount-field input {
+  max-width: 180px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.trip-costs-page .cost-photo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.trip-costs-page .cost-photo img,
+.trip-costs-page .cost-photo-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.trip-costs-page .cost-photo-empty {
+  border: 1px dashed var(--tqe-border);
+  color: var(--tqe-muted);
+  font-size: 12px;
+}
+
+.trip-costs-page .pending-photo {
+  position: relative;
+}
+
+.trip-costs-page .pending-photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Totais */
+.trip-costs-page .cost-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.trip-costs-page .cost-summary-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  font-size: 13px;
+}
+
+/* Lançamentos / viagens */
+.trip-costs-page .order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trip-costs-page .order-card {
+  display: block;
+  background: var(--tqe-surface);
+  border: 1px solid var(--tqe-border);
+  border-left: 4px solid var(--tqe-accent);
+  border-radius: 6px;
+  padding: 14px;
+  color: var(--tqe-text);
+}
+
+.trip-costs-page .order-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.trip-costs-page .cost-amount {
+  color: var(--tqe-accent);
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.trip-costs-page .cost-card-body {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.trip-costs-page .cost-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.trip-costs-page .cost-card-info p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.trip-costs-page .cost-thumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.trip-costs-page .trip-card summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.trip-costs-page .trip-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.trip-costs-page .trip-card summary .hint {
+  margin: 0;
+}
+
+.trip-costs-page .trip-card[open] summary {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--tqe-border);
+}
+
+.trip-costs-page .trip-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.trip-costs-page .trip-positive {
+  color: var(--tqe-success);
+}
+
+.trip-costs-page .trip-negative {
+  color: var(--tqe-danger);
+}
+
+.trip-costs-page .trip-expense-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trip-costs-page .trip-expense-list li p {
+  margin: 2px 0 0;
+}
+
+.trip-costs-page .trip-open-order {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+@media (max-width: 560px) {
+  .trip-costs-page .cost-categories {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

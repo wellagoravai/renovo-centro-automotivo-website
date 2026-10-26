@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { TOW_QUOTES_PATH } from '../utils/towQuote/quoteKind';
 import '../styles/TowDashboard.css';
 
 interface TowKpis {
@@ -100,8 +101,9 @@ const TowDashboard: React.FC = () => {
     <div className="tow-dashboard-page">
       <div className="page-header">
         <h1>🚛 Guincho 24h</h1>
-        <button className="btn btn-primary" onClick={() => navigate('/new-service-order')}>
-          + Novo Chamado
+        {/* Chamado de guincho começa pelo orçamento; a OS abre quando ele é aprovado. */}
+        <button className="btn btn-primary" onClick={() => navigate(`${TOW_QUOTES_PATH}/novo`)}>
+          + Novo orçamento
         </button>
       </div>
 

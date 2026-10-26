@@ -22,6 +22,12 @@ import NewServiceOrderMobile from './pages/NewServiceOrderMobile';
 import ServiceOrderDetails from './pages/ServiceOrderDetails';
 import TowDashboard from './pages/TowDashboard';
 import TowQuotes from './pages/TowQuotes';
+import TowQuoteEditor from './pages/TowQuoteEditor';
+import ForkliftQuoteEditor from './pages/ForkliftQuoteEditor';
+import TripCosts from './pages/TripCosts';
+import TripCostsReport from './pages/TripCostsReport';
+import Quotes from './pages/Quotes';
+import QuoteEditor from './pages/QuoteEditor';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import './styles/globals.css';
@@ -74,8 +80,16 @@ const AppRoutes: React.FC = () => {
         <Route path="new-service-order" element={<NewServiceOrderMobile />} />
         <Route path="service-orders" element={<ServiceOrders />} />
         <Route path="service-orders/:id" element={<ServiceOrderDetails />} />
+        <Route path="orcamentos" element={<Quotes />} />
+        <Route path="orcamentos/:id" element={<QuoteEditor />} />
         <Route path="guincho" element={<TowDashboard />} />
         <Route path="orcamentos-guincho" element={<TowQuotes />} />
+        <Route path="orcamentos-guincho/novo" element={<TowQuoteEditor />} />
+        <Route path="orcamentos-guincho/:id" element={<TowQuoteEditor />} />
+        <Route path="orcamentos-empilhadeira/novo" element={<ForkliftQuoteEditor />} />
+        <Route path="orcamentos-empilhadeira/:id" element={<ForkliftQuoteEditor />} />
+        <Route path="custos-viagem" element={<TripCosts />} />
+        <Route path="custos-viagem/consultar" element={<TripCostsReport />} />
         <Route path="vehicles" element={<Vehicles />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="customers" element={<Customers />} />

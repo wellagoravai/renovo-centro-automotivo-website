@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../services/api';
+import { formatPlate } from '../utils/helpers';
 import '../styles/Vehicles.css';
 
 interface Vehicle {
@@ -44,6 +45,18 @@ const Vehicles: React.FC = () => {
   const [consultaLoading, setConsultaLoading] = useState(false);
   const [consultaError, setConsultaError] = useState<string | null>(null);
   const [consultaResultado, setConsultaResultado] = useState<VeiculoConsultaResult | null>(null);
+  const consultaInputRef = useRef<HTMLInputElement>(null);
+
+  // Duplo clique na placa da tabela: leva a placa para a consulta de dados veiculares.
+  const fillLookupPlate = (plate: string) => {
+    if (!plate) return;
+    setConsultaPlaca(formatPlate(plate));
+    setConsultaError(null);
+    setConsultaResultado(null);
+    window.getSelection()?.removeAllRanges();
+    consultaInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    consultaInputRef.current?.focus({ preventScroll: true });
+  };
 
   useEffect(() => {
     loadVehicles();
@@ -85,6 +98,8 @@ const Vehicles: React.FC = () => {
       if (response.status === 200) {
         const data = await response.json();
         setConsultaResultado(data);
+        // O backend grava o chassi consultado no cadastro do veículo com esta placa.
+        loadVehicles();
       } else if (response.status === 400) {
         const data = await response.json().catch(() => null);
         setConsultaError(data?.message || 'Placa em formato inválido.');
@@ -139,10 +154,11 @@ const Vehicles: React.FC = () => {
           </p>
           <div className="consulta-veiculo-form">
             <input
+              ref={consultaInputRef}
               type="text"
-              placeholder="Ex.: ABC1D23"
+              placeholder="Ex.: ABC-1D23"
               value={consultaPlaca}
-              onChange={(e) => setConsultaPlaca(e.target.value.toUpperCase())}
+              onChange={(e) => setConsultaPlaca(formatPlate(e.target.value))}
               maxLength={8}
               className="form-control"
             />
@@ -183,6 +199,7 @@ const Vehicles: React.FC = () => {
               <th>Modelo</th>
               <th>Ano</th>
               <th>Cor</th>
+              <th>Chassi</th>
               <th>Motor</th>
               <th>Combustível</th>
               <th>Quilometragem</th>
@@ -193,11 +210,18 @@ const Vehicles: React.FC = () => {
           <tbody>
             {vehicles.map(vehicle => (
               <tr key={vehicle.id}>
-                <td><strong>{vehicle.plate}</strong></td>
+                <td
+                  className={vehicle.plate ? 'plate-cell' : undefined}
+                  onDoubleClick={() => fillLookupPlate(vehicle.plate)}
+                  title={vehicle.plate ? 'Duplo clique para consultar os dados desta placa' : undefined}
+                >
+                  <strong>{vehicle.plate}</strong>
+                </td>
                 <td>{vehicle.brand}</td>
                 <td>{vehicle.model}</td>
                 <td>{vehicle.year}</td>
                 <td>{vehicle.color}</td>
+                <td className="vehicle-chassis">{vehicle.chassis || '—'}</td>
                 <td>{vehicle.engine}</td>
                 <td>{vehicle.fuel}</td>
                 <td>{vehicle.mileage.toLocaleString('pt-BR')} km</td>

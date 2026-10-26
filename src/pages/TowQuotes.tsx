@@ -1,43 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { FORKLIFT_QUOTES_PATH, isForkliftQuote, quotePath, TOW_QUOTES_PATH } from '../utils/towQuote/quoteKind';
+import type { TowQuote, TowQuoteStatus } from '../utils/towQuote/types';
 import '../styles/TowQuotes.css';
 
-type TowQuoteStatus = 'Pendente' | 'Aprovado' | 'Recusado';
-
-interface TowQuote {
-  id: string;
-  number: string;
-  status: TowQuoteStatus;
-  customerName: string;
-  customerPhone: string;
-  vehiclePlate: string;
-  vehicleDescription: string;
-  routeSummary: string;
-  totalKm: number | null;
-  total: number;
-  hasPdf: boolean;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  decidedAt?: string | null;
-  decidedBy?: string | null;
-  serviceOrderId?: string | null;
-  serviceOrderNumber?: string | null;
-  formData?: string;
-}
-
-// Formulário salvo pelo app (TowQuote.formData). Só os campos exibidos no detalhe.
-interface QuoteFormData {
-  assistance?: Record<string, string>;
-  service?: Record<string, string>;
-  paymentTerms?: string;
-  invoice?: Record<string, string>;
-  notes?: string;
-}
-
 type StatusFilter = 'todos' | TowQuoteStatus;
+type KindFilter = 'todos' | 'guincho' | 'empilhadeira';
 
 const statusColors: Record<TowQuoteStatus, string> = {
   Pendente: '#e67e22',
@@ -52,30 +22,24 @@ const statusOptions: { value: StatusFilter; label: string }[] = [
   { value: 'Recusado', label: 'Recusados' },
 ];
 
+const kindOptions: { value: KindFilter; label: string }[] = [
+  { value: 'todos', label: 'Todos os tipos' },
+  { value: 'guincho', label: '🚛 Guincho' },
+  { value: 'empilhadeira', label: '🏗️ Empilhadeira' },
+];
+
 const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const formatDate = (value: string) => new Date(value).toLocaleDateString('pt-BR');
-const formatDateTime = (value: string) => new Date(value).toLocaleString('pt-BR');
 const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-const parseFormData = (raw?: string): QuoteFormData => {
-  try {
-    return raw ? (JSON.parse(raw) as QuoteFormData) : {};
-  } catch {
-    return {};
-  }
-};
+const matchesKind = (quote: TowQuote, kind: KindFilter) =>
+  kind === 'todos' || (kind === 'empilhadeira') === isForkliftQuote(quote);
 
-const DetailRow: React.FC<{ label: string; value?: string | null }> = ({ label, value }) =>
-  value && value.trim() ? (
-    <div className="tq-detail-row">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  ) : null;
-
-// Histórico dos orçamentos de guincho feitos pelo app da equipe: acompanhar os
-// pendentes, ver quais viraram OS e baixar o PDF enviado ao cliente.
+// Histórico dos orçamentos de guincho e de empilhadeira (feitos aqui ou pelo app
+// da equipe): acompanhar os pendentes, ver quais viraram OS e baixar o PDF
+// enviado ao cliente. Clicar num orçamento reabre o formulário preenchido.
 const TowQuotes: React.FC = () => {
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canWrite = hasPermission('orders.write');
 
@@ -84,8 +48,19 @@ const TowQuotes: React.FC = () => {
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos');
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState<TowQuote | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // Tipo na URL: o menu lateral abre a lista já filtrada (?tipo=empilhadeira).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const kindParam = searchParams.get('tipo');
+  const kindFilter: KindFilter = kindOptions.some(o => o.value === kindParam) ? (kindParam as KindFilter) : 'todos';
+
+  const setKindFilter = (kind: KindFilter) => {
+    const next = new URLSearchParams(searchParams);
+    if (kind === 'todos') next.delete('tipo');
+    else next.set('tipo', kind);
+    setSearchParams(next, { replace: true });
+  };
 
   useEffect(() => {
     loadQuotes();
@@ -105,18 +80,20 @@ const TowQuotes: React.FC = () => {
     }
   };
 
+  const ofKind = useMemo(() => quotes.filter(q => matchesKind(q, kindFilter)), [quotes, kindFilter]);
+
   const searched = useMemo(() => {
     const term = normalize(search.trim());
-    if (!term) return quotes;
-    return quotes.filter(q =>
+    if (!term) return ofKind;
+    return ofKind.filter(q =>
       [q.number, q.customerName, q.vehiclePlate, q.vehicleDescription, q.routeSummary].some(f => normalize(f || '').includes(term))
     );
-  }, [quotes, search]);
+  }, [ofKind, search]);
 
   const visible = statusFilter === 'todos' ? searched : searched.filter(q => q.status === statusFilter);
 
   const stats = useMemo(() => {
-    const by = (status: TowQuoteStatus) => quotes.filter(q => q.status === status);
+    const by = (status: TowQuoteStatus) => ofKind.filter(q => q.status === status);
     const sum = (list: TowQuote[]) => list.reduce((acc, q) => acc + q.total, 0);
     const pending = by('Pendente');
     const approved = by('Aprovado');
@@ -130,17 +107,7 @@ const TowQuotes: React.FC = () => {
       rejected: rejected.length,
       approvalRate: decided > 0 ? Math.round((approved.length / decided) * 100) : null,
     };
-  }, [quotes]);
-
-  const openDetails = async (quote: TowQuote) => {
-    setSelected(quote);
-    try {
-      const response = await api.get(`/tow-quotes/${quote.id}`);
-      if (response.ok) setSelected(await response.json());
-    } catch {
-      // Mantém o resumo da listagem; o detalhe extra é opcional.
-    }
-  };
+  }, [ofKind]);
 
   const downloadPdf = async (quote: TowQuote) => {
     try {
@@ -160,29 +127,9 @@ const TowQuotes: React.FC = () => {
     }
   };
 
-  const replaceQuote = (updated: TowQuote) => {
-    setQuotes(prev => prev.map(q => (q.id === updated.id ? { ...q, ...updated } : q)));
-    setSelected(prev => (prev && prev.id === updated.id ? { ...prev, ...updated } : prev));
-  };
-
-  const rejectQuote = async (quote: TowQuote) => {
-    if (!window.confirm(`Marcar o orçamento ${quote.number} como recusado pelo cliente?`)) return;
-    setBusy(true);
-    try {
-      const response = await api.post(`/tow-quotes/${quote.id}/reject`, {});
-      const body = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(body?.message);
-      replaceQuote(body);
-    } catch (err) {
-      alert(`❌ ${err instanceof Error && err.message ? err.message : 'Não foi possível recusar o orçamento.'}`);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const deleteQuote = async (quote: TowQuote) => {
     if (!window.confirm(`Excluir o orçamento ${quote.number}? Esta ação não pode ser desfeita.`)) return;
-    setBusy(true);
+    setBusyId(quote.id);
     try {
       const response = await api.delete(`/tow-quotes/${quote.id}`);
       if (!response.ok) {
@@ -190,26 +137,50 @@ const TowQuotes: React.FC = () => {
         throw new Error(body?.message);
       }
       setQuotes(prev => prev.filter(q => q.id !== quote.id));
-      setSelected(null);
     } catch (err) {
       alert(`❌ ${err instanceof Error && err.message ? err.message : 'Não foi possível excluir o orçamento.'}`);
     } finally {
-      setBusy(false);
+      setBusyId(null);
     }
   };
-
-  const details = parseFormData(selected?.formData);
 
   return (
     <div className="tow-quotes-page">
       <div className="page-header">
         <div>
-          <h1>🧾 Orçamentos de Guincho</h1>
-          <p className="tq-subtitle">Feitos pelo app da equipe. Ao aprovar, o orçamento vira OS de guincho.</p>
+          <h1>🗂️ Orçamentos salvos</h1>
+          <p className="tq-subtitle">Guincho e empilhadeira, feitos aqui ou pelo app da equipe. Ao aprovar, o orçamento vira OS de guincho.</p>
         </div>
-        <button className="btn btn-secondary" onClick={loadQuotes} disabled={loading}>
-          ↻ Atualizar
-        </button>
+        <div className="tq-header-actions">
+          <button className="btn btn-secondary" onClick={loadQuotes} disabled={loading}>
+            ↻ Atualizar
+          </button>
+          {canWrite && (
+            <>
+              <Link to={`${TOW_QUOTES_PATH}/novo`} className="btn btn-primary">
+                + Guincho
+              </Link>
+              <Link to={`${FORKLIFT_QUOTES_PATH}/novo`} className="btn btn-primary">
+                + Empilhadeira
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="tq-chips tq-kind-chips" role="group" aria-label="Filtrar por tipo">
+        {kindOptions.map(option => (
+          <button
+            key={option.value}
+            type="button"
+            className={kindFilter === option.value ? 'tq-chip active' : 'tq-chip'}
+            aria-pressed={kindFilter === option.value}
+            onClick={() => setKindFilter(option.value)}
+          >
+            {option.label}
+            <span className="tq-chip-count">{quotes.filter(q => matchesKind(q, option.value)).length}</span>
+          </button>
+        ))}
       </div>
 
       <div className="tq-stats">
@@ -271,8 +242,8 @@ const TowQuotes: React.FC = () => {
                 <th>Nº</th>
                 <th>Data</th>
                 <th>Cliente</th>
-                <th>Veículo</th>
-                <th>Rota</th>
+                <th>Veículo / equipamento</th>
+                <th>Rota / locação</th>
                 <th className="tq-num">Total</th>
                 <th>Situação</th>
                 <th>OS</th>
@@ -281,8 +252,10 @@ const TowQuotes: React.FC = () => {
             </thead>
             <tbody>
               {visible.map(quote => (
-                <tr key={quote.id} className="tq-row" onClick={() => openDetails(quote)}>
-                  <td className="tq-mono">{quote.number}</td>
+                <tr key={quote.id} className="tq-row" onClick={() => navigate(quotePath(quote))}>
+                  <td className="tq-mono" title={isForkliftQuote(quote) ? 'Empilhadeira' : 'Guincho'}>
+                    {isForkliftQuote(quote) ? '🏗️' : '🚛'} {quote.number}
+                  </td>
                   <td>{formatDate(quote.createdAt)}</td>
                   <td>{quote.customerName || '—'}</td>
                   <td>{[quote.vehiclePlate, quote.vehicleDescription].filter(Boolean).join(' · ') || '—'}</td>
@@ -298,16 +271,32 @@ const TowQuotes: React.FC = () => {
                       </Link>
                     ) : '—'}
                   </td>
-                  <td>
-                    {quote.hasPdf && (
+                  <td className="tq-row-actions" onClick={e => e.stopPropagation()}>
+                    {/* OS de guincho só nasce do orçamento: o botão de aprovar no
+                        formulário abre a OS já preenchida com os dados dele. */}
+                    {canWrite && quote.status === 'Pendente' && !quote.serviceOrderId && (
                       <button
-                        className="btn btn-sm btn-primary"
-                        onClick={e => {
-                          e.stopPropagation();
-                          downloadPdf(quote);
-                        }}
+                        className="btn btn-sm btn-success"
+                        onClick={() => navigate(`${quotePath(quote)}#aprovar`)}
+                        title="Cliente aprovou: abrir a OS com os dados do orçamento"
                       >
+                        ✅ Criar OS
+                      </button>
+                    )}
+                    {quote.hasPdf && (
+                      <button className="btn btn-sm btn-primary" onClick={() => downloadPdf(quote)}>
                         PDF
+                      </button>
+                    )}
+                    {canWrite && quote.status !== 'Aprovado' && (
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => deleteQuote(quote)}
+                        disabled={busyId === quote.id}
+                        title="Excluir orçamento"
+                        aria-label={`Excluir orçamento ${quote.number}`}
+                      >
+                        ✕
                       </button>
                     )}
                   </td>
@@ -317,84 +306,9 @@ const TowQuotes: React.FC = () => {
           </table>
           {visible.length === 0 && (
             <div className="empty-state">
-              <p>{quotes.length === 0 ? 'Nenhum orçamento salvo ainda. Eles aparecem aqui quando a equipe gera o PDF pelo app.' : 'Nenhum orçamento para este filtro.'}</p>
+              <p>{ofKind.length === 0 ? 'Nenhum orçamento salvo ainda. Eles aparecem aqui quando o PDF é gerado.' : 'Nenhum orçamento para este filtro.'}</p>
             </div>
           )}
-        </div>
-      )}
-
-      {selected && (
-        <div className="tq-modal-overlay" onClick={() => setSelected(null)}>
-          <div className="tq-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
-            <div className="tq-modal-header">
-              <div>
-                <h2>Orçamento {selected.number}</h2>
-                <span className="tq-badge" style={{ backgroundColor: statusColors[selected.status] }}>{selected.status}</span>
-              </div>
-              <button className="tq-modal-close" onClick={() => setSelected(null)} aria-label="Fechar">×</button>
-            </div>
-
-            <div className="tq-modal-body">
-              <div className="tq-total">
-                <span>Total do orçamento</span>
-                <strong>{formatCurrency(selected.total)}</strong>
-                {selected.totalKm !== null && <small>{selected.totalKm.toLocaleString('pt-BR')} km rodados</small>}
-              </div>
-
-              <h3>Cliente e veículo</h3>
-              <DetailRow label="Cliente" value={selected.customerName} />
-              <DetailRow label="Telefone" value={selected.customerPhone} />
-              <DetailRow label="Veículo" value={[selected.vehiclePlate, selected.vehicleDescription].filter(Boolean).join(' · ')} />
-
-              <h3>Serviço</h3>
-              <DetailRow label="Rota" value={selected.routeSummary} />
-              <DetailRow label="Tipo de guincho" value={details.service?.towType} />
-              <DetailRow label="Retirada" value={details.service?.pickupLocation} />
-              <DetailRow label="Entrega" value={details.service?.deliveryDestination} />
-              <DetailRow label="Seguradora" value={details.assistance?.insuranceCompany} />
-              <DetailRow label="Assistência" value={details.assistance?.assistanceCompany} />
-              <DetailRow label="Protocolo" value={details.assistance?.protocol} />
-              <DetailRow label="Sinistro" value={details.assistance?.claimNumber} />
-              <DetailRow label="Pagamento" value={details.paymentTerms} />
-              <DetailRow label="Nota fiscal para" value={[details.invoice?.name, details.invoice?.document].filter(Boolean).join(' · ')} />
-              {details.notes && details.notes.trim() && <p className="tq-notes">{details.notes}</p>}
-
-              <h3>Histórico</h3>
-              <DetailRow label="Criado" value={`${formatDateTime(selected.createdAt)} · ${selected.createdBy}`} />
-              <DetailRow label="Última alteração" value={formatDateTime(selected.updatedAt)} />
-              {selected.decidedAt && (
-                <DetailRow
-                  label={selected.status === 'Aprovado' ? 'Aprovado' : 'Recusado'}
-                  value={`${formatDateTime(selected.decidedAt)}${selected.decidedBy ? ` · ${selected.decidedBy}` : ''}`}
-                />
-              )}
-              {selected.serviceOrderId && (
-                <div className="tq-detail-row">
-                  <span>OS aberta</span>
-                  <Link to={`/service-orders/${selected.serviceOrderId}`}>{selected.serviceOrderNumber ?? 'Ver OS'}</Link>
-                </div>
-              )}
-              <p className="tq-hint">Para editar ou aprovar, abra o orçamento em “Orçamentos salvos” no app da equipe.</p>
-            </div>
-
-            <div className="tq-modal-footer">
-              {canWrite && selected.status === 'Pendente' && (
-                <button className="btn btn-secondary" onClick={() => rejectQuote(selected)} disabled={busy}>
-                  Cliente recusou
-                </button>
-              )}
-              {canWrite && selected.status !== 'Aprovado' && (
-                <button className="btn btn-danger" onClick={() => deleteQuote(selected)} disabled={busy}>
-                  Excluir
-                </button>
-              )}
-              {selected.hasPdf && (
-                <button className="btn btn-primary" onClick={() => downloadPdf(selected)}>
-                  Baixar PDF
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       )}
     </div>
