@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import MapEmbed from '../components/MapEmbed';
 import './Home.css';
 
 const WHATSAPP_NUMBER = '551837222388';
@@ -217,12 +218,7 @@ const Home: React.FC = () => {
                         ⏰ Seg-Sex: 8h-18h | Sábado: 8h-13h | 💬 Chat: 24h
                     </p>
                     <div className="map-wrapper">
-                        <iframe
-                            title="Localização - Renovo Centro Automotivo"
-                            src="https://www.google.com/maps?q=MARECHAL+DEODORO+2305+Andradina+SP&output=embed"
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                        ></iframe>
+                        <MapEmbed />
                     </div>
                 </section>
             </main>

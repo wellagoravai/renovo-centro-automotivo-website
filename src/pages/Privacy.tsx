@@ -76,8 +76,8 @@ const Privacy: React.FC = () => (
             <li><strong>Vercel e Railway:</strong> hospedagem do site, do sistema e do banco de dados;</li>
             <li><strong>Cloudinary:</strong> armazenamento de fotos de veículos e comprovantes;</li>
             <li>
-                <strong>Google:</strong> mapa e fontes do site, que recebem dados técnicos da sua conexão, como
-                o IP, e endereços usados no cálculo de rotas do guincho;
+                <strong>Google:</strong> fontes do site e mapa (se você escolher exibi-lo), que recebem dados
+                técnicos da sua conexão, como o IP, e endereços usados no cálculo de rotas do guincho;
             </li>
             <li><strong>APIBrasil:</strong> placa do veículo, para a consulta de dados veiculares;</li>
             <li>
@@ -113,8 +113,9 @@ const Privacy: React.FC = () => (
         <h2>7. Cookies e armazenamento no navegador</h2>
         <p>
             Não usamos cookies de publicidade nem de estatísticas. O navegador guarda apenas a sua preferência
-            de tema e, para a equipe, a sessão de login. O mapa incorporado é fornecido pelo Google, que pode
-            usar cookies próprios. Se você preferir evitá-los, pode bloqueá-los no navegador.
+            de tema e, para a equipe, a sessão de login. O mapa do Google só carrega se você clicar em
+            &quot;Mostrar mapa&quot;; a partir daí, o Google recebe dados da sua conexão e pode usar cookies
+            próprios.
         </p>
 
         <h2>8. Segurança</h2>

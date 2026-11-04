@@ -19,6 +19,8 @@ interface Customer {
   serviceOrderCount: number;
 }
 
+const ANONYMIZED_NAME = 'Cliente anonimizado';
+
 const Customers: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +133,29 @@ const Customers: React.FC = () => {
     }
   };
 
+  const handleAnonymize = async (customer: Customer) => {
+    const confirmed = window.confirm(
+      `Anonimizar "${customer.name}"?\n\n` +
+        'Nome, documento, contatos, placa, observações e fotos serão apagados para sempre. ' +
+        'Números, datas e valores das ordens de serviço serão mantidos.\n\n' +
+        'Use apenas em um pedido de eliminação do cliente ou depois do prazo de guarda. Esta ação não pode ser desfeita.'
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await api.post(`/Customers/${customer.id}/anonymize`, {});
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        alert(data?.message || 'Erro ao anonimizar cliente');
+        return;
+      }
+      loadCustomers();
+    } catch (error) {
+      console.error('Erro ao anonimizar cliente:', error);
+      alert('Erro ao anonimizar cliente');
+    }
+  };
+
   const openNewModal = () => {
     setEditingCustomer(null);
     setFormData({
@@ -212,7 +237,7 @@ const Customers: React.FC = () => {
                 <td>{customer.serviceOrderCount}</td>
                 <td>
                   <div className="action-buttons">
-                    {hasPermission('customers.write') && (
+                    {hasPermission('customers.write') && customer.name !== ANONYMIZED_NAME && (
                       <>
                         <button
                           className="btn btn-sm btn-info"
@@ -227,6 +252,14 @@ const Customers: React.FC = () => {
                           Excluir
                         </button>
                       </>
+                    )}
+                    {hasPermission('users.manage') && customer.name !== ANONYMIZED_NAME && (
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleAnonymize(customer)}
+                      >
+                        Anonimizar
+                      </button>
                     )}
                   </div>
                 </td>

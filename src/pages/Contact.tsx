@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import MapEmbed from '../components/MapEmbed';
 import './Contact.css';
 import { CONTACT_EMAIL, CONTACT_PHONE, WHATSAPP_PHONE_1, WHATSAPP_PHONE_2, ADDRESS } from '../utils/constants';
 
@@ -143,12 +144,7 @@ const Contact: React.FC = () => {
             <section className="contact-map">
                 <h2>Nos Visite</h2>
                 <div className="map-wrapper">
-                    <iframe
-                        title="Localização - Renovo Centro Automotivo"
-                        src="https://www.google.com/maps?q=MARECHAL+DEODORO+2305+Andradina+SP&output=embed"
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                    <MapEmbed />
                 </div>
             </section>
         </div>
