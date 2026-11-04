@@ -17,9 +17,8 @@ export interface CompanyInfo {
 
 export const COMPANY: CompanyInfo = {
   name: 'Renovo Centro Automotivo',
-  // Preencher com o CNPJ da oficina — enquanto vazio, não aparece nos documentos.
-  cnpj: '',
-  address: 'Rua Marechal Deodoro, 2305 - Andradina/SP, 16901-455',
+  cnpj: '68.699.853/0001-05',
+  address: 'Rua Marechal Deodoro, 2305 - Andradina/SP, 16901-011',
   phone: '(18) 3722-2388',
   whatsapp: ['(18) 3722-2388', '(18) 99775-2055', '(18) 99824-2750'],
   email: 'jsbombasinjetoras@gmail.com',

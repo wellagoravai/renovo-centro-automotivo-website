@@ -27,14 +27,8 @@ const Footer: React.FC = () => {
                 </div>
                 <div className="footer-right social-media">
                     <h3>🌐 Siga-nos</h3>
-                    <a href={SOCIAL_MEDIA_LINKS.facebook} target="_blank" rel="noopener noreferrer">
-                        Facebook
-                    </a>
                     <a href={SOCIAL_MEDIA_LINKS.instagram} target="_blank" rel="noopener noreferrer">
                         Instagram
-                    </a>
-                    <a href={SOCIAL_MEDIA_LINKS.twitter} target="_blank" rel="noopener noreferrer">
-                        Twitter
                     </a>
                 </div>
             </div>
