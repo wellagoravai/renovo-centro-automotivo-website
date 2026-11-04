@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Home.css';
 
 const WHATSAPP_NUMBER = '551837222388';
@@ -115,6 +116,10 @@ const Home: React.FC = () => {
                                 value={quoteForm.message}
                                 onChange={handleQuoteChange}
                             ></textarea>
+                            <p className="privacy-notice">
+                                Seu pedido será aberto no WhatsApp para você enviar. Veja a{' '}
+                                <Link to="/privacidade">Política de Privacidade</Link>.
+                            </p>
                             <button type="submit" className="quote-submit">
                                 Solicitar orçamento <span aria-hidden="true">→</span>
                             </button>

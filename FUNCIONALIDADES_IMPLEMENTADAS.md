@@ -238,7 +238,7 @@ npm start
 - URL: `http://localhost:3000`
 - Faça login com:
   - Usuário: `admin`
-  - Senha: `Renovo@123`
+  - Senha: `<senha-do-ambiente-local>`
 
 ### 3. **Teste Cada Funcionalidade**
 
@@ -275,10 +275,10 @@ npm start
 
 | Usuário | Senha | Perfil | Permissões |
 |---------|-------|--------|------------|
-| admin | Renovo@123 | Administrador | Todas |
-| joao.silva | Renovo@123 | Gerente | Gerenciar OS, Clientes, Veículos |
-| maria.santos | Renovo@123 | Recepção | Criar/Editar OS |
-| pedro.oliveira | Renovo@123 | Mecânico | Ver/Atualizar OS |
+| admin | <senha-do-ambiente-local> | Administrador | Todas |
+| joao.silva | <senha-do-ambiente-local> | Gerente | Gerenciar OS, Clientes, Veículos |
+| maria.santos | <senha-do-ambiente-local> | Recepção | Criar/Editar OS |
+| pedro.oliveira | <senha-do-ambiente-local> | Mecânico | Ver/Atualizar OS |
 
 ---
 

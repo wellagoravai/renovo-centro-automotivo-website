@@ -71,7 +71,7 @@ SELECT * FROM Users;
 ### **Usuário Admin Padrão:**
 ```
 Usuário: admin
-Senha: Renovo@123
+Senha: <senha-do-ambiente-local>
 ```
 
 **Este usuário já está cadastrado no banco** (seedado na criação do banco).
@@ -117,7 +117,7 @@ Teste o login:
 POST /api/Auth/login
 {
   "Username": "admin",
-  "Password": "Renovo@123"
+  "Password": "<senha-do-ambiente-local>"
 }
 ```
 
@@ -139,7 +139,7 @@ npm start
 
 Acesse: `http://localhost:3000`
 - Login: `admin`
-- Senha: `Renovo@123`
+- Senha: `<senha-do-ambiente-local>`
 
 ---
 
@@ -190,7 +190,7 @@ mobile-poc/index.html
 4. **Login:**
    ```
    Usuário: admin
-   Senha: Renovo@123
+   Senha: <senha-do-ambiente-local>
    ```
 
 5. **Adicione à tela inicial (opcional):**
@@ -252,7 +252,7 @@ npx http-server mobile-poc -p 3000
 ✅ **Solução:** O usuário admin já existe. Use:
 ```
 Usuário: admin
-Senha: Renovo@123
+Senha: <senha-do-ambiente-local>
 ```
 
 ### **Banco de dados não existe**
@@ -315,14 +315,14 @@ Senha: Renovo@123
 ```
 URL: http://localhost:3000
 Usuário: admin
-Senha: Renovo@123
+Senha: <senha-do-ambiente-local>
 ```
 
 ### **App Mobile:**
 ```
 URL: http://localhost:3000 (ou IP do PC)
 Usuário: admin
-Senha: Renovo@123
+Senha: <senha-do-ambiente-local>
 ```
 
 ### **API:**

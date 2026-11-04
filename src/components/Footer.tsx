@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CONTACT_EMAIL, SOCIAL_MEDIA_LINKS, CONTACT_PHONE, ADDRESS, SHIPPING_INFO } from '../utils/constants';
 import './Footer.css';
 
@@ -46,6 +47,7 @@ const Footer: React.FC = () => {
                 opacity: 0.85
             }}>
                 <p>© {currentYear} Renovo Centro Automotivo. Todos os direitos reservados.</p>
+                <p><Link to="/privacidade" style={{ color: 'inherit', textDecoration: 'underline' }}>Política de Privacidade</Link></p>
             </div>
         </footer>
     );

@@ -50,7 +50,7 @@ Abra o arquivo `mobile-poc/index.html` em um navegador (funcionalidade limitada)
 
 ```
 Usuário: admin
-Senha: Renovo@123
+Senha: <senha-do-ambiente-local>
 ```
 
 ## 📋 Estrutura do Projeto

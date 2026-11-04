@@ -111,7 +111,7 @@ src/
 1. **Faça login no sistema** através da página Portal
 2. Use as credenciais de teste:
    - Usuário: `admin`
-   - Senha: `Renovo@123`
+   - Senha: `<senha-do-ambiente-local>`
 
 ### Se o token existe mas ainda dá 401:
 1. **Limpe o localStorage** e faça login novamente:
@@ -135,12 +135,12 @@ src/
 
 | Usuário | Senha | Perfil | Pode Criar OS? |
 |---------|-------|--------|----------------|
-| admin | Renovo@123 | Administrador | ✅ Sim |
-| joao.silva | Renovo@123 | Gerente | ✅ Sim |
-| maria.santos | Renovo@123 | Recepção | ✅ Sim |
-| pedro.oliveira | Renovo@123 | Mecânico | ✅ Sim |
-| carlos.ferreira | Renovo@123 | Mecânico | ✅ Sim |
-| ana.costa | Renovo@123 | Almoxarifado | ❌ Não |
+| admin | <senha-do-ambiente-local> | Administrador | ✅ Sim |
+| joao.silva | <senha-do-ambiente-local> | Gerente | ✅ Sim |
+| maria.santos | <senha-do-ambiente-local> | Recepção | ✅ Sim |
+| pedro.oliveira | <senha-do-ambiente-local> | Mecânico | ✅ Sim |
+| carlos.ferreira | <senha-do-ambiente-local> | Mecânico | ✅ Sim |
+| ana.costa | <senha-do-ambiente-local> | Almoxarifado | ❌ Não |
 
 ## 📝 **Próximos Passos**
 

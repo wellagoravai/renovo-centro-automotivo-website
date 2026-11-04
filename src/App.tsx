@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import Services from './pages/Services';
 import Products from './pages/Products';
 import Portal from './pages/Portal';
+import Privacy from './pages/Privacy';
 import Dashboard from './pages/DashboardEnhanced';
 import ServiceOrders from './pages/ServiceOrders';
 import Inventory from './pages/Inventory';
@@ -62,6 +63,7 @@ const AppRoutes: React.FC = () => {
         <Route path="products" element={<Products />} />
         <Route path="contact" element={<Contact />} />
         <Route path="portal" element={<Portal />} />
+        <Route path="privacidade" element={<Privacy />} />
       </Route>
 
       <Route

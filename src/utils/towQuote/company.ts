@@ -23,7 +23,7 @@ export const COMPANY: CompanyInfo = {
   phone: '(18) 3722-2388',
   whatsapp: ['(18) 3722-2388', '(18) 99775-2055', '(18) 99824-2750'],
   email: 'jsbombasinjetoras@gmail.com',
-  website: 'www.renovocentroautomotivo.com.br',
+  website: 'www.renovoautoeguincho.com.br',
   logoUrl: '/assets/logo.png',
 };
 

@@ -25,7 +25,6 @@ export const api = {
   async get(url: string) {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
-    console.log('GET request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -34,7 +33,6 @@ export const api = {
     }
 
     const response = await fetch(fullUrl, { headers });
-    console.log('GET response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -47,7 +45,6 @@ export const api = {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
     const isFormData = data instanceof FormData;
-    console.log('POST request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       // FormData define seu próprio Content-Type (com boundary) — o navegador
       // só faz isso certo se a gente não fixar o header na mão.
@@ -63,7 +60,6 @@ export const api = {
       body: isFormData ? data : JSON.stringify(data),
     });
 
-    console.log('POST response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -77,7 +73,6 @@ export const api = {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
     const isFormData = data instanceof FormData;
-    console.log('PUT request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     };
@@ -91,7 +86,6 @@ export const api = {
       body: isFormData ? data : JSON.stringify(data),
     });
     
-    console.log('PUT response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -104,7 +98,6 @@ export const api = {
   async patch(url: string, data: any) {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
-    console.log('PATCH request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -118,7 +111,6 @@ export const api = {
       body: JSON.stringify(data),
     });
     
-    console.log('PATCH response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -131,7 +123,6 @@ export const api = {
   async delete(url: string) {
     const fullUrl = buildApiUrl(url, API_URL);
     const token = localStorage.getItem('token');
-    console.log('DELETE request to:', fullUrl, 'Token:', token ? 'Present' : 'Missing');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -144,7 +135,6 @@ export const api = {
       headers,
     });
     
-    console.log('DELETE response status:', response.status);
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

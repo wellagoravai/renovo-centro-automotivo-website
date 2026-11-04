@@ -1,3 +1,6 @@
 .vercel
 .env*
 node_modules
+
+# Saida de build (a Vercel gera a cada deploy)
+build

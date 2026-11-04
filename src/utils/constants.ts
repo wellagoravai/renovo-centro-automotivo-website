@@ -1,6 +1,3 @@
-export const API_BASE_URL = 'https://api.renovocentroautomotivo.com';
-export const PRODUCTS_ENDPOINT = `${API_BASE_URL}/products`;
-export const SERVICES_ENDPOINT = `${API_BASE_URL}/services`;
 export const CONTACT_EMAIL = 'jsbombasinjetoras@gmail.com';
 export const CONTACT_PHONE = '(18) 3722-2388';
 export const WHATSAPP_PHONE_1 = '(18) 99775-2055';

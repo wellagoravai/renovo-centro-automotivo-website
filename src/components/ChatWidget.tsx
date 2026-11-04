@@ -428,6 +428,10 @@ const ChatWidget: React.FC = () => {
                 value={leadForm.details}
                 onChange={handleLeadChange}
               />
+              <p className="privacy-notice">
+                Seus dados serão abertos no WhatsApp para você enviar. Veja a{' '}
+                <a href="/privacidade" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.
+              </p>
               <div className="lead-form-actions">
                 <button
                   type="button"

@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Disallow: /portal
+Disallow: /login
+Disallow: /dashboard
+Disallow: /new-service-order
+Disallow: /service-orders
+Disallow: /orcamentos
+Disallow: /orcamentos-guincho
+Disallow: /orcamentos-empilhadeira
+Disallow: /guincho
+Disallow: /custos-viagem
+Disallow: /vehicles
+Disallow: /inventory
+Disallow: /customers
+Disallow: /users
+Disallow: /reports
+Disallow: /settings
+
+Sitemap: https://renovoautoeguincho.com.br/sitemap.xml

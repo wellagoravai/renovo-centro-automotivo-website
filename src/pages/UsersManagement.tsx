@@ -316,6 +316,7 @@ const UsersManagement: React.FC = () => {
                 <label>{editingUser ? 'Nova Senha (deixe em branco para manter)' : 'Senha *'}</label>
                 <input
                   type="password"
+                  minLength={8}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required={!editingUser}
@@ -326,6 +327,7 @@ const UsersManagement: React.FC = () => {
                   <label>Confirmar Senha *</label>
                   <input
                     type="password"
+                    minLength={8}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required

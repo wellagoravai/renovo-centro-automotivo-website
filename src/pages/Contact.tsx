@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Contact.css';
 import { CONTACT_EMAIL, CONTACT_PHONE, WHATSAPP_PHONE_1, WHATSAPP_PHONE_2, ADDRESS } from '../utils/constants';
 
@@ -7,7 +8,6 @@ const toWhatsappLink = (phone: string) => `https://wa.me/55${phone.replace(/\D/g
 const Contact: React.FC = () => {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
         phone: '',
         message: '',
     });
@@ -19,10 +19,14 @@ const Contact: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        // Aqui você pode adicionar a lógica para enviar o formulário
-        alert('Obrigado por sua mensagem! Em breve entraremos em contato!');
-        setFormData({ name: '', email: '', phone: '', message: '' });
+        const text = [
+            'Olá! Vim pelo formulário de contato do site.',
+            `Nome: ${formData.name}`,
+            `Telefone: ${formData.phone}`,
+            `Mensagem: ${formData.message}`,
+        ].join('\n');
+        window.open(`${toWhatsappLink(CONTACT_PHONE)}?text=${encodeURIComponent(text)}`, '_blank');
+        setFormData({ name: '', phone: '', message: '' });
     };
 
     return (
@@ -100,26 +104,14 @@ const Contact: React.FC = () => {
                                 </div>
 
                                 <div className="form-group">
-                                    <label htmlFor="email">Email *</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                        placeholder="seu.email@exemplo.com"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="phone">Telefone</label>
+                                    <label htmlFor="phone">Telefone *</label>
                                     <input
                                         type="tel"
                                         id="phone"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
+                                        required
                                         placeholder="(18) 9 XXXX-XXXX"
                                     />
                                 </div>
@@ -137,7 +129,11 @@ const Contact: React.FC = () => {
                                     ></textarea>
                                 </div>
 
-                                <button type="submit" className="button">Enviar Mensagem</button>
+                                <p className="privacy-notice">
+                                    Ao continuar, sua mensagem será aberta no WhatsApp para você enviar.
+                                    Veja a <Link to="/privacidade">Política de Privacidade</Link>.
+                                </p>
+                                <button type="submit" className="button">Enviar pelo WhatsApp</button>
                             </form>
                         </div>
                     </div>

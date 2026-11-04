@@ -47,7 +47,7 @@ Após o deploy, clique no projeto e vá em **"Variables"**:
 Adicione estas variáveis:
 
 ```
-Jwt:Key=RenovoWorkshop-Development-Key-123456
+Jwt__Key=<gere-uma-chave-aleatoria-de-64-caracteres>
 Jwt:Issuer=RenovoWorkshop
 Jwt:Audience=RenovoWorkshopUsers
 ASPNETCORE_ENVIRONMENT=Production
@@ -112,7 +112,7 @@ REACT_APP_API_URL=https://renovo-workshop-api-production.up.railway.app
 1. Acesse o frontend no Vercel
 2. Tente fazer login com:
    - **Usuário**: `admin`
-   - **Senha**: `admin123`
+   - **Senha**: `<senha-do-ambiente-local>`
 3. Verifique se as APIs estão funcionando
 
 ---
@@ -133,7 +133,7 @@ Você deve ver a documentação Swagger da API.
 ```bash
 curl -X POST https://renovo-workshop-api-production.up.railway.app/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"<senha-do-ambiente-local>"}'
 ```
 
 Deve retornar um token JWT.
