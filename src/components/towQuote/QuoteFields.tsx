@@ -104,7 +104,7 @@ export const QuoteStatusBanner: React.FC<{ quote: TowQuote }> = ({ quote }) => (
     <span className="status-badge" style={{ backgroundColor: quoteStatusColors[quote.status] }}>{quote.status}</span>
     <span className="hint">
       {quote.status === 'Aprovado' && quote.serviceOrderId && (
-        <>OS <Link to={`/service-orders/${quote.serviceOrderId}`}>{quote.serviceOrderNumber ?? 'aberta'}</Link> · alterações não são mais salvas</>
+        <>OS <Link to={`/service-orders/${quote.serviceOrderId}`}>{quote.serviceOrderNumber ?? 'aberta'}</Link> · dá para alterar: o novo valor vai também para a OS</>
       )}
       {quote.status === 'Recusado' && 'Gerar um novo PDF volta o orçamento para pendente.'}
       {quote.status === 'Pendente' && `Salvo em ${new Date(quote.updatedAt).toLocaleString('pt-BR')}`}

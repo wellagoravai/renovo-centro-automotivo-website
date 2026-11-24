@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { InvoiceFields, PaymentFields, QuoteStatusBanner, TextField } from '../components/towQuote/QuoteFields';
 import {
   EMPTY_INVOICE,
+  agreementLine,
   PAYMENT_METHODS,
   describePayment,
   errorMessage,
@@ -13,7 +14,10 @@ import {
   type InvoiceData,
 } from '../utils/towQuote/quoteForm';
 import { useAuth } from '../hooks/useAuth';
-import { useSavedQuote } from '../hooks/useSavedQuote';
+import { useQuoteFormKey } from '../hooks/useQuoteFormKey';
+import DraftNotice from '../components/DraftNotice';
+import { useFormDraft } from '../hooks/useFormDraft';
+import { SaveCancelledError, useSavedQuote } from '../hooks/useSavedQuote';
 import { formatCpfCnpj } from '../utils/helpers';
 import { api } from '../utils/towQuote/towApi';
 import type { CreatedServiceOrder, TowQuote } from '../utils/towQuote/types';
@@ -64,7 +68,7 @@ const EMPTY_TRANSPORT = { included: true, value: '' };
 // Orçamento de locação de empilhadeira (hora, diária, mês ou contrato por
 // período). Faz parte do serviço de guincho: o guincho leva a empilhadeira, e o
 // aprovado vira OS de guincho. Valores digitados à mão por enquanto.
-const ForkliftQuoteEditor: React.FC = () => {
+const ForkliftQuoteEditorForm: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id: routeQuoteId } = useParams();
@@ -109,7 +113,7 @@ const ForkliftQuoteEditor: React.FC = () => {
     if (data.notes !== undefined) setNotes(data.notes);
   };
 
-  const { savedQuote, loadingQuote, loadError, isApproved, rejecting, saveQuote, storePdf, downloadSavedPdf, rejectQuote, markApproved } =
+  const { savedQuote, loadingQuote, loadError, isApproved, rejecting, savingApproved, saveQuote, saveApproved, storePdf, downloadSavedPdf, rejectQuote, markApproved } =
     useSavedQuote<ForkliftFormData>(routeQuoteId, FORKLIFT_QUOTES_PATH, applyFormData);
 
   const isPeriod = rental.mode === 'Período';
@@ -150,6 +154,30 @@ const ForkliftQuoteEditor: React.FC = () => {
     notes,
   });
 
+  const draft = useFormDraft<ForkliftFormData>(routeQuoteId ? null : 'orcamento-empilhadeira', formSnapshot(), applyFormData);
+
+  // Acordo gravado nas observações da OS (menos a nota fiscal e as observações livres).
+  const agreementLines = (quoteNumber?: string) => [
+    agreementLine(`Orçamento ${quoteNumber ? `${quoteNumber} ` : ''}de locação de empilhadeira aprovado`, formatCurrency(price.total)),
+    agreementLine('Equipamento', [equipment.model.trim() || FORKLIFT_LABEL, equipment.capacity.trim(), equipment.operator].filter(Boolean).join(' · ')),
+    {
+      label: 'Contrato por período',
+      text: isPeriod ? `Contrato por período${periodText ? ` (${periodText})` : ''}: ${formatCurrency(price.rentalValue)}` : null,
+    },
+    agreementLine(
+      'Locação',
+      !isPeriod && `${describeQuantity(rental.mode, price.quantity)} x ${formatCurrency(unitValue ?? 0)} = ${formatCurrency(price.rentalValue)}` +
+        (periodText ? ` · ${periodText}` : ''),
+    ),
+    agreementLine(
+      'Paletes',
+      palletCount && palletCount.toLocaleString('pt-BR') +
+        (price.palletsValue > 0 ? ` x ${formatCurrency(pricePerPallet ?? 0)} = ${formatCurrency(price.palletsValue)}` : ''),
+    ),
+    agreementLine(TRANSPORT_DESCRIPTION, transport.included && (price.transportValue > 0 ? formatCurrency(price.transportValue) : 'a consultar')),
+    agreementLine('Pagamento', paymentTerms),
+  ];
+
   const saveForkliftQuote = () => saveQuote({
     customerName: customer.name.trim(),
     customerPhone: customer.phone,
@@ -159,6 +187,7 @@ const ForkliftQuoteEditor: React.FC = () => {
     totalKm: null,
     total: price.total,
     formData: JSON.stringify(formSnapshot()),
+    orderSync: { agreementLines: agreementLines(savedQuote?.number) },
   });
 
   const handleGeneratePdf = async () => {
@@ -177,6 +206,7 @@ const ForkliftQuoteEditor: React.FC = () => {
       try {
         quote = await saveForkliftQuote();
       } catch (error) {
+        if (error instanceof SaveCancelledError) return;
         warnings.push(`O orçamento não foi salvo no histórico: ${errorMessage(error, 'erro desconhecido')}`);
       }
       const number = quote?.number
@@ -242,16 +272,7 @@ const ForkliftQuoteEditor: React.FC = () => {
 
     const invoiceData = invoiceLines(invoice);
     const agreement = [
-      `Orçamento ${quote ? `${quote.number} ` : ''}de locação de empilhadeira aprovado: ${formatCurrency(price.total)}`,
-      `Equipamento: ${[equipment.model.trim() || FORKLIFT_LABEL, equipment.capacity.trim(), equipment.operator].filter(Boolean).join(' · ')}`,
-      isPeriod
-        ? `Contrato por período${periodText ? ` (${periodText})` : ''}: ${formatCurrency(price.rentalValue)}`
-        : `Locação: ${describeQuantity(rental.mode, price.quantity)} x ${formatCurrency(unitValue ?? 0)} = ${formatCurrency(price.rentalValue)}` +
-          (periodText ? ` · ${periodText}` : ''),
-      palletCount && `Paletes: ${palletCount.toLocaleString('pt-BR')}` +
-        (price.palletsValue > 0 ? ` x ${formatCurrency(pricePerPallet ?? 0)} = ${formatCurrency(price.palletsValue)}` : ''),
-      transport.included && `${TRANSPORT_DESCRIPTION}: ${price.transportValue > 0 ? formatCurrency(price.transportValue) : 'a consultar'}`,
-      paymentTerms && `Pagamento: ${paymentTerms}`,
+      ...agreementLines(quote?.number).map((line) => line.text),
       invoiceData.length > 0 && `Dados para nota fiscal:\n${invoiceData.join('\n')}`,
       notes.trim() && `Observações: ${notes.trim()}`,
     ].filter(Boolean).join('\n');
@@ -292,6 +313,7 @@ const ForkliftQuoteEditor: React.FC = () => {
         },
       });
 
+      draft.clear();
       if (quote) await markApproved(quote, order.id, order.number);
       navigate(`/service-orders/${order.id}`);
     } catch (error) {
@@ -311,6 +333,7 @@ const ForkliftQuoteEditor: React.FC = () => {
       {loadingQuote && <p className="hint">Carregando orçamento...</p>}
       {loadError && <p className="error-text">{loadError}</p>}
       {savedQuote && <QuoteStatusBanner quote={savedQuote} />}
+      <DraftNotice visible={draft.restored} onDiscard={draft.discard} />
 
       {/* No computador as etapas ficam lado a lado: o orçamento inteiro numa tela. */}
       <div className="tq-columns">
@@ -471,6 +494,11 @@ const ForkliftQuoteEditor: React.FC = () => {
         />
       </div>
 
+      {isApproved && savedQuote?.serviceOrderId && (
+        <button type="button" className="btn-primary btn-generate-pdf" onClick={() => saveApproved(saveForkliftQuote)} disabled={savingApproved || generatingPdf || loadingQuote}>
+          {savingApproved ? 'Salvando...' : '💾 Salvar alterações no orçamento e na OS'}
+        </button>
+      )}
       <button type="button" className="btn-primary btn-generate-pdf" onClick={handleGeneratePdf} disabled={generatingPdf}>
         {generatingPdf ? 'Gerando PDF...' : '📄 Gerar orçamento em PDF'}
       </button>
@@ -492,12 +520,19 @@ const ForkliftQuoteEditor: React.FC = () => {
         </button>
       )}
       <p className="hint" style={{ textAlign: 'center' }}>
-        Quando o cliente aprovar, abra a OS: os dados deste orçamento já vão preenchidos.
+        {isApproved
+          ? 'Mudou o valor depois de aprovado? Altere os campos e toque em Salvar alterações.'
+          : 'Quando o cliente aprovar, abra a OS: os dados deste orçamento já vão preenchidos.'}
       </p>
       </section>
       </div>
     </div>
   );
+};
+
+const ForkliftQuoteEditor: React.FC = () => {
+  const { id } = useParams();
+  return <ForkliftQuoteEditorForm key={useQuoteFormKey(id)} />;
 };
 
 export default ForkliftQuoteEditor;

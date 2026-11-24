@@ -5,6 +5,7 @@ import PlaceSearchField, { placeLabel, type FoundPlace } from '../components/tow
 import { InvoiceFields, PaymentFields, QuoteStatusBanner, TextField } from '../components/towQuote/QuoteFields';
 import {
   EMPTY_INVOICE,
+  agreementLine,
   PAYMENT_METHODS,
   UF_LIST,
   describePayment,
@@ -17,7 +18,10 @@ import {
 import { api } from '../utils/towQuote/towApi';
 import { fetchFipeBrands, fetchFipeModels, type FipeOption } from '../utils/towQuote/fipe';
 import { useAuth } from '../hooks/useAuth';
-import { useSavedQuote } from '../hooks/useSavedQuote';
+import { useQuoteFormKey } from '../hooks/useQuoteFormKey';
+import DraftNotice from '../components/DraftNotice';
+import { useFormDraft } from '../hooks/useFormDraft';
+import { SaveCancelledError, useSavedQuote } from '../hooks/useSavedQuote';
 import type { CreatedServiceOrder, TowQuote } from '../utils/towQuote/types';
 import { formatPlate } from '../utils/towQuote/plate';
 import { formatCpfCnpj } from '../utils/helpers';
@@ -153,7 +157,7 @@ interface FreightLegResult {
   pedagioIndisponivel: boolean;
 }
 
-const TowQuoteEditor: React.FC = () => {
+const TowQuoteEditorForm: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id: routeQuoteId } = useParams();
@@ -297,7 +301,7 @@ const TowQuoteEditor: React.FC = () => {
   };
 
   // Reabrindo um orçamento salvo (/quotes/:id): preenche o formulário inteiro.
-  const { savedQuote, loadingQuote, loadError, isApproved, rejecting, saveQuote: saveRecord, storePdf, downloadSavedPdf, rejectQuote, markApproved } =
+  const { savedQuote, loadingQuote, loadError, isApproved, rejecting, savingApproved, saveQuote: saveRecord, saveApproved, storePdf, downloadSavedPdf, rejectQuote, markApproved } =
     useSavedQuote<QuoteFormData>(routeQuoteId, TOW_QUOTES_PATH, applyFormData);
 
   const updateStop = (id: number, patch: Partial<RouteStop>) => {
@@ -465,6 +469,24 @@ const TowQuoteEditor: React.FC = () => {
     notes,
   });
 
+  const draft = useFormDraft<QuoteFormData>(routeQuoteId ? null : 'orcamento-guincho', formSnapshot(), applyFormData);
+
+  // Acordo gravado nas observações da OS (menos a nota fiscal e as observações livres).
+  const agreementLines = (quoteNumber?: string) => [
+    agreementLine(
+      `Orçamento ${quoteNumber ? `${quoteNumber} ` : ''}aprovado`,
+      formatCurrency(price.total) +
+        (price.complete ? ` (saída ${formatCurrency(truckDepartureValue)} + ${price.excessKm} km excedentes x ${formatCurrency(pricePerKmValue ?? 0)}` +
+          (price.tollsValue > 0 ? ` + pedágios ${formatCurrency(price.tollsValue)} c/ 5% de reserva` : '') + ')' : '') +
+        (manualRoute ? ' · KM e pedágio informados manualmente' : ''),
+    ),
+    agreementLine('Tipo de guincho', service.towType + (service.serviceDate ? ` · Data do serviço: ${service.serviceDate.split('-').reverse().join('/')}` : '')),
+    agreementLine('Protocolo/OS da assistência', assistance.protocol),
+    agreementLine('Solicitante', [assistance.requesterName, assistance.requesterPhone].filter(Boolean).join(' - ')),
+    agreementLine('Rota', filledSteps.map((step) => `${step.label}: ${step.place}`).join(' → ')),
+    agreementLine('Pagamento', paymentTerms),
+  ];
+
   const saveQuote = () => saveRecord({
     customerName: customer.name.trim(),
     customerPhone: customer.phone,
@@ -474,6 +496,15 @@ const TowQuoteEditor: React.FC = () => {
     totalKm: totalKmValue,
     total: price.total,
     formData: JSON.stringify(formSnapshot()),
+    orderSync: {
+      agreementLines: agreementLines(savedQuote?.number),
+      route: {
+        pricePerKm: pricePerKmValue,
+        axleCount: axleCount ? Number(axleCount) : null,
+        distanceKm: totalKmValue,
+        tollsValue: price.tollsValue || null,
+      },
+    },
   });
 
   const handleGeneratePdf = async () => {
@@ -494,6 +525,7 @@ const TowQuoteEditor: React.FC = () => {
       try {
         quote = await saveQuote();
       } catch (error) {
+        if (error instanceof SaveCancelledError) return;
         warnings.push(`O orçamento não foi salvo no histórico: ${errorMessage(error, 'erro desconhecido')}`);
       }
       const number = quote?.number
@@ -579,16 +611,7 @@ const TowQuoteEditor: React.FC = () => {
     const invoiceData = invoiceLines(invoice);
 
     const agreement = [
-      `Orçamento ${quote ? `${quote.number} ` : ''}aprovado: ${formatCurrency(price.total)}` +
-        (price.complete ? ` (saída ${formatCurrency(truckDepartureValue)} + ${price.excessKm} km excedentes x ${formatCurrency(pricePerKmValue ?? 0)}` +
-          (price.tollsValue > 0 ? ` + pedágios ${formatCurrency(price.tollsValue)} c/ 5% de reserva` : '') + ')' : '') +
-        (manualRoute ? ' · KM e pedágio informados manualmente' : ''),
-      `Tipo de guincho: ${service.towType}` + (service.serviceDate ? ` · Data do serviço: ${service.serviceDate.split('-').reverse().join('/')}` : ''),
-      assistance.protocol && `Protocolo/OS da assistência: ${assistance.protocol}`,
-      (assistance.requesterName || assistance.requesterPhone) &&
-        `Solicitante: ${[assistance.requesterName, assistance.requesterPhone].filter(Boolean).join(' - ')}`,
-      `Rota: ${filledSteps.map((step) => `${step.label}: ${step.place}`).join(' → ')}`,
-      paymentTerms && `Pagamento: ${paymentTerms}`,
+      ...agreementLines(quote?.number).map((line) => line.text),
       invoiceData.length > 0 && `Dados para nota fiscal:\n${invoiceData.join('\n')}`,
       notes.trim() && `Observações: ${notes.trim()}`,
     ].filter(Boolean).join('\n');
@@ -636,6 +659,7 @@ const TowQuoteEditor: React.FC = () => {
         },
       });
 
+      draft.clear();
       if (quote) await markApproved(quote, order.id, order.number);
       navigate(`/service-orders/${order.id}`);
     } catch (error) {
@@ -655,6 +679,7 @@ const TowQuoteEditor: React.FC = () => {
       {loadingQuote && <p className="hint">Carregando orçamento...</p>}
       {loadError && <p className="error-text">{loadError}</p>}
       {savedQuote && <QuoteStatusBanner quote={savedQuote} />}
+      <DraftNotice visible={draft.restored} onDiscard={draft.discard} />
 
       {/* No computador as etapas ficam lado a lado: o orçamento inteiro numa tela. */}
       <div className="tq-columns">
@@ -987,6 +1012,11 @@ const TowQuoteEditor: React.FC = () => {
         />
       </div>
 
+      {isApproved && savedQuote?.serviceOrderId && (
+        <button type="button" className="btn-primary btn-generate-pdf" onClick={() => saveApproved(saveQuote)} disabled={savingApproved || generatingPdf || loadingQuote}>
+          {savingApproved ? 'Salvando...' : '💾 Salvar alterações no orçamento e na OS'}
+        </button>
+      )}
       <button type="button" className="btn-primary btn-generate-pdf" onClick={handleGeneratePdf} disabled={generatingPdf}>
         {generatingPdf ? 'Gerando PDF...' : '📄 Gerar orçamento em PDF'}
       </button>
@@ -1008,12 +1038,19 @@ const TowQuoteEditor: React.FC = () => {
         </button>
       )}
       <p className="hint" style={{ textAlign: 'center' }}>
-        Quando o cliente aprovar, abra a OS: os dados deste orçamento já vão preenchidos.
+        {isApproved
+          ? 'Mudou o valor depois de aprovado? Altere os campos e toque em Salvar alterações.'
+          : 'Quando o cliente aprovar, abra a OS: os dados deste orçamento já vão preenchidos.'}
       </p>
       </section>
       </div>
     </div>
   );
+};
+
+const TowQuoteEditor: React.FC = () => {
+  const { id } = useParams();
+  return <TowQuoteEditorForm key={useQuoteFormKey(id)} />;
 };
 
 export default TowQuoteEditor;

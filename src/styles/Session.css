@@ -1,0 +1,109 @@
+/* Sessão vencida (ReauthModal) e rascunho recuperado (DraftNotice) */
+.reauth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.reauth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.reauth-card h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.reauth-card p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #1f2937;
+}
+
+.reauth-card label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.reauth-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.reauth-card .reauth-error {
+  color: #a30000;
+}
+
+.reauth-card button {
+  min-height: 44px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reauth-card button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reauth-confirm {
+  border: none;
+  background: #cc0000;
+  color: #ffffff;
+}
+
+.reauth-leave {
+  border: 1px solid #9ca3af;
+  background: transparent;
+  color: #1f2937;
+}
+
+.draft-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #d4a017;
+  border-left-width: 4px;
+  border-radius: 6px;
+  background: #fff8e1;
+  color: #5c4400;
+  font-size: 14px;
+}
+
+.draft-notice button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #5c4400;
+  border-radius: 6px;
+  background: transparent;
+  color: #5c4400;
+  font-size: 14px;
+  cursor: pointer;
+}

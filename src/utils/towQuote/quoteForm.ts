@@ -75,3 +75,15 @@ export const invoiceLines = (invoice: InvoiceData) => [
   invoice.email && `E-mail: ${invoice.email}`,
   invoice.phone && `Telefone: ${invoice.phone}`,
 ].filter(Boolean) as string[];
+
+// Linha "Rótulo: valor" do acordo gravado nas observações da OS. O rótulo é fixo para o
+// servidor achar e trocar a linha quando um orçamento aprovado muda; texto nulo = sem linha.
+export interface AgreementLine {
+  label: string;
+  text: string | null;
+}
+
+export const agreementLine = (label: string, value: string | number | false | null | undefined): AgreementLine => ({
+  label,
+  text: value ? `${label}: ${value}` : null,
+});

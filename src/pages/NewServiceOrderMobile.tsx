@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import DraftNotice from '../components/DraftNotice';
+import { useFormDraft } from '../hooks/useFormDraft';
 import { formatCpfCnpj, formatPlate, validateCpfOrCnpj } from '../utils/helpers';
 import FreightQuoteCalculator, { emptyFreightQuoteValue } from '../components/FreightQuoteCalculator';
 import { TOW_QUOTES_PATH } from '../utils/towQuote/quoteKind';
@@ -84,8 +86,6 @@ interface ServiceOrderDraft {
   towDetails: TowDetailsData;
 }
 
-const DRAFT_STORAGE_KEY = 'renovo:newServiceOrderDraft';
-
 const NewServiceOrderMobile: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -136,29 +136,26 @@ const NewServiceOrderMobile: React.FC = () => {
   const [customerChecked, setCustomerChecked] = useState(false);
   const [customerFound, setCustomerFound] = useState(false);
 
-  // Restaura o rascunho salvo antes de mandar o operador cadastrar o cliente (ver
-  // handleGoRegisterCustomer) e já reverifica o documento — a essa altura o cliente
-  // deve existir de verdade, cadastrado na tela de Clientes.
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
-      if (!raw) return;
-      sessionStorage.removeItem(DRAFT_STORAGE_KEY);
-      const draft: ServiceOrderDraft = JSON.parse(raw);
-      setServiceType(draft.serviceType);
-      setCustomer(draft.customer);
-      setVehicle(draft.vehicle);
-      setServiceOrder(draft.serviceOrder);
-      setTowDetails(draft.towDetails);
-      setCurrentStep(draft.currentStep);
-      if (draft.customer.document) {
-        checkCustomerDocument(draft.customer.document);
+  // Rascunho gravado enquanto se digita: volta se a página recarregar, se a sessão cair
+  // ou depois de ir à tela de Clientes cadastrar o cliente (ver handleGoRegisterCustomer).
+  // Ao restaurar reverifica o documento: o cliente pode ter sido cadastrado nesse meio-tempo.
+  const draft = useFormDraft<ServiceOrderDraft>(
+    'nova-os',
+    { currentStep, serviceType, customer, vehicle: { ...vehicle, photos: [] }, serviceOrder, towDetails },
+    (data) => {
+      setServiceType(data.serviceType);
+      setCustomer(data.customer);
+      setVehicle(data.vehicle);
+      setServiceOrder(data.serviceOrder);
+      setTowDetails(data.towDetails);
+      setCurrentStep(data.currentStep);
+      setCustomerChecked(false);
+      setCustomerFound(false);
+      if (data.customer.document) {
+        checkCustomerDocument(data.customer.document);
       }
-    } catch (error) {
-      console.error('Erro ao restaurar rascunho da OS:', error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  );
 
   const checkCustomerDocument = async (documentToCheck: string) => {
     const trimmedDocument = documentToCheck.trim();
@@ -202,23 +199,10 @@ const NewServiceOrderMobile: React.FC = () => {
   };
 
   // Cliente com esse CPF/CNPJ ainda não existe: em vez de criar um cadastro
-  // incompleto na hora, guarda o progresso do wizard e manda o operador cadastrar
+  // incompleto na hora, manda o operador cadastrar
   // o cliente de verdade na tela de Clientes. A OS só é criada de fato depois que
   // o operador volta pra cá e o documento é reverificado com sucesso.
   const handleGoRegisterCustomer = () => {
-    const draft: ServiceOrderDraft = {
-      currentStep,
-      serviceType,
-      customer,
-      vehicle: { ...vehicle, photos: [] },
-      serviceOrder,
-      towDetails,
-    };
-    try {
-      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-    } catch (error) {
-      console.error('Erro ao salvar rascunho da OS:', error);
-    }
     const trimmedDocument = customer.document.trim();
     navigate(`/customers?new=1&document=${encodeURIComponent(trimmedDocument)}&returnTo=${encodeURIComponent('/new-service-order')}`);
   };
@@ -367,6 +351,7 @@ const NewServiceOrderMobile: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
+        draft.clear();
         alert('✅ Ordem de serviço criada com sucesso!');
         navigate(`/service-orders/${data.id}`);
       } else {
@@ -766,6 +751,8 @@ const NewServiceOrderMobile: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <DraftNotice visible={draft.restored} onDiscard={draft.discard} photosLost />
 
       {renderActions('top')}
 

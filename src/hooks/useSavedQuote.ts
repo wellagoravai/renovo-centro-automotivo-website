@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/towQuote/towApi';
 import type { TowQuote } from '../utils/towQuote/types';
 import { shareOrDownloadPdf } from '../utils/towQuote/pdfKit';
-import { errorMessage } from '../utils/towQuote/quoteForm';
+import { errorMessage, AgreementLine } from '../utils/towQuote/quoteForm';
 
 // Corpo de POST/PUT /tow-quotes (formData = formulário inteiro serializado pelo app).
 export interface SaveQuoteBody {
@@ -15,6 +15,28 @@ export interface SaveQuoteBody {
   totalKm: number | null;
   total: number;
   formData: string;
+  // Só vai para o servidor quando o orçamento já foi aprovado: atualiza a OS junto.
+  orderSync: OrderSync;
+}
+
+export interface OrderSync {
+  agreementLines: AgreementLine[];
+  // Ausente na locação de empilhadeira.
+  route?: {
+    pricePerKm: number | null;
+    axleCount: number | null;
+    distanceKm: number | null;
+    tollsValue: number | null;
+  };
+}
+
+// O usuário desistiu de alterar um orçamento aprovado: não é falha.
+export class SaveCancelledError extends Error {
+  constructor() {
+    super('Alteração cancelada.');
+    // Necessário para o instanceof quando o build é ES5.
+    Object.setPrototypeOf(this, SaveCancelledError.prototype);
+  }
 }
 
 // Ciclo de vida de um orçamento salvo no histórico (/tow-quotes), comum ao
@@ -26,6 +48,7 @@ export function useSavedQuote<T>(routeQuoteId: string | undefined, basePath: str
   const [loadingQuote, setLoadingQuote] = useState(Boolean(routeQuoteId));
   const [loadError, setLoadError] = useState('');
   const [rejecting, setRejecting] = useState(false);
+  const [savingApproved, setSavingApproved] = useState(false);
   // Id que já está no formulário: evita recarregar do servidor quando a própria
   // tela troca /new por /:id depois de salvar.
   const loadedQuoteId = useRef<string | null>(null);
@@ -51,13 +74,21 @@ export function useSavedQuote<T>(routeQuoteId: string | undefined, basePath: str
 
   const isApproved = savedQuote?.status === 'Aprovado';
 
-  // Cria (1ª vez) ou atualiza o orçamento no histórico. Orçamento aprovado não é
-  // mais alterado — o que vale a partir daí é a OS.
-  const saveQuote = async (body: SaveQuoteBody): Promise<TowQuote> => {
-    if (savedQuote && isApproved) return savedQuote;
+  // Cria (1ª vez) ou atualiza o orçamento no histórico. Já aprovado, a alteração
+  // também vai para a OS aberta a partir dele, por isso pede confirmação.
+  const saveQuote = async ({ orderSync, ...body }: SaveQuoteBody): Promise<TowQuote> => {
+    if (savedQuote && isApproved) {
+      const changed = body.formData !== savedQuote.formData || body.total !== savedQuote.total;
+      if (!changed) return savedQuote;
+      const order = `OS ${savedQuote.serviceOrderNumber ?? ''}`.trim();
+      const value = body.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      if (!window.confirm(`Este orçamento já foi aprovado. Salvar a alteração e atualizar também a ${order}? Novo valor: ${value}.`)) {
+        throw new SaveCancelledError();
+      }
+    }
 
     const saved = savedQuote
-      ? await api.put<TowQuote>(`/tow-quotes/${savedQuote.id}`, body)
+      ? await api.put<TowQuote>(`/tow-quotes/${savedQuote.id}`, isApproved ? { ...body, orderSync } : body)
       : await api.post<TowQuote>('/tow-quotes', body);
     setSavedQuote(saved);
     if (!savedQuote) {
@@ -69,7 +100,6 @@ export function useSavedQuote<T>(routeQuoteId: string | undefined, basePath: str
 
   // Guarda o mesmo PDF enviado ao cliente. Devolve o aviso de erro, se houver.
   const storePdf = async (quote: TowQuote, blob: Blob, fileName: string): Promise<string | null> => {
-    if (isApproved) return null;
     try {
       const form = new FormData();
       form.append('file', blob, fileName);
@@ -103,6 +133,19 @@ export function useSavedQuote<T>(routeQuoteId: string | undefined, basePath: str
     }
   };
 
+  // Botão "Salvar alterações" do orçamento aprovado.
+  const saveApproved = async (save: () => Promise<TowQuote>) => {
+    setSavingApproved(true);
+    try {
+      const quote = await save();
+      alert(`Alterações salvas no orçamento e na OS ${quote.serviceOrderNumber ?? ''}`.trim() + '. Gere o PDF de novo para enviar o valor atualizado ao cliente.');
+    } catch (error) {
+      if (!(error instanceof SaveCancelledError)) alert(errorMessage(error, 'Não foi possível salvar as alterações.'));
+    } finally {
+      setSavingApproved(false);
+    }
+  };
+
   const markApproved = async (quote: TowQuote, serviceOrderId: string, serviceOrderNumber: string) => {
     try {
       setSavedQuote(await api.post<TowQuote>(`/tow-quotes/${quote.id}/approve`, { serviceOrderId }));
@@ -125,7 +168,9 @@ export function useSavedQuote<T>(routeQuoteId: string | undefined, basePath: str
     loadError,
     isApproved,
     rejecting,
+    savingApproved,
     saveQuote,
+    saveApproved,
     storePdf,
     downloadSavedPdf,
     rejectQuote,
