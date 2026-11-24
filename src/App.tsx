@@ -13,6 +13,8 @@ import Services from './pages/Services';
 import Products from './pages/Products';
 import Portal from './pages/Portal';
 import Privacy from './pages/Privacy';
+import TowService from './pages/TowService';
+import { useCanonical } from './hooks/usePageMeta';
 import Dashboard from './pages/DashboardEnhanced';
 import ServiceOrders from './pages/ServiceOrders';
 import Inventory from './pages/Inventory';
@@ -43,15 +45,19 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-const PublicLayout: React.FC = () => (
-  <div className="public-layout">
-    <Header />
-    <main>
-      <Outlet />
-    </main>
-    <Footer />
-  </div>
-);
+const PublicLayout: React.FC = () => {
+  useCanonical();
+
+  return (
+    <div className="public-layout">
+      <Header />
+      <main>
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 const AppRoutes: React.FC = () => {
   return (
@@ -60,6 +66,8 @@ const AppRoutes: React.FC = () => {
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
         <Route path="services" element={<Services />} />
+        {/* Não pode começar com /guincho: o robots.txt bloqueia esse prefixo (rota do painel). */}
+        <Route path="servico-de-guincho-andradina" element={<TowService />} />
         <Route path="products" element={<Products />} />
         <Route path="contact" element={<Contact />} />
         <Route path="portal" element={<Portal />} />

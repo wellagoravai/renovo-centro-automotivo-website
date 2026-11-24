@@ -18,7 +18,7 @@ export interface CompanyInfo {
 export const COMPANY: CompanyInfo = {
   name: 'Renovo Centro Automotivo',
   cnpj: '68.699.853/0001-05',
-  address: 'Rua Marechal Deodoro, 2305 - Andradina/SP, 16901-011',
+  address: 'Rua Marechal Deodoro, 2305 - Andradina/SP, 16901-455',
   phone: '(18) 3722-2388',
   whatsapp: ['(18) 3722-2388', '(18) 99775-2055', '(18) 99824-2750'],
   email: 'jsbombasinjetoras@gmail.com',
@@ -32,7 +32,7 @@ export const TOW_COMPANY: CompanyInfo = {
   name: 'Renovo Guincho',
   legalName: 'Marcio Fabricio Silva de Araujo Guinchos Ltda',
   cnpj: '68.699.853/0001-05',
-  address: 'Rua Marechal Deodoro, 2305 - Centro - Andradina/SP, 16901-011',
+  address: 'Rua Marechal Deodoro, 2305 - Andradina/SP, 16901-455',
   phone: COMPANY.phone,
   whatsapp: COMPANY.whatsapp,
   email: COMPANY.email,

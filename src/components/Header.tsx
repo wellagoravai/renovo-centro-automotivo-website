@@ -8,6 +8,7 @@ const Header: React.FC = () => {
 
     const menuItems = [
         { label: 'Serviços', to: '/services' },
+        { label: 'Guincho', to: '/servico-de-guincho-andradina' },
         { label: 'Produtos', to: '/products' },
         { label: 'Sobre', to: '/about' },
         { label: 'Contato', to: '/contact' },

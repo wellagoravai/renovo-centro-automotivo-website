@@ -213,7 +213,7 @@ const Home: React.FC = () => {
                 {/* Location Section */}
                 <section className="location">
                     <h2>Localização</h2>
-                    <p>MARECHAL DEODORO 2305, Andradina/SP 16901-011</p>
+                    <p>MARECHAL DEODORO 2305, Andradina/SP 16901-455</p>
                     <p style={{ fontSize: '0.95rem', color: '#666' }}>
                         ⏰ Seg-Sex: 8h-18h | Sábado: 8h-13h | 💬 Chat: 24h
                     </p>

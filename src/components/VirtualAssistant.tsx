@@ -29,7 +29,7 @@ const VirtualAssistant: React.FC = () => {
 
   const knowledgeBase: Record<string, string> = {
     horario: '⏰ Nosso horário de atendimento é:\n• Segunda a Sexta: 8h às 18h\n• Sábado: 8h às 13h\n• Domingo: Fechado',
-    localizacao: '📍 Estamos localizados em:\nMARECHAL DEODORO 2305\nAndradina/SP 16901-011\n\nVocê pode encontrar nossa localização no mapa na página inicial.',
+    localizacao: '📍 Estamos localizados em:\nMARECHAL DEODORO 2305\nAndradina/SP 16901-455\n\nVocê pode encontrar nossa localização no mapa na página inicial.',
     servicos: '🔧 Oferecemos serviços de:\n• Manutenção preventiva\n• Reparos em geral\n• Diagnóstico completo\n• Peças de reposição\n\nVenha com a Renovo, segurança, confiança e qualidade!',
     manutencao: '🛠️ Manutenção Preventiva:\n• Troca de óleo e filtros\n• Revisão de pastilhas\n• Inspeção completa\n• Alinhamento e balanceamento\n\nAgende sua manutenção agora!',
     pagamento: '💳 Aceitamos:\n• Dinheiro\n• Cartão de crédito\n• Cartão de débito\n• PIX\n\nConsulte-nos sobre condições especiais!',
